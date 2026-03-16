@@ -24,8 +24,8 @@ class ScripturePane(ChordMixin, Widget):
     BINDINGS = [
         Binding("j", "next_verse", "Next verse", show=True),
         Binding("k", "prev_verse", "Prev verse", show=True),
-        Binding("J", "next_chapter", "Next chapter", show=True),
-        Binding("K", "prev_chapter", "Prev chapter", show=True),
+        Binding("J", "prev_chapter", "Prev chapter", show=True),
+        Binding("K", "next_chapter", "Next chapter", show=True),
         Binding("b", "bookmark", "Bookmark", show=True),
         Binding("m", "cycle_highlight", "Highlight", show=True),
         Binding("o", "annotate", "Annotate", show=True),

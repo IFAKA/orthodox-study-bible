@@ -119,3 +119,20 @@ def get_book_info(abbrev: str) -> Optional[tuple]:
 def all_book_abbrevs() -> list[str]:
     """All abbreviations in OSB canonical order."""
     return [e[1] for e in sorted(CANON, key=lambda x: x[0])]
+
+
+def format_ref(ref: str) -> str:
+    """Convert internal ref to human-readable string.
+
+    'GEN-1-1'  → 'Genesis 1:1'
+    'GEN-1'    → 'Genesis 1'
+    'GEN'      → 'Genesis'
+    """
+    parts = ref.split("-")
+    info = get_book_info(parts[0])
+    name = info[2] if info else parts[0]
+    if len(parts) == 3:
+        return f"{name} {parts[1]}:{parts[2]}"
+    if len(parts) == 2:
+        return f"{name} {parts[1]}"
+    return name

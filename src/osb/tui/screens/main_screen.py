@@ -18,6 +18,7 @@ from osb.tui.screens.my_notes_screen import MyNotesScreen
 from osb.tui.screens.search_screen import SearchScreen
 from osb.tui.widgets.app_header import AppHeader
 from osb.tui.widgets.book_tree import BookTree
+from osb.tui.widgets.quit_modal import QuitModal
 from osb.tui.widgets.right_pane import RightPane
 from osb.tui.widgets.scripture_pane import ScripturePane
 
@@ -144,6 +145,11 @@ class MainScreen(Screen):
             sidebar = self.query_one("#sidebar", BookTree)
             if self._sidebar_visible:
                 sidebar.remove_class("hidden")
+                ref = self._current_chapter_ref
+                if ref:
+                    self.call_after_refresh(
+                        lambda r=ref: sidebar.navigate_to_chapter(r)
+                    )
                 self.call_after_refresh(sidebar.focus)
             else:
                 sidebar.add_class("hidden")
@@ -176,7 +182,11 @@ class MainScreen(Screen):
             screen.add_class("sepia")
 
     def action_quit_app(self) -> None:
-        self.app.exit()
+        def _on_confirm(confirmed: bool | None) -> None:
+            if confirmed:
+                self.app.exit()
+
+        self.app.push_screen(QuitModal(), _on_confirm)
 
     def action_focus_scripture(self) -> None:
         try:

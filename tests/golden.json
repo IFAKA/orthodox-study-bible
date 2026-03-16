@@ -1,0 +1,1178 @@
+{
+  "total_verses": 36008,
+  "total_books": 78,
+  "verse_counts": {
+    "GEN": 1531,
+    "EXO": 1171,
+    "LEV": 859,
+    "NUM": 1287,
+    "DEU": 959,
+    "JOS": 660,
+    "JDG": 617,
+    "RUT": 85,
+    "1SA": 774,
+    "2SA": 696,
+    "1KI": 826,
+    "2KI": 723,
+    "1CH": 929,
+    "2CH": 848,
+    "1ES": 434,
+    "EZR": 280,
+    "NEH": 393,
+    "TOB": 248,
+    "JDT": 340,
+    "EST": 172,
+    "1MA": 923,
+    "2MA": 555,
+    "3MA": 227,
+    "PSA": 2534,
+    "JOB": 1080,
+    "PRO": 955,
+    "ECC": 222,
+    "SNG": 117,
+    "WIS": 435,
+    "SIR": 1372,
+    "HOS": 197,
+    "AMO": 145,
+    "MIC": 105,
+    "JOL": 73,
+    "OBA": 21,
+    "JON": 48,
+    "NAH": 47,
+    "HAB": 56,
+    "ZEP": 53,
+    "HAG": 38,
+    "ZEC": 211,
+    "MAL": 55,
+    "ISA": 1290,
+    "JER": 1299,
+    "BAR": 141,
+    "LAM": 150,
+    "LJE": 73,
+    "EZK": 1267,
+    "SUS": 64,
+    "DAN": 424,
+    "BEL": 42,
+    "MAT": 1071,
+    "MRK": 678,
+    "LUK": 1151,
+    "JHN": 879,
+    "ACT": 1007,
+    "ROM": 433,
+    "1CO": 437,
+    "2CO": 257,
+    "GAL": 149,
+    "EPH": 155,
+    "PHP": 104,
+    "COL": 95,
+    "1TH": 89,
+    "2TH": 47,
+    "1TI": 113,
+    "2TI": 83,
+    "TIT": 46,
+    "PHM": 25,
+    "HEB": 303,
+    "JAS": 108,
+    "1PE": 105,
+    "2PE": 61,
+    "1JN": 105,
+    "2JN": 13,
+    "3JN": 14,
+    "JUD": 25,
+    "REV": 404
+  },
+  "samples": {
+    "GEN": [
+      {
+        "ref": "GEN-1-1",
+        "text": "In the beginning God made heaven and earth."
+      },
+      {
+        "ref": "GEN-1-2",
+        "text": "The earth was invisible and unfinished; and darkness was over the deep. The Spirit of God was hovering over the face of the water."
+      },
+      {
+        "ref": "GEN-1-3",
+        "text": "Then God said, “Let there be light”; and there was light."
+      }
+    ],
+    "EXO": [
+      {
+        "ref": "EXO-1-1",
+        "text": "Now these are the names of the children of Israel who came to Egypt; each man and his household came with Jacob:"
+      },
+      {
+        "ref": "EXO-1-2",
+        "text": "Reuben, Simeon, Levi, and Judah;"
+      },
+      {
+        "ref": "EXO-1-3",
+        "text": "Is-sachar, Zebulun, and Benjamin;"
+      }
+    ],
+    "LEV": [
+      {
+        "ref": "LEV-1-1",
+        "text": "Now the Lord called to Moses, and spoke to him from the tabernacle of testimony, saying,"
+      },
+      {
+        "ref": "LEV-1-2",
+        "text": "“Speak to the children of Israel, and say to them, ‘If a man among you should offer gifts to the Lord from the cattle—the oxen or the sheep—you shall offer your gifts."
+      },
+      {
+        "ref": "LEV-1-3",
+        "text": "If his gift should be a whole burnt offering from the oxen, he shall offer a male without blemish. He shall offer it at the door of the tabernacle of testimony as acceptable before the Lord."
+      }
+    ],
+    "NUM": [
+      {
+        "ref": "NUM-1-1",
+        "text": "Now the Lord spoke to Moses in the Wilderness of Sinai in the tabernacle of testimony, on the first day of the second month in the second year after they came out of the land of Egypt, saying,"
+      },
+      {
+        "ref": "NUM-1-2",
+        "text": "“Take a census of all the congregation of the children of Israel, and according to their families by their fathers’ houses, and according to the number of names by their head count, every male"
+      },
+      {
+        "ref": "NUM-1-3",
+        "text": "from twenty years old and above—all who go out with the army of Israel. You and Aaron shall number them by their armies."
+      }
+    ],
+    "DEU": [
+      {
+        "ref": "DEU-1-1",
+        "text": "Now these are the words Moses spoke to all Israel beyond the Jordan in the desert, in the plain opposite Suph, between Paran, Tophel, Laban, Hazeroth, and Dizahab."
+      },
+      {
+        "ref": "DEU-1-2",
+        "text": "It is eleven days’ journey from Horeb by way of Mount Seir to Kadesh Barnea."
+      },
+      {
+        "ref": "DEU-1-3",
+        "text": "Now it came to pass in the fortieth year, in the eleventh month, on the first day of the month, Moses spoke to the sons of Israel according to all the Lord gave him as commandments to them,"
+      }
+    ],
+    "JOS": [
+      {
+        "ref": "JOS-1-1",
+        "text": "After the death of Moses, the Lord spoke to Joshua the son of Nun, the assistant of Moses, saying,"
+      },
+      {
+        "ref": "JOS-1-2",
+        "text": "“Moses my servant is dead. Now therefore arise, you and all this people, and cross over Jordan into the land I will give them."
+      },
+      {
+        "ref": "JOS-1-3",
+        "text": "Every place on which you tread with your feet, I will give it to you, as I said to Moses."
+      }
+    ],
+    "JDG": [
+      {
+        "ref": "JDG-1-1",
+        "text": "After Joshua died, the descendants of Israel asked of the Lord, saying, “Who shall be first to go up for us to fight against the Canaanites?”"
+      },
+      {
+        "ref": "JDG-1-2",
+        "text": "And the Lord said, “Judah shall go up. Indeed, I have delivered the land into his hand.”"
+      },
+      {
+        "ref": "JDG-1-3",
+        "text": "So Judah said to Simeon his brother, “Come up with me to my allotted territory, so that we can stand in battle formation against the Canaanites; and I will go with you to your allotted territory.” And Simeon went with him."
+      }
+    ],
+    "RUT": [
+      {
+        "ref": "RUT-1-1",
+        "text": "In the days of the judges there was a famine in the land. And a man went from Bethlehem of Judah to sojourn in the country of Moab, and his wife and his sons."
+      },
+      {
+        "ref": "RUT-1-2",
+        "text": "The name of the man was Elimelech, the name of his wife was Naomi, and the names of his two sons were Mahlon and Chilion—Ephrathites from Bethlehem of Judah. And they went to the country of Moab and remained there."
+      },
+      {
+        "ref": "RUT-1-3",
+        "text": "Then Elimelech, Naomi's husband, died; and she was left with her two sons."
+      }
+    ],
+    "1SA": [
+      {
+        "ref": "1SA-1-1",
+        "text": "There was a certain man of Ramathaim Zophim, of the mountain of Ephraim, whose name was Elkanah the son of Jeremeel, the son of Elihu, the son of Toke in Nasiv Ephraim."
+      },
+      {
+        "ref": "1SA-1-2",
+        "text": "He had two wives. The name of one was Hannah, and the name of the other was Peninnah. Peninnah had children, but Hannah none."
+      },
+      {
+        "ref": "1SA-1-3",
+        "text": "And each year the man went up from his city of Ramathaim to worship and sacrifice to Lord Sabaoth in Shiloh. Eli and his two sons, Hophni and Phinehas, both priests of the Lord, went there as well."
+      }
+    ],
+    "2SA": [
+      {
+        "ref": "2SA-1-1",
+        "text": "And it happened after the death of Saul, when David had returned from the slaughter of the Amalekites, that David stayed for two days in Ziklag."
+      },
+      {
+        "ref": "2SA-1-2",
+        "text": "And on the third day, behold, a man came from the camp of the people of Saul with his clothes torn and dust on his head. When he came to David, he fell to the ground and prostrated himself."
+      },
+      {
+        "ref": "2SA-1-3",
+        "text": "And David said to him, “Where have you come from?” He answered, “I have escaped from the camp of Israel.”"
+      }
+    ],
+    "1KI": [
+      {
+        "ref": "1KI-1-1",
+        "text": "Now King David was old, advanced in years; and they put covers on him, but he could not get warm."
+      },
+      {
+        "ref": "1KI-1-2",
+        "text": "Therefore his servants said to him, “Let them seek a young woman, a virgin for our lord the king, and she will be beside the king, warming him; she will lie with him, so our lord the king will be warm.”"
+      },
+      {
+        "ref": "1KI-1-3",
+        "text": "So they sought for a beautiful young woman throughout all the territory of Israel, and found Abishag the Shunammite, and brought her to the king."
+      }
+    ],
+    "2KI": [
+      {
+        "ref": "2KI-1-1",
+        "text": "After the death of Ahab, Moab reneged on its covenant with Israel."
+      },
+      {
+        "ref": "2KI-1-2",
+        "text": "Now Ahaziah fell through the lattice of his upper room in Samaria and was injured. He sent messengers, telling them, “Go, inquire of Baal-Zebub, god of Ekron, whether I shall recover from this injury.” And they went to inquire of him."
+      },
+      {
+        "ref": "2KI-1-3",
+        "text": "But the Angel of the Lord said to Elijah the Tishbite, “Arise, go and meet the messengers of Ahaziah, the king of Samaria, and say to them, ‘Is it because there is no God in Israel that you are going to inquire of Baal-Zebub god of Ekron?"
+      }
+    ],
+    "1CH": [
+      {
+        "ref": "1CH-1-1",
+        "text": "Adam, Seth, Enosh,"
+      },
+      {
+        "ref": "1CH-1-2",
+        "text": "Cainan, Mahalalel, Jared,"
+      },
+      {
+        "ref": "1CH-1-3",
+        "text": "Enoch, Methuselah, Lamech,"
+      }
+    ],
+    "2CH": [
+      {
+        "ref": "2CH-1-1",
+        "text": "When Solomon the son of David was firmly established over his kingdom, the Lord his God was with him and magnified him in honor."
+      },
+      {
+        "ref": "2CH-1-2",
+        "text": "Solomon spoke to all Israel, to the captains of thousands and the captains of hundreds, to the judges, to all the rulers over Israel, and to the heads of the families."
+      },
+      {
+        "ref": "2CH-1-3",
+        "text": "Solomon went with all the assembly to the high place at Gibeon, for the tabernacle of meeting with God was there, which Moses the servant of the Lord made in the wilderness."
+      }
+    ],
+    "1ES": [
+      {
+        "ref": "1ES-1-1",
+        "text": "Josiah kept the Passover to his Lord in Jerusalem. He sacrificed the paschal lamb on the fourteenth day of the first month."
+      },
+      {
+        "ref": "1ES-1-2",
+        "text": "He then placed the priests in the Lord's temple according to their divisions, clothed in their vestments."
+      },
+      {
+        "ref": "1ES-1-3",
+        "text": "He told the Levites, Israel's servants in the temple, to sanctify themselves to the Lord and to place the holy ark of the Lord in the house that King Solomon, son of David, had built. For he said, “No longer will you carry the ark upon your shoulders."
+      }
+    ],
+    "EZR": [
+      {
+        "ref": "EZR-1-1",
+        "text": "Now in the first year of Cyrus king of Persia, that the word of the Lord from the mouth of Jeremiah might be fulfilled, the Lord stirred up the spirit of Cyrus, king of Persia, and he made a proclamation throughout his entire kingdom, and even put it in writing, saying,"
+      },
+      {
+        "ref": "EZR-1-2",
+        "text": "“Thus says Cyrus king of the Persians: ‘The Lord God of heaven gave to me all the kingdoms of the earth. And He commanded me to build Him a house at Jerusalem in Judea."
+      },
+      {
+        "ref": "EZR-1-3",
+        "text": "Who is there among you from all His people? For his God shall be with him, and he shall go up to Jerusalem in Judea and rebuild the house of the God of Israel. He is the God who is in Jerusalem."
+      }
+    ],
+    "NEH": [
+      {
+        "ref": "NEH-1-1",
+        "text": "The words of Nehemiah the son of Hachaliah."
+      },
+      {
+        "ref": "NEH-1-2",
+        "text": "that Hanani, one of my brothers, came with men from Judah; and I asked them concerning the Jews who had escaped, who had survived the captivity, and concerning Jerusalem."
+      },
+      {
+        "ref": "NEH-1-3",
+        "text": "And they said to me, “The survivors who are left from the captivity in the province live there in great distress and reproach. The wall of Jerusalem is also broken down, and its gates are burned with fire.”"
+      }
+    ],
+    "TOB": [
+      {
+        "ref": "TOB-1-1",
+        "text": "This is the book of the words of Tobit, the son of Tobiel, the son of Hananiel, the son of Aduel, the son of Gabael, of the seed of Asiel, from the tribe of Naphtali."
+      },
+      {
+        "ref": "TOB-1-2",
+        "text": "He was led captive out of Thisbe in the days of Shalmaneser, king of the Assyrians. Thisbe is south of Kedesh Naphtali, in Galilee above Asher."
+      },
+      {
+        "ref": "TOB-1-3",
+        "text": "I, Tobit, walked in the paths of truth and righteousness all the days of my life. I did much almsgiving to my brethren and to the people who journeyed with me as exiles to Nineveh, in the country of the Assyrians."
+      }
+    ],
+    "JDT": [
+      {
+        "ref": "JDT-1-1",
+        "text": "It was the twelfth year of the reign of Nebuchadnezzar, who reigned in the great city of Nineveh. In those days Arphaxad, who reigned over the Medes in Ecbatana,"
+      },
+      {
+        "ref": "JDT-1-2",
+        "text": "built a wall around Ecbatana of hewn stones which were three cubits wide and six cubits long. He made the wall seventy cubits high and fifty cubits wide."
+      },
+      {
+        "ref": "JDT-1-3",
+        "text": "At its gates he set its towers, a hundred cubits high and sixty cubits wide at their foundations."
+      }
+    ],
+    "EST": [
+      {
+        "ref": "EST-1-1",
+        "text": "In the second year of the reign of the great King Artaxerxes, on the first day of Nisan, Mordecai, the son of Jair, son of Shimei, the son of Kish, of the tribe of Benjamin, had a dream. He was a Jewish man living in the city of Susa, a great man who served in the court of the king. He was from the captives Nebuchadnezzar the king of Babylon had deported from Jerusalem with Jechoniah the king of Judah. And this was his dream:"
+      },
+      {
+        "ref": "EST-1-2",
+        "text": "in the days when King Artaxerxes sat on the throne in the city of Susa,"
+      },
+      {
+        "ref": "EST-1-3",
+        "text": "that in the third year of his reign he gave a feast for his friends and the rest of the nations, and for the nobles of the Persians and the Medes and the chiefs of the satraps."
+      }
+    ],
+    "1MA": [
+      {
+        "ref": "1MA-1-1",
+        "text": "After Alexander, the son of Philip the Macedonian, came out of the land of Kittim and conquered Macedonia, and defeated Darius the king of the Persians and the Medes, and reigned in his place—he was already king of Greece—"
+      },
+      {
+        "ref": "1MA-1-2",
+        "text": "he then fought numerous wars, conquered for-tresses, and slaughtered the kings of the earth."
+      },
+      {
+        "ref": "1MA-1-3",
+        "text": "He went to the ends of the earth and took the spoils of many nations. So the earth rested from war before him, and he was exalted; his heart was likewise encouraged."
+      }
+    ],
+    "2MA": [
+      {
+        "ref": "2MA-1-1",
+        "text": "“The Jewish brothers in Jerusalem and the land of Judea, to their Jewish brothers in Egypt: Greetings and good peace."
+      },
+      {
+        "ref": "2MA-1-2",
+        "text": "“May God do good to you, and may He remember His covenant with Abraham, Isaac, and Jacob, His faithful servants."
+      },
+      {
+        "ref": "2MA-1-3",
+        "text": "May He give all of you a heart to worship Him and do His will with a strong heart and willing soul."
+      }
+    ],
+    "3MA": [
+      {
+        "ref": "3MA-1-1",
+        "text": "When Philopator heard from those who returned that the regions he ruled had been captured by Antiochus, he issued orders to all his infantry and cavalry forces, took his sister Arsinoe along with him, and set out toward the area near Raphia, where the forces of Antiochus were positioned."
+      },
+      {
+        "ref": "3MA-1-2",
+        "text": "Now a certain Theodotus, intending to carry out a plan he had developed, took the finest of the Ptolemaic weapons issued earlier to him and crossed by night to Ptolemy's tent with the intention of killing him by himself, and in that way ending the war."
+      },
+      {
+        "ref": "3MA-1-3",
+        "text": "But Dositheus, called the son of Drimylos, by birth Jew who afterward changed his religion and apostatized from the traditions of his fathers, removed the king and put in his place a certain unimportant man in the tent. That man suffered the vengeance intended for the king."
+      }
+    ],
+    "PSA": [
+      {
+        "ref": "PSA-1-1",
+        "text": "lessed is the man Who walks not in the counsel of the ungodly, Nor stands in the way of sinners, Nor sits in the seat of the troublesome;"
+      },
+      {
+        "ref": "PSA-1-2",
+        "text": "But his will is in the law of the Lord, And in His law he meditates day and night."
+      },
+      {
+        "ref": "PSA-1-3",
+        "text": "He shall be like a tree Planted by streams of waters, That produces its fruit in its season; And his leaf shall not wither, And whatever he does shall prosper."
+      }
+    ],
+    "JOB": [
+      {
+        "ref": "JOB-1-1",
+        "text": "There was a man in the land of Ausitis whose name was Job. That man was true, blameless, righteous, and God-fearing, and he abstained from every evil thing."
+      },
+      {
+        "ref": "JOB-1-2",
+        "text": "Now he had seven sons and three daughters,"
+      },
+      {
+        "ref": "JOB-1-3",
+        "text": "and his cattle consisted of seven thousand sheep, three thousand camels, five hundred yoke of oxen, and five hundred female donkeys in the pastures. Moreover he possessed a very large number of house servants. His works were also great on the earth, and that man was the most noble of all the men of the East."
+      }
+    ],
+    "PRO": [
+      {
+        "ref": "PRO-1-1",
+        "text": "The Proverbs of Solomon, the son of David, Who reigned in Israel,"
+      },
+      {
+        "ref": "PRO-1-2",
+        "text": "To know wisdom and instruction, And to understand words of discernment;"
+      },
+      {
+        "ref": "PRO-1-3",
+        "text": "To receive both subtlety of words, And to understand true righteousness and upright judgment;"
+      }
+    ],
+    "ECC": [
+      {
+        "ref": "ECC-1-1",
+        "text": "The words of the Preacher, the son of David, king of Israel in Jerusalem."
+      },
+      {
+        "ref": "ECC-1-2",
+        "text": "“Vanity of vanities,” says the Preacher; “Vanity of vanities, all is vanity!”"
+      },
+      {
+        "ref": "ECC-1-3",
+        "text": "What advantage does a man have in all his labor In which he toils under the sun?"
+      }
+    ],
+    "SNG": [
+      {
+        "ref": "SNG-1-1",
+        "text": "The Song of Songs, which is Solomon's."
+      },
+      {
+        "ref": "SNG-1-2",
+        "text": "Let him kiss me with the kisses of his mouth, For your love is better than wine,"
+      },
+      {
+        "ref": "SNG-1-3",
+        "text": "And the smell of your ointments is better than all spices. Your name is ointment poured forth; Therefore, the young maidens love you."
+      }
+    ],
+    "WIS": [
+      {
+        "ref": "WIS-1-1",
+        "text": "Love righteousness, you who judge on the earth."
+      },
+      {
+        "ref": "WIS-1-2",
+        "text": "Because He is found by those who do not tempt Him, And He is manifest to those who do not disbelieve Him."
+      },
+      {
+        "ref": "WIS-1-3",
+        "text": "For dishonest reasoning separates people from God, And when His power examines someone, It convicts the undiscerning;"
+      }
+    ],
+    "SIR": [
+      {
+        "ref": "SIR-1-1",
+        "text": "All wisdom comes from the Lord"
+      },
+      {
+        "ref": "SIR-1-2",
+        "text": "Who can count the sand of the seas,The drops of rain, and the days of eternity?"
+      },
+      {
+        "ref": "SIR-1-3",
+        "text": "Who can search out the height of heaven,The breadth of the earth, the abyss, and wisdom?"
+      }
+    ],
+    "HOS": [
+      {
+        "ref": "HOS-1-1",
+        "text": "The word of the Lord that came to Hosea the son of Beeri in the days of Uzziah, Jotham, Ahaz, and Hezekiah, kings of Judah, and in the days of Jeroboam son of Joash, king of Israel."
+      },
+      {
+        "ref": "HOS-1-2",
+        "text": "The beginning of the word of the Lord to Hosea. The Lord said to Hosea,"
+      },
+      {
+        "ref": "HOS-1-3",
+        "text": "So he went and took Gomer, daughter of Diblaim, and she conceived and bore him a son."
+      }
+    ],
+    "AMO": [
+      {
+        "ref": "AMO-1-1",
+        "text": "The words of Amos, who was among the shepherds of Tekoa, which he saw concerning Jerusalem in the days of Uzziah king of Judah, and in the days of Jeroboam the son of Joash king of Israel, two years before the earthquake."
+      },
+      {
+        "ref": "AMO-1-2",
+        "text": "And he said, “The Lord proclaims out of Zion, and out of Jerusalem He gives a shout. The pastures of the shepherds mourn, and the top of Carmel is dried up.”"
+      },
+      {
+        "ref": "AMO-1-3",
+        "text": "Thus says the Lord: “For three sins of Damascus and for four, I shall not turn away from it; for they sawed open the pregnant wives of the men of Gilead with a saw made of iron."
+      }
+    ],
+    "MIC": [
+      {
+        "ref": "MIC-1-1",
+        "text": "The word of the Lord came to Micah of Moresheth in the days of Jotham, and Ahaz, and Hezekiah, kings of Judah, concerning what he saw as it relates to Samaria and Jerusalem."
+      },
+      {
+        "ref": "MIC-1-2",
+        "text": "Hear these words, O people! Give heed, O earth, and all that is in it. For the Lord God shall be among you for a witness against you, the Lord from His holy house."
+      },
+      {
+        "ref": "MIC-1-3",
+        "text": "For behold, the Lord is coming out of His place. He will come down and tread upon the high places of the earth."
+      }
+    ],
+    "JOL": [
+      {
+        "ref": "JOL-1-1",
+        "text": "The word of the Lord came to Joel the son of Pethuel."
+      },
+      {
+        "ref": "JOL-1-2",
+        "text": "Hear this, you elders, and give ear, all of you inhabiting the land. Have such things happened in your days or in the days of your fathers?"
+      },
+      {
+        "ref": "JOL-1-3",
+        "text": "Tell your children about this, and your children to their children, and their children to the next generation."
+      }
+    ],
+    "OBA": [
+      {
+        "ref": "OBA-1-1",
+        "text": "The vision of Obadiah. Thus says the Lord God to Edom: “I heard a report from the Lord, and He sent out a message to the nations, saying, ‘Arise, and let us rise up against her for battle.’"
+      },
+      {
+        "ref": "OBA-1-2",
+        "text": "Behold, I have made you least among the nations; you are greatly dishonored."
+      },
+      {
+        "ref": "OBA-1-3",
+        "text": "The arrogance of your heart exalts you, dwelling as you do in the clefts of the rocks, as one overconfident in his habitation, saying in his heart, ‘Who will bring me down to the ground?’"
+      }
+    ],
+    "JON": [
+      {
+        "ref": "JON-1-1",
+        "text": "Now the word of the Lord came to Jonah the son of Amittai, saying,"
+      },
+      {
+        "ref": "JON-1-2",
+        "text": "“Arise and go to Nineveh, the great city, and preach in it; for the cry of her wickedness has come up to me.”"
+      },
+      {
+        "ref": "JON-1-3",
+        "text": "But Jonah rose up to flee to Tarshish from the presence of the Lord. So he went down to Joppa and found a ship going to Tarshish, paid his fare, and boarded the ship to set sail with them to Tarshish, away from the presence of the Lord."
+      }
+    ],
+    "NAH": [
+      {
+        "ref": "NAH-1-1",
+        "text": "The burden against Nineveh. The book of the vision of Nahum the Elkoshite."
+      },
+      {
+        "ref": "NAH-1-2",
+        "text": "God is jealous, and the Lord is an avenger; the Lord is avenging with fury; the Lord takes vengeance on His adversaries and drives out His enemies."
+      },
+      {
+        "ref": "NAH-1-3",
+        "text": "The Lord is patient and His power is great, but the Lord will not acquit the guilty. His way is in destruction and in a whirlwind; the clouds are the dust of His feet."
+      }
+    ],
+    "HAB": [
+      {
+        "ref": "HAB-1-1",
+        "text": "The burden which the prophet Habakkuk saw."
+      },
+      {
+        "ref": "HAB-1-2",
+        "text": "How long, O Lord, shall I cry out to You, and You will not hear me? Being wronged I cry out to You; You will not save."
+      },
+      {
+        "ref": "HAB-1-3",
+        "text": "Why have You shown me hardship and suffering, to look upon misery and ungodliness? Judgment is before me, and the judge takes bribes."
+      }
+    ],
+    "ZEP": [
+      {
+        "ref": "ZEP-1-1",
+        "text": "The word of the Lord which came to Zephaniah the son of Cushi, the son of Gedaliah, the son of Amariah, the son of Hezekiah, in the days of Josiah son of Amon, king of Judah."
+      },
+      {
+        "ref": "ZEP-1-2",
+        "text": "“Let all things be totally consumed from the face of the earth,” says the Lord."
+      },
+      {
+        "ref": "ZEP-1-3",
+        "text": "“Let man and cattle cease. Let the birds of the air and the fish of the sea be consumed. I shall drive mankind from the face of the land,” says the Lord."
+      }
+    ],
+    "HAG": [
+      {
+        "ref": "HAG-1-1",
+        "text": "In the second year of King Darius, in the sixth month, on the first day of the month, the word of the Lord came by the hand of Haggai the prophet, saying, “Speak to Zerubbabel the son of Shealtiel, from the tribe of Judah, and Joshua son of Jehozadak the high priest, this message."
+      },
+      {
+        "ref": "HAG-1-2",
+        "text": "‘Thus says the Lord Almighty: “This people says, ‘The time has not come to build the Lord's house.’ ” ’ ”"
+      },
+      {
+        "ref": "HAG-1-3",
+        "text": "Then the word of the Lord came by Haggai the prophet, saying,"
+      }
+    ],
+    "ZEC": [
+      {
+        "ref": "ZEC-1-1",
+        "text": "In the eighth month of the second year of the reign of Darius, the word of the Lord came to Zechariah, son of Berechiah, son of Addo the prophet, saying,"
+      },
+      {
+        "ref": "ZEC-1-2",
+        "text": "“The Lord has been very angry with your fathers,"
+      },
+      {
+        "ref": "ZEC-1-3",
+        "text": "and you shall say to them, ‘Thus says the Lord Almighty: “Return to Me, and I will return to you,” says the Lord,"
+      }
+    ],
+    "MAL": [
+      {
+        "ref": "MAL-1-1",
+        "text": "The burden of the word of the Lord to Israel by the hand of His messenger Malachi. Take it to heart!"
+      },
+      {
+        "ref": "MAL-1-2",
+        "text": "“I have loved you,” says the Lord. “But you say, ‘In what way have You loved us?’ Was not Esau the brother of Jacob?” says the Lord. “Yet Jacob I have loved,"
+      },
+      {
+        "ref": "MAL-1-3",
+        "text": "but Esau I have hated, and I have appointed his borders for destruction and made his heritage as dwellings of the wilderness.”"
+      }
+    ],
+    "ISA": [
+      {
+        "ref": "ISA-1-1",
+        "text": "The vision of Isaiah the son of Amoz, which he saw against Judah and Jerusalem in the kingdom of Uzziah, Jotham, Ahaz, and Hezekiah, kings of Judah."
+      },
+      {
+        "ref": "ISA-1-2",
+        "text": "Hear, O heavens, and listen, O earth. For the Lord has spoken: “I have begotten and brought up sons, but they rejected Me."
+      },
+      {
+        "ref": "ISA-1-3",
+        "text": "The ox knows its owner and the donkey its master's crib; but Israel does not know Me, and the people do not understand Me.”"
+      }
+    ],
+    "JER": [
+      {
+        "ref": "JER-1-1",
+        "text": "The word of God came to Jeremiah the son of Hilkiah of the priests, who lived in Anathoth in the land of Benjamin."
+      },
+      {
+        "ref": "JER-1-2",
+        "text": "The word of God came to him in the days of Josiah the son of Amon, king of Judah, in the thirteenth year of his reign."
+      },
+      {
+        "ref": "JER-1-3",
+        "text": "The word also came in the days of Jehoiakim the son of Josiah, king of Judah, until the eleventh year of Zedekiah the son of Josiah, king of Judah, until the captivity of Jerusalem in the fifth month."
+      }
+    ],
+    "BAR": [
+      {
+        "ref": "BAR-1-1",
+        "text": "Now these are the words of the book written by Baruch, the son of Neriah, the son of Mahseiah, the son of Zedekiah, the son of Hasadiah, the son of Hilkiah, while in Babylon,"
+      },
+      {
+        "ref": "BAR-1-2",
+        "text": "in the fifth year, on the seventh day of the month, at the time the Chaldeans took Jerusalem and burned it with fire."
+      },
+      {
+        "ref": "BAR-1-3",
+        "text": "And Baruch read the words of this book to Jechoniah the son of Joachim, king of Judah, and to all the people who came to hear the book:"
+      }
+    ],
+    "LAM": [
+      {
+        "ref": "LAM-1-1",
+        "text": "Now it came to pass that after Israel was taken captive and Jerusalem became desolate, Jeremiah sat weeping; and he lamented this song of grief over Jerusalem and said:"
+      },
+      {
+        "ref": "LAM-1-2",
+        "text": "“She weeps bitterly in the night; She sheds tears on her cheeks. Yet among all her lovers there is no one who comforts her. All who love her have dealt treacherously with her. They have become her enemies."
+      },
+      {
+        "ref": "LAM-1-3",
+        "text": "“Judea has gone into captivity Because of her humiliation and harsh servitude. She dwells among the Gentiles; She finds no rest. All who pursue her overtake her in the midst of her distress."
+      }
+    ],
+    "LJE": [
+      {
+        "ref": "LJE-1-1",
+        "text": "Because of the sins you committed in the sight of God, you will be led away to Babylon as captives by Nebuchadnezzar, king of the Babylonians."
+      },
+      {
+        "ref": "LJE-1-2",
+        "text": "After you enter Babylon, you will remain there many years, even a long time, as many as seven generations. But after this, I shall lead you from that place with peace."
+      },
+      {
+        "ref": "LJE-1-3",
+        "text": "Now in Babylon you will see gods of silver, gold, and wood carried upon shoulders as displays of fear to the Gentiles."
+      }
+    ],
+    "EZK": [
+      {
+        "ref": "EZK-1-1",
+        "text": "Now it came to pass in the thirtieth year, in the fourth month, on the fifth day of the month, as I was in the midst of the captivity by the River Chebar, the heavens were opened and I saw visions of God."
+      },
+      {
+        "ref": "EZK-1-2",
+        "text": "On the fifth day of the month, in the fifth year of King Jehoiachin's captivity,"
+      },
+      {
+        "ref": "EZK-1-3",
+        "text": "the word of the Lord came to Ezekiel the priest, the son of Buzi, in the land of the Chaldeans by the River Chebar; and the hand of the Lord was upon me."
+      }
+    ],
+    "SUS": [
+      {
+        "ref": "SUS-1-1",
+        "text": "There was a man living in Babylon, and his name was Jehoiakim."
+      },
+      {
+        "ref": "SUS-1-2",
+        "text": "He took a wife whose name was Susanna, the daughter of Hilkiah, a very beautiful woman and one who feared the Lord."
+      },
+      {
+        "ref": "SUS-1-3",
+        "text": "Her parents were righteous and taught their daughter according to the Law of Moses."
+      }
+    ],
+    "DAN": [
+      {
+        "ref": "DAN-1-1",
+        "text": "In the third year of the reign of Jehoiakim king of Judah, Nebuchadnezzar king of Babylon came to Jerusalem and besieged it."
+      },
+      {
+        "ref": "DAN-1-2",
+        "text": "The Lord gave Jehoiakim king of Judah into his hand, with some of the vessels of the house of God. Then he brought them to the land of Shinar, to the house of his god. He carried them into the treasure house of his god."
+      },
+      {
+        "ref": "DAN-1-3",
+        "text": "Then the king spoke to Ashpenaz, the chief of his eunuchs, to bring him some of the captives of Israel, and some of the royal family and some of the nobles—"
+      }
+    ],
+    "BEL": [
+      {
+        "ref": "BEL-1-1",
+        "text": "When King Astyages was gathered to his fathers, Cyrus of Persia received his kingdom."
+      },
+      {
+        "ref": "BEL-1-2",
+        "text": "Daniel was a confidant of the king and was honored above all his friends."
+      },
+      {
+        "ref": "BEL-1-3",
+        "text": "Now the Babylonians had an idol whose name was Bel, and every day they spent on it twelve bushels of fine flour, forty sheep, and six vessels of wine."
+      }
+    ],
+    "MAT": [
+      {
+        "ref": "MAT-1-1",
+        "text": "The book of the genealogy of Jesus Christ, the Son of David, the Son of Abraham:"
+      },
+      {
+        "ref": "MAT-1-2",
+        "text": "Abraham begot Isaac, Isaac begot Jacob, and Jacob begot Judah and his brothers."
+      },
+      {
+        "ref": "MAT-1-3",
+        "text": "Judah begot Perez and Zerah by Tamar, Perez begot Hezron, and Hezron begot Ram."
+      }
+    ],
+    "MRK": [
+      {
+        "ref": "MRK-1-1",
+        "text": "The beginning of the gospel of Jesus Christ, the Son of God."
+      },
+      {
+        "ref": "MRK-1-2",
+        "text": "As it is written in the Prophets:"
+      },
+      {
+        "ref": "MRK-1-3",
+        "text": "“The voice of one crying in the wilderness: ‘Prepare the way of the LORD; Make His paths straight.’ ”"
+      }
+    ],
+    "LUK": [
+      {
+        "ref": "LUK-1-1",
+        "text": "Inasmuch as many have taken in hand to set in order a narrative of those things which have been fulfilled among us,"
+      },
+      {
+        "ref": "LUK-1-2",
+        "text": "just as those who from the beginning were eyewitnesses and ministers of the word delivered them to us,"
+      },
+      {
+        "ref": "LUK-1-3",
+        "text": "it seemed good to me also, having had perfect understanding of all things from the very first, to write to you an orderly account, most excellent Theophilus,"
+      }
+    ],
+    "JHN": [
+      {
+        "ref": "JHN-1-1",
+        "text": "In the beginning was the Word, and the Word was with God, and the Word was God."
+      },
+      {
+        "ref": "JHN-1-2",
+        "text": "He was in the beginning with God."
+      },
+      {
+        "ref": "JHN-1-3",
+        "text": "All things were made through Him, and without Him nothing was made that was made."
+      }
+    ],
+    "ACT": [
+      {
+        "ref": "ACT-1-1",
+        "text": "The former account I made, O Theophilus, of all that Jesus began both to do and teach,"
+      },
+      {
+        "ref": "ACT-1-2",
+        "text": "until the day in which He was taken up, after He through the Holy Spirit had given commandments to the apostles whom He had chosen,"
+      },
+      {
+        "ref": "ACT-1-3",
+        "text": "to whom He also presented Himself alive after His suffering by many infallible proofs, being seen by them during forty days and speaking of the things pertaining to the kingdom of God."
+      }
+    ],
+    "ROM": [
+      {
+        "ref": "ROM-1-1",
+        "text": "Paul, a bondservant of Jesus Christ, called to be an apostle, separated to the gospel of God"
+      },
+      {
+        "ref": "ROM-1-2",
+        "text": "which He promised before through His prophets in the Holy Scriptures,"
+      },
+      {
+        "ref": "ROM-1-3",
+        "text": "concerning His Son Jesus Christ our Lord, who was born of the seed of David according to the flesh,"
+      }
+    ],
+    "1CO": [
+      {
+        "ref": "1CO-1-1",
+        "text": "Paul, called to be an apostle of Jesus Christ through the will of God, and Sosthenes our brother,"
+      },
+      {
+        "ref": "1CO-1-2",
+        "text": "To the church of God which is at Corinth, to those who are sanctified in Christ Jesus, called to be saints, with all who in every place call on the name of Jesus Christ our Lord, both theirs and ours:"
+      },
+      {
+        "ref": "1CO-1-3",
+        "text": "Grace to you and peace from God our Father and the Lord Jesus Christ."
+      }
+    ],
+    "2CO": [
+      {
+        "ref": "2CO-1-1",
+        "text": "Paul, an apostle of Jesus Christ by the will of God, and Timothy our brother,"
+      },
+      {
+        "ref": "2CO-1-2",
+        "text": "Grace to you and peace from God our Father and the Lord Jesus Christ."
+      },
+      {
+        "ref": "2CO-1-3",
+        "text": "Blessed be the God and Father of our Lord Jesus Christ, the Father of mercies and God of all comfort,"
+      }
+    ],
+    "GAL": [
+      {
+        "ref": "GAL-1-1",
+        "text": "Paul, an apostle (not from men nor through man, but through Jesus Christ and God the Father who raised Him from the dead),"
+      },
+      {
+        "ref": "GAL-1-2",
+        "text": "and all the brethren who are with me,"
+      },
+      {
+        "ref": "GAL-1-3",
+        "text": "Grace to you and peace from God the Father and our Lord Jesus Christ,"
+      }
+    ],
+    "EPH": [
+      {
+        "ref": "EPH-1-1",
+        "text": "Paul, an apostle of Jesus Christ by the will of God,"
+      },
+      {
+        "ref": "EPH-1-2",
+        "text": "Grace to you and peace from God our Father and the Lord Jesus Christ."
+      },
+      {
+        "ref": "EPH-1-3",
+        "text": "Blessed be the God and Father of our Lord Jesus Christ, who has blessed us with every spiritual blessing in the heavenly places in Christ,"
+      }
+    ],
+    "PHP": [
+      {
+        "ref": "PHP-1-1",
+        "text": "Paul and Timothy, bondservants of Jesus Christ,"
+      },
+      {
+        "ref": "PHP-1-2",
+        "text": "Grace to you and peace from God our Father and the Lord Jesus Christ."
+      },
+      {
+        "ref": "PHP-1-3",
+        "text": "I thank my God upon every remembrance of you,"
+      }
+    ],
+    "COL": [
+      {
+        "ref": "COL-1-1",
+        "text": "Paul, an apostle of Jesus Christ by the will of God, and Timothy our brother,"
+      },
+      {
+        "ref": "COL-1-2",
+        "text": "To the saints and faithful brethren in Christ who are in Colosse:"
+      },
+      {
+        "ref": "COL-1-3",
+        "text": "We give thanks to the God and Father of our Lord Jesus Christ, praying always for you,"
+      }
+    ],
+    "1TH": [
+      {
+        "ref": "1TH-1-1",
+        "text": "Paul, Silvanus, and Timothy,"
+      },
+      {
+        "ref": "1TH-1-2",
+        "text": "We give thanks to God always for you all, making mention of you in our prayers,"
+      },
+      {
+        "ref": "1TH-1-3",
+        "text": "remembering without ceasing your work of faith, labor of love, and patience of hope in our Lord Jesus Christ in the sight of our God and Father,"
+      }
+    ],
+    "2TH": [
+      {
+        "ref": "2TH-1-1",
+        "text": "Paul, Silvanus, and Timothy,"
+      },
+      {
+        "ref": "2TH-1-2",
+        "text": "Grace to you and peace from God our Father and the Lord Jesus Christ."
+      },
+      {
+        "ref": "2TH-1-3",
+        "text": "We are bound to thank God always for you, brethren, as it is fitting, because your faith grows exceedingly, and the love of every one of you all abounds toward each other,"
+      }
+    ],
+    "1TI": [
+      {
+        "ref": "1TI-1-1",
+        "text": "Paul, an apostle of Jesus Christ, by the commandment of God our Savior and the Lord Jesus Christ, our hope,"
+      },
+      {
+        "ref": "1TI-1-2",
+        "text": "To Timothy, a true son in the faith:"
+      },
+      {
+        "ref": "1TI-1-3",
+        "text": "As I urged you when I went into Macedonia—remain in Ephesus that you may charge some that they teach no other doctrine,"
+      }
+    ],
+    "2TI": [
+      {
+        "ref": "2TI-1-1",
+        "text": "Paul, an apostle of Jesus Christ by the will of God, according to the promise of life which is in Christ Jesus,"
+      },
+      {
+        "ref": "2TI-1-2",
+        "text": "To Timothy, a beloved son:"
+      },
+      {
+        "ref": "2TI-1-3",
+        "text": "I thank God, whom I serve with a pure conscience, as my forefathers did, as without ceasing I remember you in my prayers night and day,"
+      }
+    ],
+    "TIT": [
+      {
+        "ref": "TIT-1-1",
+        "text": "Paul, a bondservant of God and an apostle of Jesus Christ, according to the faith of God's elect and the acknowledgment of the truth which accords with godliness,"
+      },
+      {
+        "ref": "TIT-1-2",
+        "text": "in hope of eternal life which God, who cannot lie, promised before time began,"
+      },
+      {
+        "ref": "TIT-1-3",
+        "text": "but has in due time manifested His word through preaching, which was committed to me according to the commandment of God our Savior;"
+      }
+    ],
+    "PHM": [
+      {
+        "ref": "PHM-1-1",
+        "text": "Paul, a prisoner of Christ Jesus, and Timothy our brother,"
+      },
+      {
+        "ref": "PHM-1-2",
+        "text": "to the beloved Apphia, Archippus our fellow soldier, and to the church in your house:"
+      },
+      {
+        "ref": "PHM-1-3",
+        "text": "Grace to you and peace from God our Father and the Lord Jesus Christ."
+      }
+    ],
+    "HEB": [
+      {
+        "ref": "HEB-1-1",
+        "text": "God, who at various times and in various ways spoke in time past to the fathers by the prophets,"
+      },
+      {
+        "ref": "HEB-1-2",
+        "text": "has in these last days spoken to us by His Son, whom He has appointed heir of all things, through whom also He made the worlds;"
+      },
+      {
+        "ref": "HEB-1-3",
+        "text": "who being the brightness of His glory and the express image of His person, and upholding all things by the word of His power, when He had by Himself purged our sins, sat down at the right hand of the Majesty on high,"
+      }
+    ],
+    "JAS": [
+      {
+        "ref": "JAS-1-1",
+        "text": "James, a bondservant of God and of the Lord Jesus Christ,"
+      },
+      {
+        "ref": "JAS-1-2",
+        "text": "My brethren, count it all joy when you fall into various trials,"
+      },
+      {
+        "ref": "JAS-1-3",
+        "text": "knowing that the testing of your faith produces patience."
+      }
+    ],
+    "1PE": [
+      {
+        "ref": "1PE-1-1",
+        "text": "Peter, an apostle of Jesus Christ,"
+      },
+      {
+        "ref": "1PE-1-2",
+        "text": "elect according to the foreknowledge of God the Father, in sanctification of the Spirit, for obedience and sprinkling of the blood of Jesus Christ:"
+      },
+      {
+        "ref": "1PE-1-3",
+        "text": "Blessed be the God and Father of our Lord Jesus Christ, who according to His abundant mercy has begotten us again to a living hope through the resurrection of Jesus Christ from the dead,"
+      }
+    ],
+    "2PE": [
+      {
+        "ref": "2PE-1-1",
+        "text": "Simon Peter, a bondservant and apostle of Jesus Christ,"
+      },
+      {
+        "ref": "2PE-1-2",
+        "text": "Grace and peace be multiplied to you in the knowledge of God and of Jesus our Lord,"
+      },
+      {
+        "ref": "2PE-1-3",
+        "text": "as His divine power has given to us all things that pertain to life and godliness, through the knowledge of Him who called us by glory and virtue,"
+      }
+    ],
+    "1JN": [
+      {
+        "ref": "1JN-1-1",
+        "text": "That which was from the beginning, which we have heard, which we have seen with our eyes, which we have looked upon, and our hands have handled, concerning the Word of life—"
+      },
+      {
+        "ref": "1JN-1-2",
+        "text": "the life was manifested, and we have seen, and bear witness, and declare to you that eternal life which was with the Father and was manifested to us—"
+      },
+      {
+        "ref": "1JN-1-3",
+        "text": "that which we have seen and heard we declare to you, that you also may have fellowship with us; and truly our fellowship is with the Father and with His Son Jesus Christ."
+      }
+    ],
+    "2JN": [
+      {
+        "ref": "2JN-1-1",
+        "text": "The Elder,"
+      },
+      {
+        "ref": "2JN-1-2",
+        "text": "because of the truth which abides in us and will be with us forever:"
+      },
+      {
+        "ref": "2JN-1-3",
+        "text": "Grace, mercy, and peace will be with you from God the Father and from the Lord Jesus Christ, the Son of the Father, in truth and love."
+      }
+    ],
+    "3JN": [
+      {
+        "ref": "3JN-1-1",
+        "text": "The Elder,"
+      },
+      {
+        "ref": "3JN-1-2",
+        "text": "Beloved, I pray that you may prosper in all things and be in health, just as your soul prospers."
+      },
+      {
+        "ref": "3JN-1-3",
+        "text": "For I rejoiced greatly when brethren came and testified of the truth that is in you, just as you walk in the truth."
+      }
+    ],
+    "JUD": [
+      {
+        "ref": "JUD-1-1",
+        "text": "Jude, a bondservant of Jesus Christ, and brother of James,"
+      },
+      {
+        "ref": "JUD-1-2",
+        "text": "Mercy, peace, and love be multiplied to you."
+      },
+      {
+        "ref": "JUD-1-3",
+        "text": "Beloved, while I was very diligent to write to you concerning our common salvation, I found it necessary to write to you exhorting you to contend earnestly for the faith which was once for all delivered to the saints."
+      }
+    ],
+    "REV": [
+      {
+        "ref": "REV-1-1",
+        "text": "The Revelation of Jesus Christ, which God gave Him to show His servants—things which must shortly take place. And He sent and signified it by His angel to His servant John,"
+      },
+      {
+        "ref": "REV-1-2",
+        "text": "who bore witness to the word of God, and to the testimony of Jesus Christ, to all things that he saw."
+      },
+      {
+        "ref": "REV-1-3",
+        "text": "Blessed is he who reads and those who hear the words of this prophecy, and keep those things which are written in it; for the time is near."
+      }
+    ]
+  }
+}

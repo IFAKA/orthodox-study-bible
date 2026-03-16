@@ -67,6 +67,12 @@ class OrthodoxStudyApp(App):
 
             def on_key(self, event) -> None:
                 if event.key == "q":
-                    self.app.exit()
+                    from osb.tui.widgets.quit_modal import QuitModal
+
+                    def _on_confirm(confirmed: bool | None) -> None:
+                        if confirmed:
+                            self.app.exit()
+
+                    self.app.push_screen(QuitModal(), _on_confirm)
 
         return NoEpubScreen()

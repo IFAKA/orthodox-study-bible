@@ -134,6 +134,12 @@ def _extract_text_between_markers(
     """
     events: list[tuple] = []
 
+    # Seed from the container element's own verse ID (e.g. ol.olstyle in Psalms
+    # where id="Ps_vchap3-2" sits on the <ol> itself, not on a span.chbeg inside).
+    container_vid = _get_verse_id(para)
+    if container_vid:
+        events.append(("verse_start", container_vid))
+
     def walk(node) -> None:
         if isinstance(node, NavigableString):
             events.append(("text", str(node)))

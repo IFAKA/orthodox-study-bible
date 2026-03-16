@@ -16,6 +16,7 @@ from textual.widgets import Button, Footer, Label, ProgressBar
 from osb.db.queries import get_verse_count
 from osb.importer.epub_parser import ParseError, run_import
 from osb.tui.widgets.app_header import AppHeader
+from osb.tui.widgets.quit_modal import QuitModal
 
 
 class ImportScreen(Screen):
@@ -24,7 +25,10 @@ class ImportScreen(Screen):
     Posts ImportComplete when done.
     """
 
-    BINDINGS = [Binding("q", "quit_app", "Quit")]
+    BINDINGS = [
+        Binding("q", "quit_app", "Quit"),
+        Binding("enter", "continue_to_app", "Continue", show=False),
+    ]
 
     class ImportComplete(Message):
         def __init__(self, sha256: str, warnings: list[str]) -> None:
@@ -41,6 +45,7 @@ class ImportScreen(Screen):
         super().__init__(**kwargs)
         self.conn = conn
         self.epub_path = epub_path
+        self._pending_event: ImportComplete | None = None
 
     def compose(self) -> ComposeResult:
         yield AppHeader(title="Orthodox Study Bible — Importing")
@@ -109,13 +114,23 @@ class ImportScreen(Screen):
             bar = self.query_one("#import-progress", ProgressBar)
             bar.progress = 100
             warn_label = self.query_one("#import-warnings", Label)
+            btn = self.query_one("#cancel-btn", Button)
             if event.warnings:
                 warn_label.update("Warnings:\n" + "\n".join(event.warnings[:10]))
+                btn.label = "Continue →"
+                btn.variant = "primary"
+                self._pending_event = event
+                btn.focus()
             else:
                 warn_label.update("Import complete!")
+                self.app.post_message(event)
         except Exception:
-            pass
-        self.app.post_message(event)
+            self.app.post_message(event)
+
+    def action_continue_to_app(self) -> None:
+        if self._pending_event:
+            self.app.post_message(self._pending_event)
+            self._pending_event = None
 
     def on_import_screen_import_failed(self, event: ImportFailed) -> None:
         try:
@@ -126,7 +141,14 @@ class ImportScreen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "cancel-btn":
-            self.app.exit()
+            if self._pending_event:
+                self.action_continue_to_app()
+            else:
+                self.action_quit_app()
 
     def action_quit_app(self) -> None:
-        self.app.exit()
+        def _on_confirm(confirmed: bool | None) -> None:
+            if confirmed:
+                self.app.exit()
+
+        self.app.push_screen(QuitModal(), _on_confirm)

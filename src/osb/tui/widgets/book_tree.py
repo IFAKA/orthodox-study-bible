@@ -15,9 +15,17 @@ class BookTree(Tree):
     """Tree widget listing Orthodox canon books with lazy chapter loading."""
 
     BINDINGS = [
-        Binding("j", "cursor_down", "Next", show=False),
-        Binding("k", "cursor_up", "Prev", show=False),
+        Binding("j", "cursor_down", "↓", show=False),
+        Binding("k", "cursor_up", "↑", show=False),
+        Binding("l", "expand_or_select", "Open", show=False),
+        Binding("h", "collapse_or_parent", "Back", show=False),
+        Binding("enter", "expand_or_select", "Select", show=False),
+        Binding("space", "toggle_node", "Toggle", show=False),
+        Binding("o", "toggle_node", "Toggle", show=False),
+        Binding("g", "goto_top", "Top", show=False),
+        Binding("G", "goto_bottom", "Bottom", show=False),
         Binding("escape", "close_sidebar", "Close", show=True),
+        Binding("q", "close_sidebar", "Close", show=False),
     ]
 
     class ChapterSelected(Message):
@@ -74,6 +82,67 @@ class BookTree(Tree):
         if data and data.get("type") == "chapter":
             self.post_message(self.ChapterSelected(data["ref"]))
 
+    def action_expand_or_select(self) -> None:
+        """l/enter: expand node, or select chapter."""
+        node = self.cursor_node
+        if node is None:
+            return
+        data = node.data
+        if data and data.get("type") == "chapter":
+            self.post_message(self.ChapterSelected(data["ref"]))
+        elif not node.is_expanded:
+            node.expand()
+        else:
+            self.action_cursor_down()
+
+    def action_collapse_or_parent(self) -> None:
+        """h: collapse expanded node, or jump to parent."""
+        node = self.cursor_node
+        if node is None:
+            return
+        if node.is_expanded and node.children:
+            node.collapse()
+        elif node.parent and node.parent is not self.root:
+            parent = node.parent
+            self.select_node(parent)
+            self.scroll_to_node(parent)
+
+    def action_toggle_node(self) -> None:
+        """space/o: toggle expand/collapse."""
+        node = self.cursor_node
+        if node is None:
+            return
+        if node.is_expanded:
+            node.collapse()
+        else:
+            node.expand()
+
+    def action_goto_top(self) -> None:
+        """g: jump to first item."""
+        if self.root.children:
+            first = self.root.children[0]
+            self.select_node(first)
+            self.scroll_to_node(first)
+
+    def action_goto_bottom(self) -> None:
+        """G: jump to last visible item."""
+        last = self._last_visible_node()
+        if last:
+            self.select_node(last)
+            self.scroll_to_node(last)
+
+    def _last_visible_node(self) -> TreeNode | None:
+        """Return the deepest last-child in the currently expanded tree."""
+        def _walk(node: TreeNode) -> TreeNode:
+            if node.is_expanded and node.children:
+                return _walk(list(node.children)[-1])
+            return node
+
+        children = list(self.root.children)
+        if children:
+            return _walk(children[-1])
+        return None
+
     def action_close_sidebar(self) -> None:
         try:
             self.screen.action_toggle_sidebar()
@@ -100,3 +169,21 @@ class BookTree(Tree):
         if node:
             self.select_node(node)
             self.scroll_to_node(node)
+
+    def navigate_to_chapter(self, chapter_ref: str) -> None:
+        """Expand the tree to chapter_ref and select it (open at current position)."""
+        book_ref = chapter_ref.split("-")[0]
+        for testament_node in self.root.children:
+            for book_node in testament_node.children:
+                if book_node.data and book_node.data.get("ref") == book_ref:
+                    # Load chapters directly if not yet lazy-loaded
+                    if not book_node.data.get("loaded"):
+                        self._load_chapters(book_node, book_ref)
+                        book_node.data["loaded"] = True
+                    testament_node.expand()
+                    book_node.expand()
+                    # After layout refresh, select + scroll to the chapter node
+                    self.call_after_refresh(
+                        lambda ref=chapter_ref: self.highlight_chapter(ref)
+                    )
+                    return

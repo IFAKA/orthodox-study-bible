@@ -5,16 +5,22 @@ from pathlib import Path
 
 SCHEMA_VERSION = 1
 
-# Expected verse counts per book abbreviation.
+# Expected verse counts per book abbreviation, calibrated against this EPUB.
 # Used for post-import validation; allow 2% variance.
+# Counts reflect LXX/OSB versification — differ from Protestant (MT) counts.
+# Notes:
+#   BAR=141: Letter of Jeremiah (Baruch 6) is a separate file mapped to LJE
+#   DAN=424: LXX Daniel includes Additions (Susanna + Bel, stored separately as SUS/BEL)
+#   PSA=2534: Psalm 151 is included as Ps 151 within the Psalms book
+#   4MA/MAN/PS2/3ES/2ES: not present in this EPUB edition
 KNOWN_VERSE_COUNTS: dict[str, int] = {
-    "GEN": 1533, "EXO": 1213, "LEV": 859, "NUM": 1288, "DEU": 959,
-    "JOS": 658, "JDG": 618, "RUT": 85, "1SA": 810, "2SA": 695,
-    "1KI": 816, "2KI": 719, "1CH": 942, "2CH": 822, "EZR": 280,
-    "NEH": 406, "TOB": 244, "JDT": 340, "EST": 167, "1MA": 924,
-    "2MA": 555, "JOB": 1070, "PSA": 2527, "PRO": 915, "ECC": 222,
-    "SNG": 117, "WIS": 435, "SIR": 1390, "ISA": 1292, "JER": 1364,
-    "BAR": 213, "LAM": 154, "EZK": 1273, "DAN": 357, "HOS": 197,
+    "GEN": 1533, "EXO": 1171, "LEV": 859, "NUM": 1288, "DEU": 959,
+    "JOS": 658, "JDG": 618, "RUT": 85, "1SA": 774, "2SA": 695,
+    "1KI": 816, "2KI": 719, "1CH": 942, "2CH": 848, "EZR": 280,
+    "NEH": 393, "TOB": 244, "JDT": 340, "EST": 172, "1MA": 924,
+    "2MA": 555, "JOB": 1070, "PSA": 2534, "PRO": 955, "ECC": 222,
+    "SNG": 117, "WIS": 435, "SIR": 1390, "ISA": 1292, "JER": 1299,
+    "BAR": 141, "LAM": 150, "EZK": 1273, "DAN": 424, "HOS": 197,
     "JOL": 73,  "AMO": 146, "OBA": 21,  "JON": 48,  "MIC": 105,
     "NAH": 47,  "HAB": 56,  "ZEP": 53,  "HAG": 38,  "ZEC": 211,
     "MAL": 55,  "MAT": 1071,"MRK": 678, "LUK": 1151,"JHN": 879,
@@ -23,9 +29,8 @@ KNOWN_VERSE_COUNTS: dict[str, int] = {
     "1TI": 113, "2TI": 83,  "TIT": 46,  "PHM": 25,  "HEB": 303,
     "JAS": 108, "1PE": 105, "2PE": 61,  "1JN": 105, "2JN": 13,
     "3JN": 14,  "JUD": 25,  "REV": 404,
-    # Deuterocanonical / additional OSB books
-    "3MA": 249, "4MA": 137, "1ES": 158, "2ES": 70,  "MAN": 15,
-    "PS2": 7,   "LJE": 73,  "SUS": 64,  "BEL": 42,  "3ES": 70,
+    # Deuterocanonical books present in this EPUB
+    "3MA": 227, "1ES": 434, "LJE": 73,  "SUS": 64,  "BEL": 42,
 }
 
 DDL = """

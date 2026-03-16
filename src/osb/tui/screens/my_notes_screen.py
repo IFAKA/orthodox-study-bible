@@ -43,6 +43,7 @@ class MyNotesScreen(Screen):
 
     def _load_items(self) -> None:
         from osb.db.queries import get_all_annotations, get_all_bookmarks
+        from osb.importer.structure import format_ref
 
         lv = self.query_one("#notes-list", ListView)
         lv.clear()
@@ -57,16 +58,17 @@ class MyNotesScreen(Screen):
         if annotations:
             lv.append(ListItem(Label("── Annotations ──")))
             for ann in annotations:
-                item = ListItem(
-                    Label(f"  {ann.verse_ref}  {ann.body[:50]}…" if len(ann.body) > 50 else f"  {ann.verse_ref}  {ann.body}")
-                )
+                label = format_ref(ann.verse_ref)
+                preview = ann.body[:50] + "…" if len(ann.body) > 50 else ann.body
+                item = ListItem(Label(f"  {label}  {preview}"))
                 item._data = {"type": "annotation", "verse_ref": ann.verse_ref, "body": ann.body}  # type: ignore
                 lv.append(item)
 
         if bookmarks:
             lv.append(ListItem(Label("── Bookmarks ──")))
             for bm in bookmarks:
-                item = ListItem(Label(f"  {bm.verse_ref}  {bm.label or ''}"))
+                label = format_ref(bm.verse_ref)
+                item = ListItem(Label(f"  {label}  {bm.label or ''}"))
                 item._data = {"type": "bookmark", "verse_ref": bm.verse_ref}  # type: ignore
                 lv.append(item)
 
@@ -75,13 +77,15 @@ class MyNotesScreen(Screen):
         if not data:
             return
         md = self.query_one("#notes-detail", Markdown)
+        from osb.importer.structure import format_ref
+        label = format_ref(data["verse_ref"])
         if data["type"] == "annotation":
-            md.update(f"**{data['verse_ref']}**\n\n{data['body']}")
+            md.update(f"**{label}**\n\n{data['body']}")
         elif data["type"] == "bookmark":
             from osb.db.queries import get_verse
             verse = get_verse(self.conn, data["verse_ref"])
             text = verse.text if verse else ""
-            md.update(f"**{data['verse_ref']}** ♦\n\n{text}")
+            md.update(f"**{label}** ♦\n\n{text}")
 
     def action_list_down(self) -> None:
         self.query_one("#notes-list", ListView).action_cursor_down()
@@ -110,10 +114,12 @@ class MyNotesScreen(Screen):
 
         lines = [f"# OSB Study Notes — {date.today()}", ""]
 
+        from osb.importer.structure import format_ref
+
         if annotations:
             lines.append("## Annotations")
             for ann in annotations:
-                lines.append(f"### {ann.verse_ref}")
+                lines.append(f"### {format_ref(ann.verse_ref)}")
                 verse = get_verse(self.conn, ann.verse_ref)
                 if verse:
                     lines.append(f"> {verse.text}")
@@ -126,8 +132,8 @@ class MyNotesScreen(Screen):
             for bm in bookmarks:
                 verse = get_verse(self.conn, bm.verse_ref)
                 text = verse.text if verse else ""
-                label = f" — {bm.label}" if bm.label else ""
-                lines.append(f"- **{bm.verse_ref}**{label}: {text}")
+                extra_label = f" — {bm.label}" if bm.label else ""
+                lines.append(f"- **{format_ref(bm.verse_ref)}**{extra_label}: {text}")
             lines.append("")
 
         from osb.config import APP_DIR

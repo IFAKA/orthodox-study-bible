@@ -12,7 +12,7 @@ from textual.binding import Binding
 from textual.containers import VerticalScroll
 from textual.message import Message
 from textual.widget import Widget
-from textual.widgets import Input, Label, Markdown, TabbedContent, TabPane
+from textual.widgets import Input, Markdown, Static, TabbedContent, TabPane
 
 from osb import config
 from osb.db import queries
@@ -22,16 +22,14 @@ if TYPE_CHECKING:
 
 
 class RightPane(Widget):
-    """Right pane with Commentary and Chat tabs.
-
-    Commentary updates when VerseFocused events are handled.
-    Chat uses Ollama (optional) via a background thread.
-    """
+    """Right pane with Commentary and Chat tabs."""
 
     can_focus = True
 
     BINDINGS = [
         Binding("a", "toggle_tab", "Commentary/Chat", show=True),
+        Binding("ctrl+t", "toggle_tab", "Switch Tab", show=False),
+        Binding("escape", "escape_pane", "Back", show=False),
     ]
 
     class OllamaChunk(Message):
@@ -59,6 +57,7 @@ class RightPane(Widget):
         self._ollama_available: bool = False
         self._streaming: bool = False
         self._accumulated_response: str = ""
+        self._streaming_widget: Static | None = None
 
     def compose(self) -> ComposeResult:
         with TabbedContent(id="right-tabs"):
@@ -66,7 +65,7 @@ class RightPane(Widget):
                 yield Markdown("", id="commentary-text")
             with TabPane("Chat", id="tab-chat"):
                 with VerticalScroll(id="chat-history"):
-                    yield Markdown("", id="chat-history-md")
+                    pass  # messages mounted dynamically
                 yield Input(
                     placeholder="Ask about this passage… (Enter to send)",
                     id="chat-input",
@@ -81,8 +80,14 @@ class RightPane(Widget):
             tabs = self.query_one("#right-tabs", TabbedContent)
             if tabs.active == "tab-chat":
                 self.query_one("#chat-input", Input).focus()
-            # Commentary: Markdown is not focusable — RightPane retains focus,
-            # triggering #right-pane:focus border via CSS.
+            # Commentary: Markdown is not focusable — RightPane retains focus.
+        except Exception:
+            pass
+
+    def action_escape_pane(self) -> None:
+        """Return focus to scripture pane."""
+        try:
+            self.app.query_one("#scripture-pane").focus()
         except Exception:
             pass
 
@@ -98,11 +103,7 @@ class RightPane(Widget):
         threading.Thread(target=check, daemon=True).start()
 
     def _show_ollama_unavailable(self) -> None:
-        try:
-            md = self.query_one("#chat-history-md", Markdown)
-            md.update("*Ollama not running — start it with `ollama serve`*")
-        except Exception:
-            pass
+        self._append_message("assistant", "Ollama not running — start with `ollama serve`")
 
     # ── Commentary ────────────────────────────────────────────────────────────
 
@@ -153,7 +154,7 @@ class RightPane(Widget):
 
     def _send_chat(self, question: str) -> None:
         if not self._ollama_available:
-            self._append_chat("*Ollama not available. Start it with `ollama serve`.*")
+            self._append_message("assistant", "Ollama not available. Start with `ollama serve`.")
             return
         if self._streaming:
             return
@@ -161,7 +162,6 @@ class RightPane(Widget):
         chapter_ref = self._current_chapter_ref
         verse_ref = self._current_verse_ref
 
-        # Build context
         verse_text = ""
         commentary_text = ""
         if verse_ref:
@@ -172,16 +172,15 @@ class RightPane(Widget):
             notes = queries.get_all_commentary_for_chapter(self.conn, chapter_ref)
             commentary_text = " ".join(n.note_text for n in notes[:3])[:500]
 
-        # Save user message
         queries.append_chat_message(self.conn, chapter_ref, "user", question)
-        self._append_chat(f"**You:** {question}\n")
+        self._append_message("user", question)
 
-        # Build message list with rolling window
         history = queries.get_chat_history(self.conn, chapter_ref)
         messages = self._build_messages(history, verse_ref, verse_text, commentary_text)
 
         self._streaming = True
         self._accumulated_response = ""
+        self._start_stream_widget()
 
         def stream_worker():
             try:
@@ -225,53 +224,75 @@ class RightPane(Widget):
 
     def on_right_pane_ollama_chunk(self, event: "RightPane.OllamaChunk") -> None:
         self._accumulated_response += event.text
-        self._update_streaming_display()
+        self._update_stream_widget(self._accumulated_response)
 
     def on_right_pane_ollama_error(self, event: "RightPane.OllamaError") -> None:
         self._streaming = False
-        self._append_chat(f"*Error: {event.error}*\n")
+        self._finish_stream_widget("")
+        self._append_message("assistant", f"Error: {event.error}")
 
     def on_right_pane_streaming_done(self, event: "RightPane.StreamingDone") -> None:
         self._streaming = False
         if event.response and event.chapter_ref:
             queries.append_chat_message(self.conn, event.chapter_ref, "assistant", event.response)
-        self._render_chat_history()
+        self._finish_stream_widget(event.response)
 
-    def _update_streaming_display(self) -> None:
-        self._render_chat_history()
+    # ── Chat message widget helpers ───────────────────────────────────────────
 
-    def _render_chat_history(self) -> None:
-        if not self._current_chapter_ref:
-            return
-        history = queries.get_chat_history(self.conn, self._current_chapter_ref)
-        lines = []
-        for msg in history:
-            role = msg["role"]
-            content = msg["content"]
-            if role == "user":
-                lines.append(f"**You:** {content}")
-            elif role == "assistant":
-                lines.append(f"**AI:** {content}")
-        if self._streaming and self._accumulated_response:
-            lines.append(f"**AI:** {self._accumulated_response}▋")
+    def _append_message(self, role: str, content: str) -> None:
+        """Mount a single message widget into the chat history."""
         try:
-            md = self.query_one("#chat-history-md", Markdown)
-            md.update("\n\n".join(lines))
+            container = self.query_one("#chat-history", VerticalScroll)
+            if role == "user":
+                text = f"[bold gold1]▶ You[/]\n{content}"
+            else:
+                text = f"[bold dim]◆ AI[/]\n{content}"
+            widget = Static(text, classes=f"chat-msg chat-{role}")
+            container.mount(widget)
+            container.scroll_end(animate=False)
         except Exception:
             pass
 
-    def _append_chat(self, text: str) -> None:
+    def _start_stream_widget(self) -> None:
+        """Mount the in-progress AI response widget."""
         try:
-            md = self.query_one("#chat-history-md", Markdown)
-            history = queries.get_chat_history(self.conn, self._current_chapter_ref) if self._current_chapter_ref else []
-            lines = []
+            container = self.query_one("#chat-history", VerticalScroll)
+            self._streaming_widget = Static(
+                "[bold dim]◆ AI[/]\n▋",
+                classes="chat-msg chat-assistant",
+            )
+            container.mount(self._streaming_widget)
+            container.scroll_end(animate=False)
+        except Exception:
+            pass
+
+    def _update_stream_widget(self, text: str) -> None:
+        """Update the in-progress AI response widget."""
+        if self._streaming_widget:
+            self._streaming_widget.update(f"[bold dim]◆ AI[/]\n{text}▋")
+            try:
+                self.query_one("#chat-history", VerticalScroll).scroll_end(animate=False)
+            except Exception:
+                pass
+
+    def _finish_stream_widget(self, text: str) -> None:
+        """Finalize the AI response widget (remove cursor)."""
+        if self._streaming_widget:
+            if text:
+                self._streaming_widget.update(f"[bold dim]◆ AI[/]\n{text}")
+            self._streaming_widget = None
+
+    def _rebuild_chat_history(self) -> None:
+        """Clear and rebuild all chat message widgets from DB."""
+        if not self._current_chapter_ref:
+            return
+        try:
+            container = self.query_one("#chat-history", VerticalScroll)
+            container.remove_children()
+            self._streaming_widget = None
+            history = queries.get_chat_history(self.conn, self._current_chapter_ref)
             for msg in history:
-                if msg["role"] == "user":
-                    lines.append(f"**You:** {msg['content']}")
-                elif msg["role"] == "assistant":
-                    lines.append(f"**AI:** {msg['content']}")
-            lines.append(text.strip())
-            md.update("\n\n".join(l for l in lines if l))
+                self._append_message(msg["role"], msg["content"])
         except Exception:
             pass
 
@@ -296,7 +317,6 @@ class RightPane(Widget):
 
         messages = [{"role": "system", "content": system_prompt}]
 
-        # Rolling window: approximate token count
         window: list[dict] = []
         token_count = len(system_prompt.split()) * 1.3
         for msg in reversed(history[-20:]):
@@ -310,12 +330,13 @@ class RightPane(Widget):
         return messages
 
     def load_chapter(self, chapter_ref: str) -> None:
-        """Called when user navigates to a new chapter — reset chat thread."""
+        """Called when user navigates to a new chapter."""
         if chapter_ref != self._current_chapter_ref:
             self._current_chapter_ref = chapter_ref
             self._streaming = False
+            self._streaming_widget = None
             self._accumulated_response = ""
-            self._render_chat_history()
+            self._rebuild_chat_history()
 
     def on_tabbed_content_tab_changed(self, event: TabbedContent.TabChanged) -> None:
         if event.tab_pane.id == "tab-chat":
@@ -324,7 +345,6 @@ class RightPane(Widget):
             except Exception:
                 pass
         else:
-            # Commentary: Markdown not focusable — focus RightPane itself
             self.focus()
 
     def action_toggle_tab(self) -> None:

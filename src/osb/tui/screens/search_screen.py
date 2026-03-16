@@ -18,6 +18,8 @@ class SearchScreen(ModalScreen[str | None]):
     BINDINGS = [
         Binding("escape", "cancel", "Cancel"),
         Binding("enter", "select", "Select"),
+        Binding("j", "list_down", "Down", show=False),
+        Binding("k", "list_up", "Up", show=False),
     ]
 
     def __init__(self, conn: sqlite3.Connection, **kwargs) -> None:
@@ -83,6 +85,18 @@ class SearchScreen(ModalScreen[str | None]):
         ref = getattr(event.item, "_verse_ref", None)
         if ref:
             self.dismiss(ref)
+
+    def action_list_down(self) -> None:
+        try:
+            self.query_one("#search-results", ListView).action_cursor_down()
+        except Exception:
+            pass
+
+    def action_list_up(self) -> None:
+        try:
+            self.query_one("#search-results", ListView).action_cursor_up()
+        except Exception:
+            pass
 
     def action_cancel(self) -> None:
         self.dismiss(None)

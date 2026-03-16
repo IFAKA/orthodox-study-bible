@@ -73,16 +73,27 @@ Screen.sepia #right-pane {
     border-left: solid #5a4a30;
 }
 
-Screen.sepia #right-tabs ContentTab {
+Screen.sepia #right-tabs ContentTab,
+Screen.sepia #right-tabs Tab {
     background: #362d1e;
     color: #9a8060;
 }
 
-Screen.sepia #right-tabs ContentTab.-active {
+Screen.sepia #right-tabs ContentTab.-active,
+Screen.sepia #right-tabs Tab.-active {
     color: #d4a84c;
     text-style: bold;
     background: #403528;
-    border-bottom: heavy #d4a84c;
+}
+
+Screen.sepia #right-tabs ContentTab.-active > .tab--label,
+Screen.sepia #right-tabs Tab.-active > .tab--label {
+    text-style: bold underline;
+    color: #d4a84c;
+}
+
+Screen.sepia #right-tabs Tab.-active > .tab--separator {
+    color: #d4a84c;
 }
 
 Screen.sepia #commentary-text {

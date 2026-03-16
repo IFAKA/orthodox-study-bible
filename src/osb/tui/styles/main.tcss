@@ -47,7 +47,6 @@ Screen {
 Footer {
     background: $surface;
     color: $text-muted;
-    border-top: solid $border;
 }
 
 Footer > .footer--key {
@@ -190,22 +189,34 @@ VerseBlock.hl-pink   { background: $hl-pink;   }
     height: 3;
 }
 
-#right-tabs ContentTab {
+#right-tabs ContentTab,
+#right-tabs Tab {
     background: $surface;
     color: $text-muted;
     min-width: 15;
 }
 
-#right-tabs ContentTab:hover {
+#right-tabs ContentTab:hover,
+#right-tabs Tab:hover {
     background: $surface-alt;
     color: $text;
 }
 
-#right-tabs ContentTab.-active {
+#right-tabs ContentTab.-active,
+#right-tabs Tab.-active {
     color: $accent;
     text-style: bold;
     background: $surface-alt;
-    border-bottom: heavy $accent;
+}
+
+#right-tabs ContentTab.-active > .tab--label,
+#right-tabs Tab.-active > .tab--label {
+    text-style: bold underline;
+    color: $accent;
+}
+
+#right-tabs Tab.-active > .tab--separator {
+    color: $accent;
 }
 
 #right-tabs TabPane {
@@ -222,7 +233,23 @@ VerseBlock.hl-pink   { background: $hl-pink;   }
 #chat-history {
     height: 1fr;
     overflow-y: auto;
-    padding: 1 2;
+    padding: 1 1;
+}
+
+.chat-msg {
+    height: auto;
+    margin-bottom: 1;
+    padding: 0 2;
+}
+
+.chat-user {
+    background: #2a2010;
+    border-left: thick $accent;
+}
+
+.chat-assistant {
+    background: $surface-alt;
+    border-left: solid $border;
 }
 
 #chat-input-row {

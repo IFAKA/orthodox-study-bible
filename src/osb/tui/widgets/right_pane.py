@@ -76,13 +76,13 @@ class RightPane(Widget):
         self._check_ollama()
 
     def on_focus(self) -> None:
-        """When focused, delegate to the active tab's input or content."""
+        """Delegate focus to chat input when on Chat tab; stay focused for Commentary."""
         try:
             tabs = self.query_one("#right-tabs", TabbedContent)
             if tabs.active == "tab-chat":
                 self.query_one("#chat-input", Input).focus()
-            else:
-                self.query_one("#commentary-text", Markdown).focus()
+            # Commentary: Markdown is not focusable — RightPane retains focus,
+            # triggering #right-pane:focus border via CSS.
         except Exception:
             pass
 
@@ -324,10 +324,8 @@ class RightPane(Widget):
             except Exception:
                 pass
         else:
-            try:
-                self.query_one("#commentary-text", Markdown).focus()
-            except Exception:
-                pass
+            # Commentary: Markdown not focusable — focus RightPane itself
+            self.focus()
 
     def action_toggle_tab(self) -> None:
         try:

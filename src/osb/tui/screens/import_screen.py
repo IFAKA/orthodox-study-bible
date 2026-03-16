@@ -8,12 +8,14 @@ from pathlib import Path
 
 from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.containers import Vertical
 from textual.message import Message
 from textual.screen import Screen
-from textual.widgets import Button, Label, ProgressBar
+from textual.widgets import Button, Footer, Label, ProgressBar
 
 from osb.db.queries import get_verse_count
 from osb.importer.epub_parser import ParseError, run_import
+from osb.tui.widgets.app_header import AppHeader
 
 
 class ImportScreen(Screen):
@@ -41,14 +43,17 @@ class ImportScreen(Screen):
         self.epub_path = epub_path
 
     def compose(self) -> ComposeResult:
-        yield Label("Orthodox Study Bible", id="import-title")
-        yield Label(f"Importing: {self.epub_path.name}", id="import-status")
-        yield ProgressBar(total=100, id="import-progress", show_eta=False)
-        yield Label("", id="import-warnings")
-        yield Button("Cancel", id="cancel-btn", variant="error")
+        yield AppHeader(title="Orthodox Study Bible — Importing")
+        with Vertical(id="import-dialog"):
+            yield Label(f"Importing: {self.epub_path.name}", id="import-status")
+            yield ProgressBar(total=100, id="import-progress", show_eta=False)
+            yield Label("", id="import-warnings")
+            yield Button("Cancel", id="cancel-btn", variant="error")
+        yield Footer()
 
     def on_mount(self) -> None:
         self._start_import()
+        self.query_one("#cancel-btn", Button).focus()
 
     def _start_import(self) -> None:
         def worker():

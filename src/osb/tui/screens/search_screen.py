@@ -31,7 +31,7 @@ class SearchScreen(ModalScreen[str | None]):
             yield Label("Search Scripture", id="search-title", classes="modal-title")
             yield Input(placeholder="Search…", id="search-input")
             yield ListView(id="search-results")
-            yield Label("↑↓ navigate · Enter select · Esc close", id="search-help")
+            yield Label("Type to search · Tab/↓ to results · Enter select · Esc close", id="search-help")
 
     def on_mount(self) -> None:
         self.query_one("#search-input", Input).focus()

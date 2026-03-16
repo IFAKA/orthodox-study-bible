@@ -51,6 +51,10 @@ Screen.sepia VerseBlock.focused {
     border-left: thick #d4a84c;
 }
 
+Screen.sepia #scripture-pane.active-pane {
+    border-left: thick #d4a84c;
+}
+
 Screen.sepia VerseBlock .verse-num {
     color: #9a8060;
 }

@@ -21,6 +21,9 @@ class MyNotesScreen(Screen):
         Binding("q", "close", "Back"),
         Binding("escape", "close", "Back"),
         Binding("e", "export", "Export"),
+        Binding("j", "list_down", "Down", show=False),
+        Binding("k", "list_up", "Up", show=False),
+        Binding("G", "list_bottom", "Bottom", show=False),
     ]
 
     def __init__(self, conn: sqlite3.Connection, **kwargs) -> None:
@@ -79,6 +82,17 @@ class MyNotesScreen(Screen):
             verse = get_verse(self.conn, data["verse_ref"])
             text = verse.text if verse else ""
             md.update(f"**{data['verse_ref']}** ♦\n\n{text}")
+
+    def action_list_down(self) -> None:
+        self.query_one("#notes-list", ListView).action_cursor_down()
+
+    def action_list_up(self) -> None:
+        self.query_one("#notes-list", ListView).action_cursor_up()
+
+    def action_list_bottom(self) -> None:
+        lv = self.query_one("#notes-list", ListView)
+        if lv._nodes:
+            lv.index = len(lv._nodes) - 1
 
     def action_close(self) -> None:
         self.app.pop_screen()

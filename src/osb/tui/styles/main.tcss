@@ -87,8 +87,7 @@ Button:focus {
     overflow-y: auto;
 }
 
-#sidebar:focus {
-    border: none;
+#sidebar:focus-within {
     border-right: thick $accent;
 }
 
@@ -119,9 +118,10 @@ BookTree > .tree--cursor {
     padding: 0 3;
 }
 
-#scripture-pane:focus {
-    border: none;
-    background: $bg;
+/* Active pane indicator: toggled via .active-pane class in ScripturePane.on_focus */
+#scripture-pane.active-pane {
+    border-left: thick $accent;
+    padding-left: 2;
 }
 
 /* ── Verse blocks ─────────────────────────────────────────────────── */
@@ -174,6 +174,7 @@ VerseBlock.hl-pink   { background: $hl-pink;   }
     border-left: solid $border;
 }
 
+#right-pane:focus,
 #right-pane:focus-within {
     border-left: thick $accent;
 }
@@ -347,14 +348,8 @@ ImportScreen {
     width: 60%;
     height: auto;
     background: $surface;
-    border: solid $accent;
+    border: thick $accent;
     padding: 2 3;
-}
-
-#import-title {
-    color: $accent;
-    text-align: center;
-    margin-bottom: 2;
 }
 
 #import-progress {

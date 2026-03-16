@@ -121,6 +121,12 @@ class ScripturePane(ChordMixin, Widget):
 
     # ── Keyboard handling ─────────────────────────────────────────────────────
 
+    def on_focus(self) -> None:
+        self.add_class("active-pane")
+
+    def on_blur(self) -> None:
+        self.remove_class("active-pane")
+
     def on_key(self, event) -> None:
         if self.handle_chord(event):
             return

@@ -15,15 +15,15 @@ class BookTree(Tree):
     """Tree widget listing Orthodox canon books with lazy chapter loading."""
 
     BINDINGS = [
-        Binding("j", "cursor_down", "↓", show=False),
-        Binding("k", "cursor_up", "↑", show=False),
-        Binding("l", "expand_or_select", "Open", show=False),
-        Binding("h", "collapse_or_parent", "Back", show=False),
+        Binding("j", "cursor_down", "↓", show=True),
+        Binding("k", "cursor_up", "↑", show=True),
+        Binding("l", "expand_or_select", "Open", show=True),
+        Binding("h", "collapse_or_parent", "Back", show=True),
         Binding("enter", "expand_or_select", "Select", show=False),
         Binding("space", "toggle_node", "Toggle", show=False),
         Binding("o", "toggle_node", "Toggle", show=False),
-        Binding("g", "goto_top", "Top", show=False),
-        Binding("G", "goto_bottom", "Bottom", show=False),
+        Binding("g", "goto_top", "Top", show=True),
+        Binding("G", "goto_bottom", "Bottom", show=True),
         Binding("escape", "close_sidebar", "Close", show=True),
         Binding("q", "close_sidebar", "Close", show=False),
     ]

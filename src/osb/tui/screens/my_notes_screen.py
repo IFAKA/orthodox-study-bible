@@ -7,17 +7,20 @@ from pathlib import Path
 
 from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.containers import Horizontal
 from textual.screen import Screen
-from textual.widgets import Label, ListItem, ListView, Markdown
+from textual.widgets import Footer, Label, ListItem, ListView, Markdown
+
+from osb.tui.widgets.app_header import AppHeader
 
 
 class MyNotesScreen(Screen):
     """Screen showing all annotations and bookmarks."""
 
     BINDINGS = [
-        Binding("q", "close", "Close"),
-        Binding("escape", "close", "Close"),
-        Binding("e", "export", "Export to Markdown"),
+        Binding("q", "close", "Back"),
+        Binding("escape", "close", "Back"),
+        Binding("e", "export", "Export"),
     ]
 
     def __init__(self, conn: sqlite3.Connection, **kwargs) -> None:
@@ -25,13 +28,15 @@ class MyNotesScreen(Screen):
         self.conn = conn
 
     def compose(self) -> ComposeResult:
-        yield Label("My Notes & Bookmarks", id="notes-title")
-        yield ListView(id="notes-list")
-        yield Markdown("Select an item to view", id="notes-detail")
-        yield Label("q/Esc close · e export all", id="notes-footer")
+        yield AppHeader(title="My Notes & Bookmarks")
+        with Horizontal(id="notes-layout"):
+            yield ListView(id="notes-list")
+            yield Markdown("Select an item to view", id="notes-detail")
+        yield Footer()
 
     def on_mount(self) -> None:
         self._load_items()
+        self.query_one("#notes-list", ListView).focus()
 
     def _load_items(self) -> None:
         from osb.db.queries import get_all_annotations, get_all_bookmarks

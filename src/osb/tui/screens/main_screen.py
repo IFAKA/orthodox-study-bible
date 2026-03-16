@@ -7,8 +7,9 @@ from datetime import date
 
 from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.containers import Horizontal
 from textual.screen import Screen
-from textual.widgets import Input, Label
+from textual.widgets import Footer, Input, Label
 
 from osb.db import queries
 from osb.importer.lectionary import get_primary_reading
@@ -16,6 +17,7 @@ from osb.tui.screens.daily_screen import DailyScreen
 from osb.tui.screens.my_notes_screen import MyNotesScreen
 from osb.tui.screens.search_screen import SearchScreen
 from osb.tui.widgets.annotation_modal import AnnotationModal
+from osb.tui.widgets.app_header import AppHeader
 from osb.tui.widgets.book_tree import BookTree
 from osb.tui.widgets.right_pane import RightPane
 from osb.tui.widgets.scripture_pane import ScripturePane
@@ -25,15 +27,15 @@ class MainScreen(Screen):
     """Primary 3-pane reading screen."""
 
     BINDINGS = [
-        Binding("t", "toggle_sidebar", "Toggle sidebar"),
+        Binding("t", "toggle_sidebar", "Sidebar"),
         Binding("/", "search", "Search"),
-        Binding("N", "notes", "My Notes"),
-        Binding("L", "lectionary", "Today's reading"),
-        Binding("T", "toggle_theme", "Toggle theme"),
-        Binding("E", "export_notes", "Export notes"),
+        Binding("N", "notes", "Notes"),
+        Binding("L", "lectionary", "Lectionary"),
         Binding("q", "quit_app", "Quit"),
-        Binding("h", "focus_scripture", "Focus scripture"),
-        Binding("l", "focus_right", "Focus right pane"),
+        Binding("T", "toggle_theme", "Theme", show=False),
+        Binding("E", "export_notes", "Export", show=False),
+        Binding("h", "focus_scripture", "Scripture", show=False),
+        Binding("l", "focus_right", "Commentary/Chat", show=False),
     ]
 
     def __init__(self, conn: sqlite3.Connection, **kwargs) -> None:
@@ -43,28 +45,19 @@ class MainScreen(Screen):
         self._current_chapter_ref: str | None = None
 
     def compose(self) -> ComposeResult:
-        # Header
-        yield Label("", id="app-header")
+        yield AppHeader()
 
-        # Sidebar (always in layout, visibility toggled)
-        sidebar = BookTree(self.conn, id="sidebar")
-        sidebar.add_class("hidden")
-        yield sidebar
+        # 3-pane horizontal layout
+        with Horizontal(id="main-layout"):
+            yield BookTree(self.conn, id="sidebar", classes="hidden")
+            yield ScripturePane(self.conn, id="scripture-pane")
+            yield RightPane(self.conn, id="right-pane")
 
-        # Scripture pane
-        yield ScripturePane(self.conn, id="scripture-pane")
-
-        # Right pane
-        yield RightPane(self.conn, id="right-pane")
-
-        # Footer
-        yield Label(
-            "[t]sidebar  [/]search  [N]notes  [b]bookmark  [L]lectionary",
-            id="app-footer",
-        )
+        yield Footer()
 
     def on_mount(self) -> None:
         self._restore_session()
+        self.call_after_refresh(lambda: self.query_one("#scripture-pane", ScripturePane).focus())
 
     def _restore_session(self) -> None:
         last_ref = queries.get_session(self.conn, "last_verse_ref", "")
@@ -106,10 +99,9 @@ class MainScreen(Screen):
         lectionary_str = f"Today: {lectionary_ref}" if lectionary_ref else ""
 
         try:
-            header = self.query_one("#app-header", Label)
-            header.update(
-                f"{book_name} {ch.number}{complete_str}  {lectionary_str}"
-            )
+            header = self.query_one(AppHeader)
+            header.update_title(f"{book_name} {ch.number}{complete_str}")
+            header.update_lectionary(lectionary_str)
         except Exception:
             pass
 
@@ -154,8 +146,12 @@ class MainScreen(Screen):
             sidebar = self.query_one("#sidebar", BookTree)
             if self._sidebar_visible:
                 sidebar.remove_class("hidden")
+                self.call_after_refresh(sidebar.focus)
             else:
                 sidebar.add_class("hidden")
+                self.call_after_refresh(
+                    lambda: self.query_one("#scripture-pane", ScripturePane).focus()
+                )
         except Exception:
             pass
 

@@ -42,40 +42,42 @@ Screen.sepia #scripture-pane {
     background: #2c2416;
 }
 
-Screen.sepia .verse-block {
+Screen.sepia VerseBlock {
     color: #ddd0b0;
 }
 
-Screen.sepia .verse-block.focused {
+Screen.sepia VerseBlock.focused {
     background: #403528;
     border-left: thick #d4a84c;
 }
 
-Screen.sepia .verse-block .verse-num {
+Screen.sepia VerseBlock .verse-num {
     color: #9a8060;
 }
 
-Screen.sepia .verse-block .verse-glyph {
+Screen.sepia VerseBlock .verse-glyph {
     color: #d4a84c;
 }
 
-Screen.sepia .verse-block.hl-yellow { background: #5a4800; }
-Screen.sepia .verse-block.hl-green  { background: #243824; }
-Screen.sepia .verse-block.hl-blue   { background: #142848; }
-Screen.sepia .verse-block.hl-pink   { background: #481828; }
+Screen.sepia VerseBlock.hl-yellow { background: #5a4800; }
+Screen.sepia VerseBlock.hl-green  { background: #243824; }
+Screen.sepia VerseBlock.hl-blue   { background: #142848; }
+Screen.sepia VerseBlock.hl-pink   { background: #481828; }
 
 Screen.sepia #right-pane {
     background: #362d1e;
     border-left: solid #5a4a30;
 }
 
-Screen.sepia #right-pane ContentTab {
+Screen.sepia #right-tabs ContentTab {
     background: #362d1e;
     color: #9a8060;
 }
 
-Screen.sepia #right-pane ContentTab.-active {
+Screen.sepia #right-tabs ContentTab.-active {
     color: #d4a84c;
+    text-style: bold;
+    background: #403528;
     border-bottom: heavy #d4a84c;
 }
 

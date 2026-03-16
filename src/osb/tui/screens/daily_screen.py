@@ -7,6 +7,7 @@ from datetime import date
 
 from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.containers import Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, Label
 
@@ -30,12 +31,14 @@ class DailyScreen(ModalScreen[str | None]):
 
     def compose(self) -> ComposeResult:
         today = date.today().strftime("%A, %B %-d")
-        yield Label(f"Today's Readings — {today}", id="daily-title")
-        yield Label("", id="daily-readings")
-        yield Button("Go to first reading", id="goto-btn", variant="primary")
-        yield Button("Close", id="close-btn")
+        with Vertical(id="daily-dialog", classes="modal-dialog"):
+            yield Label(f"Today's Readings — {today}", id="daily-title", classes="modal-title")
+            yield Label("", id="daily-readings")
+            yield Button("Go to first reading", id="goto-btn", variant="primary")
+            yield Button("Close", id="close-btn")
 
     def on_mount(self) -> None:
+        self.query_one("#goto-btn", Button).focus()
         label = self.query_one("#daily-readings", Label)
         if self._readings:
             lines = []

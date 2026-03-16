@@ -6,6 +6,7 @@ import sqlite3
 
 from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.containers import Vertical
 from textual.message import Message
 from textual.screen import ModalScreen
 from textual.widgets import Input, Label, ListItem, ListView
@@ -26,10 +27,14 @@ class SearchScreen(ModalScreen[str | None]):
         self._debounce_timer = None
 
     def compose(self) -> ComposeResult:
-        yield Label("Search Scripture", id="search-title")
-        yield Input(placeholder="Search…", id="search-input")
-        yield ListView(id="search-results")
-        yield Label("↑↓ navigate · Enter select · Esc close", id="search-help")
+        with Vertical(id="search-dialog", classes="modal-dialog"):
+            yield Label("Search Scripture", id="search-title", classes="modal-title")
+            yield Input(placeholder="Search…", id="search-input")
+            yield ListView(id="search-results")
+            yield Label("↑↓ navigate · Enter select · Esc close", id="search-help")
+
+    def on_mount(self) -> None:
+        self.query_one("#search-input", Input).focus()
 
     def on_input_changed(self, event: Input.Changed) -> None:
         if event.input.id != "search-input":

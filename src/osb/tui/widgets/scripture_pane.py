@@ -26,18 +26,20 @@ class ScripturePane(ChordMixin, Widget):
     Emits VerseFocused when the focused verse changes.
     """
 
+    can_focus = True
+
     BINDINGS = [
-        Binding("j", "next_verse", "Next verse", show=False),
-        Binding("k", "prev_verse", "Prev verse", show=False),
-        Binding("J", "next_chapter", "Next chapter", show=False),
-        Binding("K", "prev_chapter", "Prev chapter", show=False),
+        Binding("j", "next_verse", "Next verse", show=True),
+        Binding("k", "prev_verse", "Prev verse", show=True),
+        Binding("J", "prev_chapter", "Prev chapter", show=True),
+        Binding("K", "next_chapter", "Next chapter", show=True),
+        Binding("b", "bookmark", "Bookmark", show=True),
+        Binding("m", "cycle_highlight", "Highlight", show=True),
+        Binding("o", "annotate", "Annotate", show=True),
         Binding("G", "last_verse", "Last verse", show=False),
         Binding("space", "page_down", "Page down", show=False),
-        Binding("ctrl+d", "half_page_down", "Half page down", show=False),
+        Binding("ctrl+d", "half_page_down", "Half page", show=False),
         Binding("ctrl+u", "half_page_up", "Half page up", show=False),
-        Binding("o", "annotate", "Annotate", show=False),
-        Binding("m", "cycle_highlight", "Highlight", show=False),
-        Binding("b", "bookmark", "Bookmark", show=False),
     ]
 
     class VerseFocused(Message):

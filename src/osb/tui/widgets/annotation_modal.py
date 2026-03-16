@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.containers import Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, Label, TextArea
 
@@ -25,9 +26,13 @@ class AnnotationModal(ModalScreen[str | None]):
         self.existing_text = existing_text
 
     def compose(self) -> ComposeResult:
-        yield Label(f"Annotation: {self.verse_ref}", id="annotation-ref")
-        yield TextArea(self.existing_text, id="annotation-editor", language="markdown")
-        yield Label("Ctrl+S save · Esc cancel", id="annotation-help")
+        with Vertical(id="annotation-dialog", classes="modal-dialog"):
+            yield Label(f"Annotation: {self.verse_ref}", id="annotation-ref", classes="modal-title")
+            yield TextArea(self.existing_text, id="annotation-editor", language="markdown")
+            yield Label("Ctrl+S save · Esc cancel", id="annotation-help")
+
+    def on_mount(self) -> None:
+        self.query_one("#annotation-editor", TextArea).focus()
 
     def action_save(self) -> None:
         editor = self.query_one("#annotation-editor", TextArea)

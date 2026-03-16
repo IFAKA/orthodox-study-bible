@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 import httpx
 from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.containers import VerticalScroll
 from textual.message import Message
 from textual.widget import Widget
 from textual.widgets import Input, Label, Markdown, TabbedContent, TabPane
@@ -27,8 +28,10 @@ class RightPane(Widget):
     Chat uses Ollama (optional) via a background thread.
     """
 
+    can_focus = True
+
     BINDINGS = [
-        Binding("a", "toggle_tab", "Toggle Commentary/Chat", show=False),
+        Binding("a", "toggle_tab", "Commentary/Chat", show=True),
     ]
 
     class OllamaChunk(Message):
@@ -62,7 +65,8 @@ class RightPane(Widget):
             with TabPane("Commentary", id="tab-commentary"):
                 yield Markdown("", id="commentary-text")
             with TabPane("Chat", id="tab-chat"):
-                yield Label("", id="chat-history-label")
+                with VerticalScroll(id="chat-history"):
+                    yield Markdown("", id="chat-history-md")
                 yield Input(
                     placeholder="Ask about this passage… (Enter to send)",
                     id="chat-input",
@@ -70,6 +74,17 @@ class RightPane(Widget):
 
     def on_mount(self) -> None:
         self._check_ollama()
+
+    def on_focus(self) -> None:
+        """When focused, delegate to the active tab's input or content."""
+        try:
+            tabs = self.query_one("#right-tabs", TabbedContent)
+            if tabs.active == "tab-chat":
+                self.query_one("#chat-input", Input).focus()
+            else:
+                self.query_one("#commentary-text", Markdown).focus()
+        except Exception:
+            pass
 
     def _check_ollama(self) -> None:
         def check():
@@ -84,8 +99,8 @@ class RightPane(Widget):
 
     def _show_ollama_unavailable(self) -> None:
         try:
-            label = self.query_one("#chat-history-label", Label)
-            label.update("Ollama not running — start it with `ollama serve`")
+            md = self.query_one("#chat-history-md", Markdown)
+            md.update("*Ollama not running — start it with `ollama serve`*")
         except Exception:
             pass
 
@@ -240,16 +255,23 @@ class RightPane(Widget):
         if self._streaming and self._accumulated_response:
             lines.append(f"**AI:** {self._accumulated_response}▋")
         try:
-            label = self.query_one("#chat-history-label", Label)
-            label.update("\n\n".join(lines))
+            md = self.query_one("#chat-history-md", Markdown)
+            md.update("\n\n".join(lines))
         except Exception:
             pass
 
     def _append_chat(self, text: str) -> None:
         try:
-            label = self.query_one("#chat-history-label", Label)
-            current = str(label.renderable) if hasattr(label, "renderable") else ""
-            label.update(f"{current}\n{text}" if current else text)
+            md = self.query_one("#chat-history-md", Markdown)
+            history = queries.get_chat_history(self.conn, self._current_chapter_ref) if self._current_chapter_ref else []
+            lines = []
+            for msg in history:
+                if msg["role"] == "user":
+                    lines.append(f"**You:** {msg['content']}")
+                elif msg["role"] == "assistant":
+                    lines.append(f"**AI:** {msg['content']}")
+            lines.append(text.strip())
+            md.update("\n\n".join(l for l in lines if l))
         except Exception:
             pass
 
@@ -294,6 +316,18 @@ class RightPane(Widget):
             self._streaming = False
             self._accumulated_response = ""
             self._render_chat_history()
+
+    def on_tabbed_content_tab_changed(self, event: TabbedContent.TabChanged) -> None:
+        if event.tab_pane.id == "tab-chat":
+            try:
+                self.query_one("#chat-input", Input).focus()
+            except Exception:
+                pass
+        else:
+            try:
+                self.query_one("#commentary-text", Markdown).focus()
+            except Exception:
+                pass
 
     def action_toggle_tab(self) -> None:
         try:

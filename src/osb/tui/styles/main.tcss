@@ -27,8 +27,10 @@ Screen {
     height: 1;
     background: $surface;
     color: $accent;
-    padding: 0 1;
+    padding: 0 2;
     dock: top;
+    text-style: bold;
+    border-bottom: solid $border;
     layout: horizontal;
 }
 
@@ -42,28 +44,38 @@ Screen {
 }
 
 /* ── Footer ────────────────────────────────────────────────────── */
-#app-footer {
-    height: 1;
+Footer {
     background: $surface;
     color: $text-muted;
-    padding: 0 1;
-    dock: bottom;
-    layout: horizontal;
+    border-top: solid $border;
 }
 
-#footer-keys {
-    width: 1fr;
+Footer > .footer--key {
+    background: $surface-alt;
+    color: $accent;
 }
 
-#footer-status {
-    width: auto;
-    color: $text-muted;
+Footer > .footer--highlight {
+    background: $accent;
+    color: $bg;
 }
 
-/* ── Main layout ────────────────────────────────────────────────── */
-#main-layout {
-    layout: horizontal;
-    height: 1fr;
+/* ── Focus States (targeted — avoid breaking container layouts) ── */
+Input:focus {
+    border: tall $accent;
+}
+
+TextArea:focus {
+    border: tall $accent;
+}
+
+ListView:focus {
+    border: tall $accent;
+}
+
+Button:focus {
+    border: tall $accent;
+    text-style: bold;
 }
 
 /* ── Sidebar / BookTree ──────────────────────────────────────────── */
@@ -75,8 +87,13 @@ Screen {
     overflow-y: auto;
 }
 
+#sidebar:focus {
+    border: none;
+    border-right: thick $accent;
+}
+
 #sidebar.hidden {
-    visibility: hidden;
+    display: none;
 }
 
 BookTree {
@@ -99,40 +116,56 @@ BookTree > .tree--cursor {
     width: 1fr;
     background: $bg;
     overflow-y: auto;
-    padding: 1 3;
+    padding: 0 3;
+}
+
+#scripture-pane:focus {
+    border: none;
+    background: $bg;
 }
 
 /* ── Verse blocks ─────────────────────────────────────────────────── */
-.verse-block {
+VerseBlock {
     padding: 0 0 0 3;
     color: $text-verse;
+    height: auto;
+    border: none;
 }
 
-.verse-block.focused {
+VerseBlock:focus {
     background: $surface-alt;
     border-left: thick $accent;
     padding-left: 2;
 }
 
-.verse-block .verse-num {
+VerseBlock.focused {
+    background: $surface-alt;
+    border-left: thick $accent;
+    padding-left: 2;
+}
+
+VerseBlock .verse-num {
     color: $text-muted;
     width: 3;
+    height: auto;
 }
 
-.verse-block .verse-text {
+VerseBlock .verse-text {
     width: 1fr;
+    height: auto;
 }
 
-.verse-block .verse-glyph {
+VerseBlock .verse-glyph {
     width: 2;
     color: $accent;
+    height: auto;
 }
 
 /* Highlight variants */
-.verse-block.hl-yellow { background: $hl-yellow; }
-.verse-block.hl-green  { background: $hl-green;  }
-.verse-block.hl-blue   { background: $hl-blue;   }
-.verse-block.hl-pink   { background: $hl-pink;   }
+VerseBlock.hl-yellow { background: $hl-yellow; }
+VerseBlock.hl-green  { background: $hl-green;  }
+VerseBlock.hl-blue   { background: $hl-blue;   }
+VerseBlock.hl-pink   { background: $hl-pink;   }
 
 /* ── Right pane ────────────────────────────────────────────────────── */
 #right-pane {
@@ -141,36 +174,47 @@ BookTree > .tree--cursor {
     border-left: solid $border;
 }
 
-#right-pane TabbedContent {
+#right-pane:focus-within {
+    border-left: thick $accent;
+}
+
+#right-tabs {
     height: 1fr;
 }
 
-#right-pane ContentTab {
+#right-tabs > TabBar {
     background: $surface;
     color: $text-muted;
+    border-bottom: solid $border;
+    height: 3;
 }
 
-#right-pane ContentTab.-active {
-    color: $accent;
-    border-bottom: heavy $accent;
+#right-tabs ContentTab {
+    background: $surface;
+    color: $text-muted;
+    min-width: 15;
 }
 
-/* ── Commentary tab ────────────────────────────────────────────────── */
-#commentary-scroll {
-    padding: 1 2;
-    overflow-y: auto;
-    height: 1fr;
-}
-
-#commentary-text {
+#right-tabs ContentTab:hover {
+    background: $surface-alt;
     color: $text;
 }
 
-#xref-section {
-    border-top: solid $border;
-    padding-top: 1;
-    color: $text-muted;
-    margin-top: 1;
+#right-tabs ContentTab.-active {
+    color: $accent;
+    text-style: bold;
+    background: $surface-alt;
+    border-bottom: heavy $accent;
+}
+
+#right-tabs TabPane {
+    padding: 0;
+}
+
+/* ── Commentary tab ────────────────────────────────────────────────── */
+#commentary-text {
+    padding: 1 2;
+    color: $text;
 }
 
 /* ── Chat tab ──────────────────────────────────────────────────────── */
@@ -178,19 +222,6 @@ BookTree > .tree--cursor {
     height: 1fr;
     overflow-y: auto;
     padding: 1 2;
-}
-
-.chat-message-user {
-    background: $surface-alt;
-    padding: 0 1;
-    margin-bottom: 1;
-    color: $text;
-}
-
-.chat-message-assistant {
-    padding: 0 1;
-    margin-bottom: 1;
-    color: $text;
 }
 
 #chat-input-row {
@@ -204,19 +235,38 @@ BookTree > .tree--cursor {
     background: $surface-alt;
     border: solid $border;
     color: $text;
+    padding: 0 1;
+}
+
+#chat-input:focus {
+    border: tall $accent;
+}
+
+/* ── Common Modal Styling ──────────────────────────────────────────── */
+.modal-dialog {
+    width: 70%;
+    height: 60%;
+    background: $surface;
+    border: thick $accent;
+    padding: 1 2;
+}
+
+.modal-title {
+    color: $accent;
+    text-align: center;
+    text-style: bold;
+    margin-bottom: 1;
 }
 
 /* ── Search screen ─────────────────────────────────────────────────── */
 SearchScreen {
     align: center middle;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 #search-dialog {
-    width: 70%;
-    height: 60%;
-    background: $surface;
-    border: solid $accent;
-    padding: 1 2;
+    width: 80%;
+    height: 70%;
 }
 
 #search-input {
@@ -225,11 +275,17 @@ SearchScreen {
     border: solid $border;
     color: $text;
     margin-bottom: 1;
+    padding: 0 1;
+}
+
+#search-input:focus {
+    border: tall $accent;
 }
 
 #search-results {
     height: 1fr;
     overflow-y: auto;
+    border: solid $border;
 }
 
 .search-result {
@@ -243,7 +299,7 @@ SearchScreen {
     width: 12;
 }
 
-.search-result:hover {
+.search-result:focus {
     background: $surface-alt;
     color: $text;
 }
@@ -251,14 +307,12 @@ SearchScreen {
 /* ── Annotation modal ────────────────────────────────────────────────── */
 AnnotationModal {
     align: center middle;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 #annotation-dialog {
-    width: 60%;
-    height: 50%;
-    background: $surface;
-    border: solid $accent;
-    padding: 1 2;
+    width: 70%;
+    height: 60%;
 }
 
 #annotation-ref {
@@ -271,6 +325,11 @@ AnnotationModal {
     background: $surface-alt;
     border: solid $border;
     color: $text;
+    padding: 0 1;
+}
+
+#annotation-editor:focus {
+    border: tall $accent;
 }
 
 #annotation-help {

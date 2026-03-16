@@ -5,6 +5,7 @@ from __future__ import annotations
 import sqlite3
 from typing import TYPE_CHECKING
 
+from textual.binding import Binding
 from textual.message import Message
 from textual.widgets import Tree
 from textual.widgets.tree import TreeNode
@@ -17,6 +18,12 @@ if TYPE_CHECKING:
 
 class BookTree(Tree):
     """Tree widget listing Orthodox canon books with lazy chapter loading."""
+
+    BINDINGS = [
+        Binding("j", "cursor_down", "Next", show=False),
+        Binding("k", "cursor_up", "Prev", show=False),
+        Binding("escape", "close_sidebar", "Close", show=True),
+    ]
 
     class ChapterSelected(Message):
         """Posted when user selects a chapter."""
@@ -69,6 +76,12 @@ class BookTree(Tree):
         data = event.node.data
         if data and data.get("type") == "chapter":
             self.post_message(self.ChapterSelected(data["ref"]))
+
+    def action_close_sidebar(self) -> None:
+        try:
+            self.screen.action_toggle_sidebar()
+        except Exception:
+            pass
 
     def highlight_chapter(self, chapter_ref: str) -> None:
         """Scroll to and select the node for the given chapter."""

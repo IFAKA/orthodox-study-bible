@@ -3,17 +3,12 @@
 from __future__ import annotations
 
 import sqlite3
-from typing import TYPE_CHECKING
-
 from textual.binding import Binding
 from textual.message import Message
 from textual.widgets import Tree
 from textual.widgets.tree import TreeNode
 
-from osb.db.queries import get_all_books, get_chapters_for_book
-
-if TYPE_CHECKING:
-    pass
+from osb.db.queries import get_all_books, get_chapters_for_book, get_chapters_with_chat
 
 
 class BookTree(Tree):
@@ -36,9 +31,10 @@ class BookTree(Tree):
         super().__init__("Books", **kwargs)
         self.conn = conn
         self._chapter_nodes: dict[str, TreeNode] = {}
-        self._book_nodes: dict[str, TreeNode] = {}
+        self._chapters_with_chat: set[str] = set()
 
     def on_mount(self) -> None:
+        self._chapters_with_chat = get_chapters_with_chat(self.conn)
         self._load_books()
 
     def _load_books(self) -> None:
@@ -51,8 +47,7 @@ class BookTree(Tree):
                 label = {"OT": "Old Testament", "NT": "New Testament", "DC": "Deuterocanon"}.get(t, t)
                 testament_nodes[t] = self.root.add(label, expand=False)
 
-            node = testament_nodes[t].add(book.name, expand=False, data={"type": "book", "ref": book.ref})
-            self._book_nodes[book.ref] = node
+            testament_nodes[t].add(book.name, expand=False, data={"type": "book", "ref": book.ref})
 
         self.root.expand()
 
@@ -66,9 +61,11 @@ class BookTree(Tree):
     def _load_chapters(self, book_node: TreeNode, book_ref: str) -> None:
         chapters = get_chapters_for_book(self.conn, book_ref)
         for ch in chapters:
+            base = f"Chapter {ch.number}"
+            label = base + (" ◆" if ch.ref in self._chapters_with_chat else "")
             ch_node = book_node.add_leaf(
-                f"Chapter {ch.number}",
-                data={"type": "chapter", "ref": ch.ref},
+                label,
+                data={"type": "chapter", "ref": ch.ref, "base_label": base},
             )
             self._chapter_nodes[ch.ref] = ch_node
 
@@ -82,6 +79,20 @@ class BookTree(Tree):
             self.screen.action_toggle_sidebar()
         except Exception:
             pass
+
+    def mark_chapter_chat(self, chapter_ref: str, has_chat: bool) -> None:
+        """Add or remove the ◆ chat indicator on a chapter node."""
+        node = self._chapter_nodes.get(chapter_ref)
+        if not node:
+            return
+        if has_chat:
+            self._chapters_with_chat.add(chapter_ref)
+        else:
+            self._chapters_with_chat.discard(chapter_ref)
+        data = node.data
+        if data:
+            base = data.get("base_label", data["ref"])
+            node.set_label(base + (" ◆" if has_chat else ""))
 
     def highlight_chapter(self, chapter_ref: str) -> None:
         """Scroll to and select the node for the given chapter."""

@@ -24,7 +24,7 @@ Screen {
 
 /* ── Header ────────────────────────────────────────────────────── */
 #app-header {
-    height: 1;
+    height: 2;
     background: $surface;
     color: $accent;
     padding: 0 2;
@@ -230,6 +230,26 @@ VerseBlock.hl-pink   { background: $hl-pink;   }
 }
 
 /* ── Chat tab ──────────────────────────────────────────────────────── */
+#ollama-status {
+    height: auto;
+    min-height: 1;
+    padding: 0 1;
+    background: $surface-alt;
+    border-bottom: solid $border;
+    color: $text-muted;
+}
+
+.debug-panel {
+    height: auto;
+    max-height: 12;
+    padding: 1 2;
+    background: #0a1520;
+    border-top: solid $border;
+    border-bottom: solid $border;
+    color: $text-muted;
+    display: none;
+}
+
 #chat-history {
     height: 1fr;
     overflow-y: auto;
@@ -447,6 +467,20 @@ DailyScreen {
 
 #daily-readings {
     margin-bottom: 1;
+}
+
+/* ── Splash screen ──────────────────────────────────────────────────── */
+SplashScreen {
+    align: center middle;
+    background: $bg;
+}
+
+#splash-cross {
+    color: $accent;
+    text-align: center;
+    text-style: bold;
+    width: auto;
+    height: auto;
 }
 
 /* ── Lectionary bar ─────────────────────────────────────────────────── */

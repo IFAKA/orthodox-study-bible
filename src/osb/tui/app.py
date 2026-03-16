@@ -9,6 +9,7 @@ from textual.app import App, ComposeResult
 
 from osb.tui.screens.import_screen import ImportScreen
 from osb.tui.screens.main_screen import MainScreen
+from osb.tui.screens.splash_screen import SplashScreen
 
 
 class OrthodoxStudyApp(App):
@@ -26,6 +27,9 @@ class OrthodoxStudyApp(App):
         self.epub_path = epub_path
 
     def on_mount(self) -> None:
+        self.push_screen(SplashScreen(), self._after_splash)
+
+    def _after_splash(self, _result=None) -> None:
         from osb.db.queries import get_verse_count
 
         verse_count = get_verse_count(self.conn)

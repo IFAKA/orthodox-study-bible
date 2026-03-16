@@ -3,21 +3,14 @@
 from __future__ import annotations
 
 import sqlite3
-from typing import TYPE_CHECKING
-
-from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.message import Message
-from textual.scroll_view import ScrollView
 from textual.widget import Widget
-from textual.widgets import Label
 
 from osb.db import queries
+from osb.db.queries import get_annotated_verse_refs_for_chapter, get_bookmarked_verse_refs_for_chapter
 from osb.tui.mixins.chord_handler import ChordMixin
 from osb.tui.widgets.verse_block import VerseBlock
-
-if TYPE_CHECKING:
-    pass
 
 
 class ScripturePane(ChordMixin, Widget):
@@ -31,8 +24,8 @@ class ScripturePane(ChordMixin, Widget):
     BINDINGS = [
         Binding("j", "next_verse", "Next verse", show=True),
         Binding("k", "prev_verse", "Prev verse", show=True),
-        Binding("J", "prev_chapter", "Prev chapter", show=True),
-        Binding("K", "next_chapter", "Next chapter", show=True),
+        Binding("J", "next_chapter", "Next chapter", show=True),
+        Binding("K", "prev_chapter", "Prev chapter", show=True),
         Binding("b", "bookmark", "Bookmark", show=True),
         Binding("m", "cycle_highlight", "Highlight", show=True),
         Binding("o", "annotate", "Annotate", show=True),
@@ -75,17 +68,10 @@ class ScripturePane(ChordMixin, Widget):
             return
         verses = queries.get_verses_for_chapter(self.conn, self._chapter_ref)
         highlights = queries.get_highlights_for_chapter(self.conn, self._chapter_ref)
-        annotations = {
-            a.verse_ref
-            for a in queries.get_all_annotations(self.conn)
-            if a.verse_ref and a.verse_ref.startswith(self._chapter_ref)
-        }
-        bookmarks_set = {
-            bm.verse_ref
-            for bm in queries.get_all_bookmarks(self.conn)
-            if bm.verse_ref.startswith(self._chapter_ref)
-        }
+        annotations = get_annotated_verse_refs_for_chapter(self.conn, self._chapter_ref)
+        bookmarks_set = get_bookmarked_verse_refs_for_chapter(self.conn, self._chapter_ref)
 
+        blocks: list[VerseBlock] = []
         for v in verses:
             block = VerseBlock(
                 verse_ref=v.ref,
@@ -100,7 +86,10 @@ class ScripturePane(ChordMixin, Widget):
             )
             self._verse_refs.append(v.ref)
             self._blocks[v.ref] = block
-            self.mount(block)
+            blocks.append(block)
+
+        if blocks:
+            self.mount(*blocks)
 
         if focus_verse_ref and focus_verse_ref in self._blocks:
             idx = self._verse_refs.index(focus_verse_ref)
@@ -149,19 +138,16 @@ class ScripturePane(ChordMixin, Widget):
     def action_prev_chapter(self) -> None:
         self.post_message(self.ChapterChangeRequested(-1))
 
-    def action_last_verse(self) -> None:
-        self.action_goto_last_verse()
-
     def action_goto_first_verse(self) -> None:
         if self._verse_refs:
             self._set_focus_idx(0)
 
-    def action_goto_last_verse(self) -> None:
+    def action_last_verse(self) -> None:
         if self._verse_refs:
             self._set_focus_idx(len(self._verse_refs) - 1)
 
     def action_goto_reference(self) -> None:
-        self.app.action_goto_reference()
+        self.screen.action_goto_reference()
 
     def action_page_down(self) -> None:
         self.scroll_page_down()
@@ -175,7 +161,7 @@ class ScripturePane(ChordMixin, Widget):
     def action_annotate(self) -> None:
         ref = self.focused_verse_ref
         if ref:
-            self.app.action_annotate(ref)
+            self.app.screen.action_annotate(ref)
 
     def action_cycle_highlight(self) -> None:
         ref = self.focused_verse_ref
@@ -215,15 +201,14 @@ class ScripturePane(ChordMixin, Widget):
 
     def refresh_verse_state(self, verse_ref: str) -> None:
         """Refresh a single verse block's decoration state."""
-        if not self._chapter_ref:
+        block = self._blocks.get(verse_ref)
+        if not block:
             return
-        highlights = queries.get_highlights_for_chapter(self.conn, self._chapter_ref)
+        hl = queries.get_highlight(self.conn, verse_ref)
         ann = queries.get_annotation(self.conn, verse_ref)
         bm = queries.get_bookmark(self.conn, verse_ref)
-        block = self._blocks.get(verse_ref)
-        if block:
-            block.update_state(
-                highlight_color=highlights.get(verse_ref),
-                has_annotation=ann is not None,
-                has_bookmark=bm is not None,
-            )
+        block.update_state(
+            highlight_color=hl.color if hl else None,
+            has_annotation=ann is not None,
+            has_bookmark=bm is not None,
+        )

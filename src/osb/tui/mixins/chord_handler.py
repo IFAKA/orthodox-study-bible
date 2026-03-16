@@ -71,7 +71,7 @@ class ChordMixin:
             self.action_goto_reference()
             return True
         if first == "g" and second == "G":
-            self.action_goto_last_verse()
+            self.action_last_verse()
             return True
         return False
 
@@ -80,13 +80,7 @@ class ChordMixin:
         pass  # subclasses can implement g=go-to-line etc.
 
     def _cancel_chord_timer(self) -> None:
-        if self._chord_timer is not None:
-            try:
-                # Textual timer cancel
-                pass  # timers in Textual auto-cancel; nothing to do explicitly
-            except Exception:
-                pass
-            self._chord_timer = None
+        self._chord_timer = None
 
     def _chord_timeout(self) -> None:
         """Called after CHORD_TIMEOUT_MS if no second key was pressed."""
@@ -101,7 +95,7 @@ class ChordMixin:
     def action_goto_first_verse(self) -> None:
         """Jump to first verse of current chapter. Override in widget."""
 
-    def action_goto_last_verse(self) -> None:
+    def action_last_verse(self) -> None:
         """Jump to last verse of current chapter. Override in widget."""
 
     def action_goto_reference(self) -> None:

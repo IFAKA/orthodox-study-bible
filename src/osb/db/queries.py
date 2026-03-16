@@ -220,6 +220,22 @@ def get_all_annotations(conn: sqlite3.Connection) -> list[Annotation]:
     return [Annotation(**dict(r)) for r in rows]
 
 
+def get_annotated_verse_refs_for_chapter(conn: sqlite3.Connection, chapter_ref: str) -> set[str]:
+    rows = conn.execute(
+        "SELECT verse_ref FROM annotations WHERE verse_ref IN (SELECT ref FROM verses WHERE chapter_ref=?)",
+        (chapter_ref,),
+    ).fetchall()
+    return {r[0] for r in rows}
+
+
+def get_bookmarked_verse_refs_for_chapter(conn: sqlite3.Connection, chapter_ref: str) -> set[str]:
+    rows = conn.execute(
+        "SELECT verse_ref FROM bookmarks WHERE verse_ref IN (SELECT ref FROM verses WHERE chapter_ref=?)",
+        (chapter_ref,),
+    ).fetchall()
+    return {r[0] for r in rows}
+
+
 # ── Reading progress ──────────────────────────────────────────────────────────
 
 def mark_chapter_complete(conn: sqlite3.Connection, chapter_ref: str) -> None:
@@ -311,6 +327,13 @@ def append_chat_message(
 def delete_chat_history(conn: sqlite3.Connection, chapter_ref: str) -> None:
     conn.execute("DELETE FROM chat_history WHERE chapter_ref=?", (chapter_ref,))
     conn.commit()
+
+
+def get_chapters_with_chat(conn: sqlite3.Connection) -> set[str]:
+    rows = conn.execute(
+        "SELECT DISTINCT chapter_ref FROM chat_history"
+    ).fetchall()
+    return {r[0] for r in rows}
 
 
 # ── Meta ──────────────────────────────────────────────────────────────────────

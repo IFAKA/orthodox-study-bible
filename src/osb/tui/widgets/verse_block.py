@@ -18,7 +18,6 @@ class VerseBlock(Widget):
     VerseBlock {
         layout: horizontal;
         height: auto;
-        padding: 0 0 0 0;
     }
     """
 
@@ -69,9 +68,6 @@ class VerseBlock(Widget):
             self.query_one(f"#vglyph-{self.verse_ref}", Label).update(glyph)
         except Exception:
             pass
-
-    def set_focused(self, focused: bool) -> None:
-        self.focused = focused
 
     def update_state(
         self,

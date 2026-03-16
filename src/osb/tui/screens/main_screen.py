@@ -16,7 +16,6 @@ from osb.importer.lectionary import get_primary_reading
 from osb.tui.screens.daily_screen import DailyScreen
 from osb.tui.screens.my_notes_screen import MyNotesScreen
 from osb.tui.screens.search_screen import SearchScreen
-from osb.tui.widgets.annotation_modal import AnnotationModal
 from osb.tui.widgets.app_header import AppHeader
 from osb.tui.widgets.book_tree import BookTree
 from osb.tui.widgets.right_pane import RightPane
@@ -33,7 +32,6 @@ class MainScreen(Screen):
         Binding("L", "lectionary", "Lectionary"),
         Binding("q", "quit_app", "Quit"),
         Binding("T", "toggle_theme", "Theme", show=False),
-        Binding("E", "export_notes", "Export", show=False),
         Binding("h", "focus_scripture", "Scripture", show=False),
         Binding("l", "focus_right", "Commentary/Chat", show=False),
     ]
@@ -177,9 +175,6 @@ class MainScreen(Screen):
         else:
             screen.add_class("sepia")
 
-    def action_export_notes(self) -> None:
-        self.app.push_screen(MyNotesScreen(self.conn))
-
     def action_quit_app(self) -> None:
         self.app.exit()
 
@@ -196,19 +191,11 @@ class MainScreen(Screen):
             pass
 
     def action_annotate(self, verse_ref: str) -> None:
-        existing = queries.get_annotation(self.conn, verse_ref)
-        existing_text = existing.body if existing else ""
-
-        def on_result(text: str | None) -> None:
-            if text is not None:
-                queries.save_annotation(self.conn, verse_ref, text)
-                try:
-                    sp = self.query_one("#scripture-pane", ScripturePane)
-                    sp.refresh_verse_state(verse_ref)
-                except Exception:
-                    pass
-
-        self.app.push_screen(AnnotationModal(verse_ref, existing_text), on_result)
+        try:
+            rp = self.query_one("#right-pane", RightPane)
+            rp.focus_notes_editor()
+        except Exception:
+            pass
 
     def action_goto_reference(self) -> None:
         """Show goto-reference input dialog."""

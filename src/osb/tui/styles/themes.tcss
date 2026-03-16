@@ -1,0 +1,134 @@
+/* Sepia theme — Screen.sepia class overrides actual properties */
+
+Screen.sepia {
+    background: #2c2416;
+    color: #e8dcc0;
+}
+
+Screen.sepia #app-header {
+    background: #362d1e;
+    color: #d4a84c;
+}
+
+Screen.sepia #app-footer {
+    background: #362d1e;
+    color: #9a8060;
+}
+
+Screen.sepia #footer-status {
+    color: #9a8060;
+}
+
+Screen.sepia #sidebar {
+    background: #362d1e;
+    border-right: solid #5a4a30;
+}
+
+Screen.sepia BookTree {
+    background: #362d1e;
+    color: #e8dcc0;
+}
+
+Screen.sepia BookTree > .tree--guides {
+    color: #5a4a30;
+}
+
+Screen.sepia BookTree > .tree--cursor {
+    background: #9a7230;
+    color: #e8dcc0;
+}
+
+Screen.sepia #scripture-pane {
+    background: #2c2416;
+}
+
+Screen.sepia .verse-block {
+    color: #ddd0b0;
+}
+
+Screen.sepia .verse-block.focused {
+    background: #403528;
+    border-left: thick #d4a84c;
+}
+
+Screen.sepia .verse-block .verse-num {
+    color: #9a8060;
+}
+
+Screen.sepia .verse-block .verse-glyph {
+    color: #d4a84c;
+}
+
+Screen.sepia .verse-block.hl-yellow { background: #5a4800; }
+Screen.sepia .verse-block.hl-green  { background: #243824; }
+Screen.sepia .verse-block.hl-blue   { background: #142848; }
+Screen.sepia .verse-block.hl-pink   { background: #481828; }
+
+Screen.sepia #right-pane {
+    background: #362d1e;
+    border-left: solid #5a4a30;
+}
+
+Screen.sepia #right-pane ContentTab {
+    background: #362d1e;
+    color: #9a8060;
+}
+
+Screen.sepia #right-pane ContentTab.-active {
+    color: #d4a84c;
+    border-bottom: heavy #d4a84c;
+}
+
+Screen.sepia #commentary-text {
+    color: #e8dcc0;
+}
+
+Screen.sepia #chat-input {
+    background: #403528;
+    border: solid #5a4a30;
+    color: #e8dcc0;
+}
+
+Screen.sepia #search-dialog {
+    background: #362d1e;
+    border: solid #d4a84c;
+}
+
+Screen.sepia #search-input {
+    background: #403528;
+    border: solid #5a4a30;
+    color: #e8dcc0;
+}
+
+Screen.sepia .search-result {
+    border-bottom: solid #5a4a30;
+    color: #9a8060;
+}
+
+Screen.sepia .search-result .result-ref {
+    color: #d4a84c;
+}
+
+Screen.sepia .search-result:hover {
+    background: #403528;
+    color: #e8dcc0;
+}
+
+Screen.sepia #annotation-dialog {
+    background: #362d1e;
+    border: solid #d4a84c;
+}
+
+Screen.sepia #annotation-ref {
+    color: #d4a84c;
+}
+
+Screen.sepia #annotation-editor {
+    background: #403528;
+    border: solid #5a4a30;
+    color: #e8dcc0;
+}
+
+Screen.sepia #annotation-help {
+    color: #9a8060;
+}

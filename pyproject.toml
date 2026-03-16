@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "orthodox-study-bible"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "textual>=0.61.0",
+    "ebooklib>=0.18",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",
+    "platformdirs>=4.0.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+osb = "osb.__main__:main"
+
+[dependency-groups]
+dev = ["textual-dev>=0.61.0", "pytest>=8.0", "litecli>=1.12"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/osb"]

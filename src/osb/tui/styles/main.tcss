@@ -1,0 +1,378 @@
+/* Orthodox Study Bible — main stylesheet */
+
+/* ── Variables (dark theme defaults) ──────────────────────────── */
+$bg:           #1a1a1a;
+$surface:      #242424;
+$surface-alt:  #2e2e2e;
+$border:       #3a3a3a;
+$accent:       #c9a84c;
+$accent-dim:   #8a6f2e;
+$text:         #e8e0d0;
+$text-muted:   #888880;
+$text-verse:   #d4cdc0;
+
+$hl-yellow:    #4a3c00;
+$hl-green:     #1a3a1a;
+$hl-blue:      #0a2040;
+$hl-pink:      #3a1028;
+
+/* ── App root ──────────────────────────────────────────────────── */
+Screen {
+    background: $bg;
+    color: $text;
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+#app-header {
+    height: 1;
+    background: $surface;
+    color: $accent;
+    padding: 0 1;
+    dock: top;
+    layout: horizontal;
+}
+
+#header-title {
+    width: 1fr;
+}
+
+#header-lectionary {
+    width: auto;
+    color: $text-muted;
+}
+
+/* ── Footer ────────────────────────────────────────────────────── */
+#app-footer {
+    height: 1;
+    background: $surface;
+    color: $text-muted;
+    padding: 0 1;
+    dock: bottom;
+    layout: horizontal;
+}
+
+#footer-keys {
+    width: 1fr;
+}
+
+#footer-status {
+    width: auto;
+    color: $text-muted;
+}
+
+/* ── Main layout ────────────────────────────────────────────────── */
+#main-layout {
+    layout: horizontal;
+    height: 1fr;
+}
+
+/* ── Sidebar / BookTree ──────────────────────────────────────────── */
+#sidebar {
+    width: 22%;
+    min-width: 18;
+    background: $surface;
+    border-right: solid $border;
+    overflow-y: auto;
+}
+
+#sidebar.hidden {
+    visibility: hidden;
+}
+
+BookTree {
+    background: $surface;
+    color: $text;
+    padding: 0 1;
+}
+
+BookTree > .tree--guides {
+    color: $border;
+}
+
+BookTree > .tree--cursor {
+    background: $accent-dim;
+    color: $text;
+}
+
+/* ── Scripture pane ───────────────────────────────────────────────── */
+#scripture-pane {
+    width: 1fr;
+    background: $bg;
+    overflow-y: auto;
+    padding: 1 3;
+}
+
+/* ── Verse blocks ─────────────────────────────────────────────────── */
+.verse-block {
+    padding: 0 0 0 3;
+    color: $text-verse;
+}
+
+.verse-block.focused {
+    background: $surface-alt;
+    border-left: thick $accent;
+    padding-left: 2;
+}
+
+.verse-block .verse-num {
+    color: $text-muted;
+    width: 3;
+}
+
+.verse-block .verse-text {
+    width: 1fr;
+}
+
+.verse-block .verse-glyph {
+    width: 2;
+    color: $accent;
+}
+
+/* Highlight variants */
+.verse-block.hl-yellow { background: $hl-yellow; }
+.verse-block.hl-green  { background: $hl-green;  }
+.verse-block.hl-blue   { background: $hl-blue;   }
+.verse-block.hl-pink   { background: $hl-pink;   }
+
+/* ── Right pane ────────────────────────────────────────────────────── */
+#right-pane {
+    width: 40%;
+    background: $surface;
+    border-left: solid $border;
+}
+
+#right-pane TabbedContent {
+    height: 1fr;
+}
+
+#right-pane ContentTab {
+    background: $surface;
+    color: $text-muted;
+}
+
+#right-pane ContentTab.-active {
+    color: $accent;
+    border-bottom: heavy $accent;
+}
+
+/* ── Commentary tab ────────────────────────────────────────────────── */
+#commentary-scroll {
+    padding: 1 2;
+    overflow-y: auto;
+    height: 1fr;
+}
+
+#commentary-text {
+    color: $text;
+}
+
+#xref-section {
+    border-top: solid $border;
+    padding-top: 1;
+    color: $text-muted;
+    margin-top: 1;
+}
+
+/* ── Chat tab ──────────────────────────────────────────────────────── */
+#chat-history {
+    height: 1fr;
+    overflow-y: auto;
+    padding: 1 2;
+}
+
+.chat-message-user {
+    background: $surface-alt;
+    padding: 0 1;
+    margin-bottom: 1;
+    color: $text;
+}
+
+.chat-message-assistant {
+    padding: 0 1;
+    margin-bottom: 1;
+    color: $text;
+}
+
+#chat-input-row {
+    height: 3;
+    padding: 0 1;
+    border-top: solid $border;
+}
+
+#chat-input {
+    width: 1fr;
+    background: $surface-alt;
+    border: solid $border;
+    color: $text;
+}
+
+/* ── Search screen ─────────────────────────────────────────────────── */
+SearchScreen {
+    align: center middle;
+}
+
+#search-dialog {
+    width: 70%;
+    height: 60%;
+    background: $surface;
+    border: solid $accent;
+    padding: 1 2;
+}
+
+#search-input {
+    width: 1fr;
+    background: $surface-alt;
+    border: solid $border;
+    color: $text;
+    margin-bottom: 1;
+}
+
+#search-results {
+    height: 1fr;
+    overflow-y: auto;
+}
+
+.search-result {
+    padding: 0 1;
+    border-bottom: solid $border;
+    color: $text-muted;
+}
+
+.search-result .result-ref {
+    color: $accent;
+    width: 12;
+}
+
+.search-result:hover {
+    background: $surface-alt;
+    color: $text;
+}
+
+/* ── Annotation modal ────────────────────────────────────────────────── */
+AnnotationModal {
+    align: center middle;
+}
+
+#annotation-dialog {
+    width: 60%;
+    height: 50%;
+    background: $surface;
+    border: solid $accent;
+    padding: 1 2;
+}
+
+#annotation-ref {
+    color: $accent;
+    margin-bottom: 1;
+}
+
+#annotation-editor {
+    height: 1fr;
+    background: $surface-alt;
+    border: solid $border;
+    color: $text;
+}
+
+#annotation-help {
+    color: $text-muted;
+    margin-top: 1;
+}
+
+/* ── Import screen ───────────────────────────────────────────────────── */
+ImportScreen {
+    align: center middle;
+    background: $bg;
+}
+
+#import-dialog {
+    width: 60%;
+    height: auto;
+    background: $surface;
+    border: solid $accent;
+    padding: 2 3;
+}
+
+#import-title {
+    color: $accent;
+    text-align: center;
+    margin-bottom: 2;
+}
+
+#import-progress {
+    margin-bottom: 1;
+}
+
+#import-status {
+    color: $text-muted;
+    margin-bottom: 1;
+}
+
+#import-warnings {
+    color: #c0803a;
+}
+
+/* ── My Notes screen ────────────────────────────────────────────────── */
+MyNotesScreen {
+    background: $bg;
+}
+
+#notes-layout {
+    layout: horizontal;
+    height: 1fr;
+}
+
+#notes-list {
+    width: 35%;
+    background: $surface;
+    border-right: solid $border;
+    overflow-y: auto;
+    padding: 0 1;
+}
+
+#notes-detail {
+    width: 1fr;
+    padding: 1 2;
+    overflow-y: auto;
+}
+
+.notes-item {
+    padding: 0 1;
+    border-bottom: solid $border;
+    color: $text-muted;
+}
+
+.notes-item .notes-ref {
+    color: $accent;
+}
+
+/* ── Daily screen ──────────────────────────────────────────────────── */
+DailyScreen {
+    align: center middle;
+}
+
+#daily-dialog {
+    width: 55%;
+    height: auto;
+    background: $surface;
+    border: solid $accent;
+    padding: 2 3;
+}
+
+#daily-title {
+    color: $accent;
+    text-align: center;
+    margin-bottom: 1;
+}
+
+#daily-readings {
+    margin-bottom: 1;
+}
+
+/* ── Lectionary bar ─────────────────────────────────────────────────── */
+LectionaryBar {
+    height: 1;
+    background: $surface;
+    color: $text-muted;
+    padding: 0 1;
+    dock: bottom;
+}

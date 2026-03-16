@@ -15,7 +15,6 @@ _PRAYER = "Lord Jesus Christ, Son of God, have mercy on me, a sinner."
 _DIM    = Color.parse("#4a3a12")   # unlit border segment
 _GOLD   = Color.parse("#c9a84c")   # resting text + mid-glow
 _BRIGHT = Color.parse("#ffffff")   # peak glow
-_DIM_GOLD = Color.parse("#7a6020") # prayer text colour (softer)
 
 # ── Timing ────────────────────────────────────────────────────────────────────
 _FADE_IN    = 0.28   # opacity 0→1  (out_expo: snaps in, settles smoothly)
@@ -49,6 +48,14 @@ def _angular_dist(a: float, b: float) -> float:
     return min(d, 2 * math.pi - d)
 
 
+def _box_content(prayer_chars: int) -> str:
+    """Compose the full box markup: title + typewritten prayer."""
+    if prayer_chars == 0:
+        return _ART
+    partial = _PRAYER[:prayer_chars]
+    return f"{_ART}\n\n[italic #7a6020]{partial}[/]"
+
+
 class SplashScreen(Screen):
     """Startup splash: ☦ symbol + title, bordered box, rotating glow."""
 
@@ -66,12 +73,6 @@ class SplashScreen(Screen):
         text-align: center;
         text-style: bold;
     }
-    #prayer-text {
-        text-align: center;
-        color: #7a6020;
-        padding: 1 0 0 0;
-        text-style: italic;
-    }
     """
 
     def __init__(self, **kwargs) -> None:
@@ -86,7 +87,6 @@ class SplashScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Static(_ART, id="splash-box")
-        yield Static("", id="prayer-text")
 
     def on_mount(self) -> None:
         box = self.query_one("#splash-box", Static)
@@ -122,7 +122,6 @@ class SplashScreen(Screen):
             return
 
         for attr, center in _SIDES:
-            # Gaussian-shaped glow for each source (physically plausible falloff)
             dist_a = _angular_dist(self._angle_a, center)
             dist_b = _angular_dist(self._angle_b, center)
             glow_a = math.exp(-dist_a * _FALLOFF)
@@ -140,8 +139,8 @@ class SplashScreen(Screen):
     def _tick_type(self) -> None:
         self._type_idx += 1
         try:
-            label = self.query_one("#prayer-text", Static)
-            label.update(_PRAYER[: self._type_idx])
+            box = self.query_one("#splash-box", Static)
+            box.update(_box_content(self._type_idx))
         except Exception:
             pass
         if self._type_idx >= len(_PRAYER):

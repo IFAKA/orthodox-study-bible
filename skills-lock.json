@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "building-tui-apps": {
+      "source": "mhagrelius/dotfiles",
+      "sourceType": "github",
+      "computedHash": "5c14d412572dc7d713d298760aedfbc8473cd257740a12b7468ffd5f14461e43"
+    },
+    "ratatui-tui": {
+      "source": "blacktop/dotfiles",
+      "sourceType": "github",
+      "computedHash": "94bcff606dbebe619206ad13236309a9fc77b6a0a8f69301f60eca83a82c58e4"
+    }
+  }
+}

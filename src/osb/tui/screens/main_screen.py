@@ -28,7 +28,8 @@ class MainScreen(Screen):
 
     BINDINGS = [
         Binding("t", "toggle_sidebar", "Sidebar"),
-        Binding("/", "search", "Search"),
+        Binding("/", "search", "Search", show=False),
+        Binding("F", "search", "Search"),
         Binding("N", "notes", "Notes"),
         Binding("L", "lectionary", "Lectionary"),
         Binding("q", "quit_app", "Quit"),

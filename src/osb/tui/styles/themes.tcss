@@ -106,6 +106,32 @@ Screen.sepia #chat-input {
     color: #e8dcc0;
 }
 
+Screen.sepia #sp-search-bar {
+    background: #403528;
+    border-top: solid #5a4a30;
+}
+
+Screen.sepia #sp-search-prefix {
+    color: #d4a84c;
+}
+
+Screen.sepia #sp-search-input {
+    background: #403528;
+    color: #e8dcc0;
+}
+
+Screen.sepia #sp-search-help {
+    color: #9a8060;
+}
+
+Screen.sepia VerseBlock.search-dim {
+    color: #5a4a30;
+}
+
+Screen.sepia VerseBlock.search-dim .verse-num {
+    color: #3a2e20;
+}
+
 Screen.sepia #search-dialog {
     background: #362d1e;
     border: solid #d4a84c;

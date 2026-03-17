@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import sqlite3
+from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.containers import Horizontal
 from textual.message import Message
 from textual.widget import Widget
+from textual.widgets import Input, Label
 
 from osb.db import queries
 from osb.db.queries import get_annotated_verse_refs_for_chapter, get_bookmarked_verse_refs_for_chapter
@@ -22,6 +25,7 @@ class ScripturePane(ChordMixin, Widget):
     can_focus = True
 
     BINDINGS = [
+        Binding("/", "start_search", "Find", show=True),
         Binding("j", "next_verse", "Next verse", show=True),
         Binding("k", "prev_verse", "Prev verse", show=True),
         Binding("J", "prev_chapter", "Prev chapter", show=True),
@@ -52,6 +56,15 @@ class ScripturePane(ChordMixin, Widget):
         self._verse_refs: list[str] = []
         self._focused_idx: int = 0
         self._blocks: dict[str, VerseBlock] = {}
+        self._search_mode: bool = False
+        self._match_refs: list[str] = []
+        self._match_idx: int = 0
+
+    def compose(self) -> ComposeResult:
+        with Horizontal(id="sp-search-bar", classes="hidden"):
+            yield Label("/", id="sp-search-prefix")
+            yield Input(id="sp-search-input", placeholder="")
+            yield Label("  n/N · Esc", id="sp-search-help")
 
     # ── Public API ────────────────────────────────────────────────────────────
 
@@ -60,7 +73,17 @@ class ScripturePane(ChordMixin, Widget):
         self._verse_refs = []
         self._blocks = {}
         self._focused_idx = 0
-        self.remove_children()
+        # Remove only VerseBlocks so the search bar is preserved
+        for block in self.query(VerseBlock):
+            block.remove()
+        self._search_mode = False
+        self._match_refs = []
+        self._match_idx = 0
+        try:
+            self.query_one("#sp-search-bar").add_class("hidden")
+            self.query_one("#sp-search-input", Input).clear()
+        except Exception:
+            pass
         self._render_chapter(focus_verse_ref)
 
     def _render_chapter(self, focus_verse_ref: str | None = None) -> None:
@@ -117,6 +140,19 @@ class ScripturePane(ChordMixin, Widget):
         self.remove_class("active-pane")
 
     def on_key(self, event) -> None:
+        if event.key == "escape" and self._search_mode:
+            self._clear_search()
+            event.stop()
+            return
+        if self._search_mode and not self._is_search_focused():
+            if event.key == "n":
+                self._next_match()
+                event.stop()
+                return
+            elif event.key == "N":
+                self._prev_match()
+                event.stop()
+                return
         if self.handle_chord(event):
             return
 
@@ -178,6 +214,75 @@ class ScripturePane(ChordMixin, Widget):
             block = self._blocks.get(ref)
             if block:
                 block.has_bookmark = added
+
+    def action_start_search(self) -> None:
+        self._search_mode = True
+        try:
+            self.query_one("#sp-search-bar").remove_class("hidden")
+            self.call_after_refresh(lambda: self.query_one("#sp-search-input", Input).focus())
+        except Exception:
+            pass
+
+    def on_input_changed(self, event: Input.Changed) -> None:
+        if event.input.id == "sp-search-input":
+            self._apply_search_filter(event.value)
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        if event.input.id == "sp-search-input":
+            if self._match_refs:
+                self._match_idx = 0
+                self._set_focus_idx(self._verse_refs.index(self._match_refs[0]))
+            self.focus()
+
+    def _is_search_focused(self) -> bool:
+        try:
+            return self.query_one("#sp-search-input", Input).has_focus
+        except Exception:
+            return False
+
+    def _apply_search_filter(self, query: str) -> None:
+        self._match_refs = []
+        if not query:
+            for block in self._blocks.values():
+                block.remove_class("search-match")
+                block.remove_class("search-dim")
+            return
+        q = query.lower()
+        for ref, block in self._blocks.items():
+            if q in block.verse_text.lower():
+                block.add_class("search-match")
+                block.remove_class("search-dim")
+                self._match_refs.append(ref)
+            else:
+                block.remove_class("search-match")
+                block.add_class("search-dim")
+        self._match_idx = 0
+
+    def _next_match(self) -> None:
+        if not self._match_refs:
+            return
+        self._match_idx = (self._match_idx + 1) % len(self._match_refs)
+        self._set_focus_idx(self._verse_refs.index(self._match_refs[self._match_idx]))
+
+    def _prev_match(self) -> None:
+        if not self._match_refs:
+            return
+        self._match_idx = (self._match_idx - 1) % len(self._match_refs)
+        self._set_focus_idx(self._verse_refs.index(self._match_refs[self._match_idx]))
+
+    def _clear_search(self) -> None:
+        self._search_mode = False
+        self._match_refs = []
+        self._match_idx = 0
+        for block in self._blocks.values():
+            block.remove_class("search-match")
+            block.remove_class("search-dim")
+        try:
+            self.query_one("#sp-search-bar").add_class("hidden")
+            self.query_one("#sp-search-input", Input).clear()
+        except Exception:
+            pass
+        self.focus()
 
     # ── Internal ─────────────────────────────────────────────────────────────
 

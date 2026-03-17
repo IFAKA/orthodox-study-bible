@@ -166,6 +166,50 @@ VerseBlock.hl-green  { background: $hl-green;  }
 VerseBlock.hl-blue   { background: $hl-blue;   }
 VerseBlock.hl-pink   { background: $hl-pink;   }
 
+/* ── In-chapter search bar ────────────────────────────────────────── */
+#sp-search-bar {
+    height: 1;
+    dock: bottom;
+    background: $surface-alt;
+    border-top: solid $border;
+    padding: 0 1;
+}
+
+#sp-search-bar.hidden {
+    display: none;
+}
+
+#sp-search-prefix {
+    color: $accent;
+    width: 2;
+}
+
+#sp-search-input {
+    width: 1fr;
+    border: none;
+    background: $surface-alt;
+    color: $text;
+    padding: 0;
+    height: 1;
+}
+
+#sp-search-input:focus {
+    border: none;
+}
+
+#sp-search-help {
+    color: $text-muted;
+    width: auto;
+}
+
+VerseBlock.search-dim {
+    color: $text-muted;
+}
+
+VerseBlock.search-dim .verse-num {
+    color: $border;
+}
+
 /* ── Right pane ────────────────────────────────────────────────────── */
 #right-pane {
     width: 40%;

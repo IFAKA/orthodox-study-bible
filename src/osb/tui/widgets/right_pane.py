@@ -203,7 +203,10 @@ class RightPane(Widget):
 
         def callback(ref: str | None) -> None:
             if ref:
-                self.app.query_one(MainScreen)._navigate_to_verse(ref)
+                for screen in self.app.screen_stack:
+                    if isinstance(screen, MainScreen):
+                        screen._navigate_to_verse(ref)
+                        break
 
         self.app.push_screen(ChatRefScreen(self._last_refs), callback)
 

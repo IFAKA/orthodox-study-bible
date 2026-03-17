@@ -140,11 +140,11 @@ class ScripturePane(ChordMixin, Widget):
         self.remove_class("active-pane")
 
     def on_key(self, event) -> None:
-        if event.key == "escape" and self._search_mode:
-            self._clear_search()
-            event.stop()
-            return
         if self._search_mode and not self._is_search_focused():
+            if event.key in ("escape", "enter"):
+                self._clear_search()
+                event.stop()
+                return
             if event.key == "n":
                 self._next_match()
                 event.stop()
@@ -153,6 +153,10 @@ class ScripturePane(ChordMixin, Widget):
                 self._prev_match()
                 event.stop()
                 return
+        if event.key == "escape" and self._search_mode:
+            self._clear_search()
+            event.stop()
+            return
         if self.handle_chord(event):
             return
 
@@ -248,6 +252,7 @@ class ScripturePane(ChordMixin, Widget):
             for ref, block in self._blocks.items():
                 block.remove_class("search-match")
                 block.remove_class("search-dim")
+                block.remove_class("search-current")
                 try:
                     block.query_one(f"#vtext-{ref}", TLabel).update(block.verse_text)
                 except Exception:
@@ -284,17 +289,29 @@ class ScripturePane(ChordMixin, Widget):
                 block.remove_class("search-match")
                 block.add_class("search-dim")
         self._match_idx = 0
+        self._update_search_current()
+
+    def _update_search_current(self) -> None:
+        for ref, block in self._blocks.items():
+            block.remove_class("search-current")
+        if self._match_refs:
+            cur_ref = self._match_refs[self._match_idx]
+            block = self._blocks.get(cur_ref)
+            if block:
+                block.add_class("search-current")
 
     def _next_match(self) -> None:
         if not self._match_refs:
             return
         self._match_idx = (self._match_idx + 1) % len(self._match_refs)
+        self._update_search_current()
         self._set_focus_idx(self._verse_refs.index(self._match_refs[self._match_idx]))
 
     def _prev_match(self) -> None:
         if not self._match_refs:
             return
         self._match_idx = (self._match_idx - 1) % len(self._match_refs)
+        self._update_search_current()
         self._set_focus_idx(self._verse_refs.index(self._match_refs[self._match_idx]))
 
     def _clear_search(self) -> None:
@@ -305,6 +322,7 @@ class ScripturePane(ChordMixin, Widget):
         for ref, block in self._blocks.items():
             block.remove_class("search-match")
             block.remove_class("search-dim")
+            block.remove_class("search-current")
             try:
                 block.query_one(f"#vtext-{ref}", TLabel).update(block.verse_text)
             except Exception:

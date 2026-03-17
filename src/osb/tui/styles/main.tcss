@@ -204,6 +204,12 @@ VerseBlock.hl-pink   { background: $hl-pink;   }
 
 VerseBlock.search-match {
     background: $surface-alt;
+    border-left: thick $accent-dim;
+    padding-left: 2;
+}
+
+VerseBlock.search-current {
+    background: #3a3000;
     border-left: thick $accent;
     padding-left: 2;
 }

@@ -124,6 +124,12 @@ Screen.sepia #sp-search-help {
     color: #9a8060;
 }
 
+Screen.sepia VerseBlock.search-current {
+    background: #3a2800;
+    border-left: thick #d4a84c;
+    padding-left: 2;
+}
+
 Screen.sepia VerseBlock.search-dim {
     color: #5a4a30;
 }

@@ -63,3 +63,7 @@ class OrthodoxStudyApp(App):
         run_migrations(self.conn)
         self._show_main()
 
+    def fade_and_exit(self) -> None:
+        """Animate current screen opacity to 0 and then exit."""
+        self.screen.styles.animate("opacity", 0.0, duration=0.3, on_complete=self.exit)
+

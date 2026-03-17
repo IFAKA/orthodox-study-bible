@@ -187,6 +187,6 @@ class DownloadScreen(Screen):
     def action_quit_app(self) -> None:
         def _on_confirm(confirmed: bool | None) -> None:
             if confirmed:
-                self.app.exit()
+                self.app.fade_and_exit()
 
         self.app.push_screen(QuitModal(), _on_confirm)

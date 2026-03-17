@@ -20,5 +20,10 @@ MAX_CONTEXT_TOKENS = 3000
 
 JURISDICTION = "OCA"
 
+# Pre-built DB download (GitHub Releases)
+# Update DB_RELEASE_SHA256 after running: uv run python scripts/build_release_db.py
+DB_RELEASE_URL = "https://github.com/IFAKA/orthodox-study-bible/releases/download/db-v1/osb.db.gz"
+DB_RELEASE_SHA256 = "cfca96f6291da23f868a7929abb9f4bfa259b62db91ca91085636d7e7c854f11"
+
 # Minimum sidebar width in columns
 MIN_SIDEBAR_WIDTH = 18

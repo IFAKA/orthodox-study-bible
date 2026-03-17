@@ -1,20 +1,26 @@
-# Orthodox Study Bible
+# Orthodox Study Bible TUI
 
-A fully offline TUI app for studying the Orthodox Study Bible. Built with Python + Textual.
+[![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Built with Textual](https://img.shields.io/badge/Built%20with-Textual-000000.svg)](https://textual.textualize.io/)
+
+A modern, offline-first Terminal User Interface (TUI) for studying the **Orthodox Study Bible (OSB)**. Built with Python and the [Textual](https://textual.textualize.io/) framework, it combines traditional scripture study with modern features like local AI assistance and full-text search.
 
 ![dark theme screenshot placeholder](https://github.com/user-attachments/assets/af3cadd5-ec3e-4c24-be60-04090d966d3b)
 
+---
 
-## Features
+## 📖 Table of Contents
+- [Features](#features)
+- [Requirements](#requirements)
+- [Setup & Installation](#setup--installation)
+- [Keybindings](#keybindings)
+- [AI Chat (Optional)](#ai-chat-optional)
+- [Developer Guide](#developer-guide)
+- [SEO & AI Optimization](#seo--ai-optimization)
+- [License](#license)
 
-- Full scripture text from the OSB (78 books, 35,945 verses)
-- Commentary and cross-references per verse
-- Full-text search (FTS5)
-- Personal annotations, highlights, and bookmarks
-- Daily lectionary (Menaion + Paschal cycle, Julian calendar)
-- Optional local AI chat via Ollama (streams, no cloud)
-- Sepia theme, Markdown export, reading progress
-- Vim-style keybindings, fully keyboard-driven
+---
 
 ![commentary](https://github.com/user-attachments/assets/3571ab38-7702-452d-98e1-d27f1b4288ed)
 
@@ -26,35 +32,57 @@ A fully offline TUI app for studying the Orthodox Study Bible. Built with Python
 
 ![searchinline](https://github.com/user-attachments/assets/383a81e9-afcc-4c89-a07e-90f1f2f48769)
 
-## Requirements
+## ✨ Features
 
-- Python 3.11+
-- [uv](https://docs.astral.sh/uv/) (recommended) or pip
-- Your own copy of the Orthodox Study Bible EPUB (not included)
+- **Full Scripture Text**: Complete 78-book canon of the OSB (35,945 verses).
+- **Commentary & Cross-References**: Integrated study notes available instantly for every verse.
+- **Full-Text Search (FTS5)**: Blazing fast search across all books and commentary.
+- **Personal Study Tools**: Add annotations, bookmarks, and color-coded highlights.
+- **Daily Lectionary**: Built-in tracking for the Menaion and Paschal cycles (Julian calendar).
+- **Local AI Chat**: Stream theological inquiries directly through [Ollama](https://ollama.ai) (100% private, no cloud).
+- **Modern UI**: Dark and Sepia themes, responsive layout, and Vim-style navigation.
+- **Markdown Export**: Export your personal notes and study progress to Markdown.
 
-## Setup
+---
+
+## 🛠 Requirements
+
+- **Python 3.11+**
+- **[uv](https://docs.astral.sh/uv/)** (highly recommended) or pip.
+- **Orthodox Study Bible EPUB**: You must provide your own legally acquired copy of the OSB EPUB.
+
+---
+
+## 🚀 Setup & Installation
+
+### One-Command Install (Recommended)
+
+```bash
+curl -sSL https://raw.githubusercontent.com/IFAKA/orthodox-study-bible/main/install.sh | sh
+osb
+```
+
+The scripture database is downloaded automatically on first launch (~15 MB, one time only). The app works fully offline after that.
+
+### Manual Install
+
+```bash
+uv tool install git+https://github.com/IFAKA/orthodox-study-bible
+osb
+```
+
+### From Source (with EPUB)
 
 ```bash
 git clone https://github.com/IFAKA/orthodox-study-bible
 cd orthodox-study-bible
-
-# Place your EPUB in the project root or data/
 cp /path/to/the-orthodox-study-bible.epub .
-
-# Install and run (first launch imports the EPUB automatically)
 uv run osb
 ```
 
-Or install globally:
+---
 
-```bash
-uv tool install .
-osb
-```
-
-The first run shows an import screen (~30–60 seconds). After that, it goes straight to the reader.
-
-## Keybindings
+## ⌨️ Keybindings
 
 | Key | Action |
 |-----|--------|
@@ -66,100 +94,59 @@ The first run shows an import screen (~30–60 seconds). After that, it goes str
 | `t` | toggle book tree sidebar |
 | `/` | search |
 | `o` | edit annotation for focused verse |
-| `m` | cycle highlight color (yellow → green → blue → pink → off) |
+| `m` | cycle highlight color |
 | `b` | bookmark verse |
 | `a` | toggle Commentary / Chat tab |
-| `L` | jump to today's lectionary reading |
+| `L` | today's lectionary readings |
 | `N` | My Notes (all annotations + bookmarks) |
-| `T` | toggle dark / sepia theme |
+| `T` | toggle Dark / Sepia theme |
 | `E` | export annotations to Markdown |
 | `q` | quit / close modal |
 
-## Developer: verifying features
+---
 
-After setup, use these steps to manually verify every major feature:
+## 🤖 AI Chat (Optional)
 
-**Navigation**
-- `j` / `k` — move between verses; commentary updates in right pane
-- `J` / `K` — jump between chapters; book tree selection follows
-- `g g` — jump to first verse of chapter
-- `G` — jump to last verse of chapter
-- `h` / `l` — shift focus between BookTree ↔ ScripturePane ↔ RightPane
-
-**Search**
-- `/` — open search, type a word (e.g. `mercy`), `Enter` to jump, `Escape` to cancel
-
-**Annotations & highlights**
-- `o` — open annotation editor on focused verse, type a note, save
-- `m` — cycle highlight color on focused verse (yellow → green → blue → pink → off)
-- `b` — bookmark focused verse
-
-**My Notes screen**
-- `N` — open Notes screen showing all annotations and bookmarks; `Escape` to return
-
-**Lectionary**
-- `L` — open today's lectionary modal (shows readings if it's a feast day, otherwise "No specific readings found for today" — this is correct for non-feast days)
-
-**Tabs**
-- `a` — toggle Commentary ↔ Chat tab in right pane
-
-**Theme**
-- `T` — toggle dark ↔ sepia theme
-
-**Export**
-- `E` — export all annotations to a Markdown file (check terminal output for path)
-
-**Sidebar**
-- `t` — toggle BookTree sidebar visibility
-
-**Quit modal**
-- `q` — open quit confirmation; `y` to quit, `n` / `Escape` to cancel
-
-**CLI flags**
-```bash
-uv run osb --reimport     # re-parse EPUB (keeps notes/bookmarks)
-uv run osb --reset        # wipe personal data, keep scripture
-uv run osb --db-path      # print DB file path
-uv run osb --uninstall    # remove all app data
-```
-
-**Tests** (requires EPUB at project root)
-```bash
-pytest tests/test_parser.py
-```
-
-## AI Chat (optional)
-
-Install and run [Ollama](https://ollama.ai), then switch to the Chat tab with `a`. The app works fully without it.
+Enhance your study with local AI. Install [Ollama](https://ollama.ai) and pull your preferred model:
 
 ```bash
 ollama serve
-ollama pull llama3.2  # or whichever model you prefer
+ollama pull llama3.2
 ```
 
-Change the model in `src/osb/config.py` (`OLLAMA_MODEL`).
+Switch to the **Chat** tab in the app with `a`. All conversations remain on your machine.
 
-## Data location
+---
 
-- macOS: `~/Library/Application Support/osb/osb.db`
-- Linux: `$XDG_DATA_HOME/osb/osb.db`
+## 👨‍💻 Developer Guide
 
-## Useful commands
+### Verifying Features
+- Run `uv run osb --reimport` to test the EPUB parser.
+- Run `uv run osb --reset` to wipe local data while keeping scripture.
+- Check `uv run osb --db-path` for the SQLite file location.
 
+### Running Tests
+Ensure an OSB EPUB is present in the root directory:
 ```bash
-osb --reimport          # re-parse EPUB, keeps your annotations/bookmarks
-osb --reset             # clear personal data, keep scripture
-osb --uninstall         # remove all app data
-osb --db-path           # print the DB path
+uv run pytest tests/test_parser.py
 ```
 
-## Uninstall
+---
 
-```bash
-osb --uninstall         # removes app data
-uv tool uninstall orthodox-study-bible  # removes the command
-```
+## 🔍 SEO & AI Optimization
 
-## License
+This project is optimized for both search engines and AI agents.
+- **Structured Metadata**: Defined in `pyproject.toml`.
+- **AI Context**: See [llms.txt](llms.txt) for a technical summary optimized for Large Language Models.
+- **Social Preview**: [Instructions for adding a repository social image](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/configuring-a-social-preview-for-your-repository).
 
-Personal use. The Orthodox Study Bible text is copyright St. Athanasius Orthodox Academy.
+---
+
+## 📜 License
+
+- **Code**: MIT License (see [LICENSE](LICENSE)).
+- **Content**: The Orthodox Study Bible text is copyright © St. Athanasius Orthodox Academy. This software is a tool for personal study and does not distribute copyrighted text.
+
+---
+
+Built with ❤️ for the Orthodox community.

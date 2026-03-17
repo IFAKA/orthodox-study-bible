@@ -1,0 +1,28 @@
+# Orthodox Study Bible TUI
+
+An offline, keyboard-driven Terminal User Interface (TUI) for studying the Orthodox Study Bible (OSB), built with Python and the Textual framework.
+
+## Key Features
+- **Offline First**: All scripture text is stored locally in a SQLite database (FTS5 enabled).
+- **Comprehensive Content**: Supports the full 78-book canon of the OSB, including commentary and cross-references.
+- **AI Integration**: Optional local LLM chat interface via Ollama for theological inquiries and text analysis.
+- **Daily Lectionary**: Automated tracking of the Paschal and Menaion cycles (Julian calendar).
+- **Personalization**: Annotations, highlights, and bookmarks with Markdown export support.
+- **Modern TUI**: Built with Textual, featuring Vim-style keybindings, responsive layout, and multiple themes (Dark/Sepia).
+
+## Technical Architecture
+- **Language**: Python 3.11+
+- **Framework**: Textual (TUI engine)
+- **Database**: SQLite with FTS5 for full-text search.
+- **Importer**: Custom EPUB parser (`BeautifulSoup`, `lxml`) for converting OSB EPUB structure to relational data.
+- **AI**: Streams from Ollama API (`localhost:11434`) for real-time chat.
+- **State Management**: Reactive properties and message passing within Textual components.
+
+## Directory Structure
+- `src/osb/tui/`: UI components, screens, and CSS styles.
+- `src/osb/importer/`: Logic for parsing and importing the OSB EPUB.
+- `src/osb/db/`: Database schema and query layer.
+- `src/osb/models.py`: Pydantic models for scripture and annotations.
+
+## For LLMs
+This project is highly modular. The `ScripturePane` handles text rendering, while the `RightPane` manages context-aware commentary and AI chat. The database schema separates immutable scripture data from user annotations.

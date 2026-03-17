@@ -7,6 +7,7 @@ from pathlib import Path
 
 from textual.app import App, ComposeResult
 
+from osb.tui.screens.download_screen import DownloadScreen
 from osb.tui.screens.import_screen import ImportScreen
 from osb.tui.screens.main_screen import MainScreen
 from osb.tui.screens.splash_screen import SplashScreen
@@ -37,7 +38,7 @@ class OrthodoxStudyApp(App):
             if self.epub_path and self.epub_path.exists():
                 self.push_screen(ImportScreen(self.conn, self.epub_path))
             else:
-                self.push_screen(self._make_no_epub_screen())
+                self.push_screen(DownloadScreen(self.conn))
         else:
             self._show_main()
 
@@ -52,27 +53,13 @@ class OrthodoxStudyApp(App):
         self.pop_screen()
         self._show_main()
 
-    def _make_no_epub_screen(self):
-        from textual.screen import Screen
-        from textual.widgets import Label
+    def on_download_screen_download_complete(self, _event: DownloadScreen.DownloadComplete) -> None:
+        from osb.config import DB_PATH
+        from osb.db.migrations import run_migrations
+        from osb.db.schema import open_db
 
-        class NoEpubScreen(Screen):
-            def compose(self) -> ComposeResult:
-                yield Label(
-                    "No EPUB found.\n\n"
-                    "Place your OSB EPUB at data/osb.epub and restart.\n"
-                    "Or pass the path with: osb --epub /path/to/osb.epub\n\n"
-                    "Press q to quit.",
-                )
+        self.pop_screen()
+        self.conn = open_db(DB_PATH)
+        run_migrations(self.conn)
+        self._show_main()
 
-            def on_key(self, event) -> None:
-                if event.key == "q":
-                    from osb.tui.widgets.quit_modal import QuitModal
-
-                    def _on_confirm(confirmed: bool | None) -> None:
-                        if confirmed:
-                            self.app.exit()
-
-                    self.app.push_screen(QuitModal(), _on_confirm)
-
-        return NoEpubScreen()

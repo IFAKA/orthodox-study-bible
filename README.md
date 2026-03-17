@@ -16,6 +16,16 @@ A fully offline TUI app for studying the Orthodox Study Bible. Built with Python
 - Sepia theme, Markdown export, reading progress
 - Vim-style keybindings, fully keyboard-driven
 
+![commentary](https://github.com/user-attachments/assets/3571ab38-7702-452d-98e1-d27f1b4288ed)
+
+![chat](https://github.com/user-attachments/assets/37c614ca-8b97-4fc1-8f7f-a2fe34660476)
+
+![notes](https://github.com/user-attachments/assets/471dbc4d-d44a-49e6-b3ad-146d6a217213)
+
+![search](https://github.com/user-attachments/assets/12848dc3-6819-438f-89f5-a2ac8e30e0c7)
+
+![searchinline](https://github.com/user-attachments/assets/383a81e9-afcc-4c89-a07e-90f1f2f48769)
+
 ## Requirements
 
 - Python 3.11+

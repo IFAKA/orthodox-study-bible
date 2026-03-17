@@ -222,6 +222,7 @@ class OsbEpubParser:
         self.verses_data: list[dict] = []
         self.commentary_data: list[dict] = []
         self.cross_refs_data: list[dict] = []
+        self.glossary_data: list[dict] = []
 
         self._inserted_books: set[str] = set()
         self._inserted_chapters: set[str] = set()
@@ -251,7 +252,42 @@ class OsbEpubParser:
                 self._parse_item(name, content)
             except Exception as e:
                 logger.error("Error parsing %s: %s", name, e, exc_info=True)
+        self._parse_glossary()
         self.progress_cb(total, total, "Parsing complete")
+
+    def _parse_glossary(self) -> None:
+        """Scan EPUB items for a glossary section and extract term/definition pairs."""
+        for item in self.items:
+            name = item.get_name().lower()
+            if "gloss" not in name and "vocab" not in name:
+                continue
+            content = item.get_content()
+            try:
+                soup = BeautifulSoup(content, "lxml")
+            except Exception:
+                continue
+            # Look for definition list structure (dl/dt/dd) or paragraphs with bold terms
+            dts = soup.find_all("dt")
+            if dts:
+                for dt in dts:
+                    term = dt.get_text(strip=True)
+                    dd = dt.find_next_sibling("dd")
+                    definition = dd.get_text(" ", strip=True) if dd else ""
+                    if term and definition:
+                        self.glossary_data.append({"term": term, "definition": definition})
+                continue
+            # Fallback: bold-paragraph pattern (p > b/strong as term, rest as definition)
+            for p in soup.find_all("p"):
+                bold = p.find(["b", "strong"])
+                if not bold:
+                    continue
+                term = bold.get_text(strip=True)
+                if not term:
+                    continue
+                bold.extract()
+                definition = p.get_text(" ", strip=True).lstrip(":— ").strip()
+                if definition:
+                    self.glossary_data.append({"term": term, "definition": definition})
 
     def _parse_item(self, name: str, content: bytes) -> None:
         soup = BeautifulSoup(content, "lxml")
@@ -471,6 +507,11 @@ class OsbEpubParser:
             "INSERT INTO commentary_fts(id, note_text) VALUES (?, ?)",
             [(r[0], r[1]) for r in rows],
         )
+        if self.glossary_data:
+            conn.executemany(
+                "INSERT OR REPLACE INTO glossary(term, definition) VALUES (:term, :definition)",
+                self.glossary_data,
+            )
         conn.commit()
 
 

@@ -131,6 +131,11 @@ CREATE TABLE IF NOT EXISTS lectionary_paschal (
     reading_ref TEXT NOT NULL,
     PRIMARY KEY(offset_days, service)
 );
+
+CREATE TABLE IF NOT EXISTS glossary (
+    term       TEXT PRIMARY KEY,
+    definition TEXT NOT NULL
+);
 """
 
 

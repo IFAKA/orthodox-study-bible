@@ -97,14 +97,19 @@ Button:focus {
 BookTree {
     background: $surface;
     color: $text;
-    padding: 0 1;
 }
 
-BookTree > .tree--guides {
+BookTree Tree {
+    padding: 0 1;
+    background: $surface;
+    color: $text;
+}
+
+BookTree .tree--guides {
     color: $border;
 }
 
-BookTree > .tree--cursor {
+BookTree .tree--cursor {
     background: $accent-dim;
     color: $text;
 }

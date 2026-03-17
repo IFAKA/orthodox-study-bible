@@ -387,6 +387,85 @@ def get_chapters_with_chat(conn: sqlite3.Connection) -> set[str]:
     return {r[0] for r in rows}
 
 
+# ── Reading progress (extended) ───────────────────────────────────────────────
+
+def unmark_chapter_complete(conn: sqlite3.Connection, chapter_ref: str) -> None:
+    conn.execute("DELETE FROM reading_progress WHERE chapter_ref=?", (chapter_ref,))
+    conn.commit()
+
+
+def get_verse_refs_with_crossrefs_for_chapter(
+    conn: sqlite3.Connection, chapter_ref: str
+) -> set[str]:
+    rows = conn.execute(
+        """SELECT DISTINCT cr.from_ref FROM cross_references cr
+           JOIN verses v ON v.ref = cr.from_ref
+           WHERE v.chapter_ref = ?""",
+        (chapter_ref,),
+    ).fetchall()
+    return {r[0] for r in rows}
+
+
+def get_total_progress(conn: sqlite3.Connection) -> tuple[int, int]:
+    row = conn.execute(
+        """SELECT (SELECT COUNT(*) FROM reading_progress),
+                  (SELECT COUNT(*) FROM chapters)"""
+    ).fetchone()
+    return (row[0] or 0, row[1] or 0) if row else (0, 0)
+
+
+def get_all_books_progress(conn: sqlite3.Connection) -> list[dict]:
+    rows = conn.execute(
+        """SELECT b.ref, b.name, b.testament, b.osb_order,
+                  COUNT(ch.ref) as total,
+                  COUNT(rp.chapter_ref) as done
+           FROM books b
+           JOIN chapters ch ON ch.book_ref = b.ref
+           LEFT JOIN reading_progress rp ON rp.chapter_ref = ch.ref
+           GROUP BY b.ref ORDER BY b.osb_order"""
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_first_incomplete_chapter(
+    conn: sqlite3.Connection, book_ref: str
+) -> Optional[str]:
+    """Return first chapter not in reading_progress, or first chapter if all complete."""
+    row = conn.execute(
+        """SELECT ch.ref FROM chapters ch
+           WHERE ch.book_ref = ?
+             AND ch.ref NOT IN (SELECT chapter_ref FROM reading_progress)
+           ORDER BY ch.number LIMIT 1""",
+        (book_ref,),
+    ).fetchone()
+    if row:
+        return row[0]
+    # All complete — return first chapter
+    row = conn.execute(
+        "SELECT ref FROM chapters WHERE book_ref=? ORDER BY number LIMIT 1",
+        (book_ref,),
+    ).fetchone()
+    return row[0] if row else None
+
+
+# ── Glossary ──────────────────────────────────────────────────────────────────
+
+def search_glossary(conn: sqlite3.Connection, query: str, limit: int = 50) -> list[dict]:
+    like = f"%{query}%"
+    rows = conn.execute(
+        "SELECT term, definition FROM glossary WHERE term LIKE ? OR definition LIKE ? LIMIT ?",
+        (like, like, limit),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_glossary_term(conn: sqlite3.Connection, term: str) -> Optional[dict]:
+    row = conn.execute(
+        "SELECT term, definition FROM glossary WHERE term=?", (term,)
+    ).fetchone()
+    return dict(row) if row else None
+
+
 # ── Meta ──────────────────────────────────────────────────────────────────────
 
 def get_verse_count(conn: sqlite3.Connection) -> int:

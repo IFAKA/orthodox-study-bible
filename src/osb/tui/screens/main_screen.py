@@ -12,9 +12,11 @@ from textual.screen import Screen
 from textual.widgets import Footer, Input, Label
 
 from osb.db import queries
-from osb.importer.lectionary import get_primary_reading
+from osb.importer.lectionary import get_primary_feast
 from osb.tui.screens.daily_screen import DailyScreen
+from osb.tui.screens.glossary_screen import GlossaryScreen
 from osb.tui.screens.my_notes_screen import MyNotesScreen
+from osb.tui.screens.progress_screen import ProgressScreen
 from osb.tui.screens.search_screen import SearchScreen
 from osb.tui.widgets.app_header import AppHeader
 from osb.tui.widgets.book_tree import BookTree
@@ -32,6 +34,8 @@ class MainScreen(Screen):
         Binding("F", "search", "Search"),
         Binding("N", "notes", "Notes"),
         Binding("L", "lectionary", "Lectionary"),
+        Binding("p", "progress", "Progress"),
+        Binding("?", "glossary", "Glossary"),
         Binding("q", "quit_app", "Quit"),
         Binding("T", "toggle_theme", "Theme", show=False),
         Binding("h", "focus_scripture", "Scripture", show=False),
@@ -57,6 +61,7 @@ class MainScreen(Screen):
 
     def on_mount(self) -> None:
         self._restore_session()
+        self._update_progress()
         self.call_after_refresh(lambda: self.query_one("#scripture-pane", ScripturePane).focus())
 
     def _restore_session(self) -> None:
@@ -95,13 +100,24 @@ class MainScreen(Screen):
         book_name = book.name if book else ch.book_ref
         complete = queries.is_chapter_complete(self.conn, chapter_ref)
         complete_str = " ✓" if complete else ""
-        lectionary_ref = get_primary_reading(date.today())
-        lectionary_str = f"Today: {lectionary_ref}" if lectionary_ref else ""
+        feast = get_primary_feast(date.today())
+        if feast:
+            ref, feast_name = feast
+            lectionary_str = f"Today: {feast_name} · {ref}" if feast_name else f"Today: {ref}"
+        else:
+            lectionary_str = ""
 
         try:
             header = self.query_one(AppHeader)
             header.update_title(f"{book_name} {ch.number}{complete_str}")
             header.update_lectionary(lectionary_str)
+        except Exception:
+            pass
+
+    def _update_progress(self) -> None:
+        done, total = queries.get_total_progress(self.conn)
+        try:
+            self.query_one(AppHeader).update_progress(f"{done} / {total} chapters")
         except Exception:
             pass
 
@@ -139,6 +155,12 @@ class MainScreen(Screen):
         if 0 <= new_idx < len(chapters):
             self._load_chapter(chapters[new_idx].ref)
 
+    def on_scripture_pane_chapter_completion_changed(
+        self, event: ScripturePane.ChapterCompletionChanged
+    ) -> None:
+        self._update_header(event.chapter_ref)
+        self._update_progress()
+
     # ── Actions ───────────────────────────────────────────────────────────────
 
     def action_toggle_sidebar(self) -> None:
@@ -172,9 +194,19 @@ class MainScreen(Screen):
         self.app.push_screen(MyNotesScreen(self.conn))
 
     def action_lectionary(self) -> None:
-        ref = get_primary_reading(date.today())
-        if ref:
-            self._navigate_to_verse(ref)
+        feast = get_primary_feast(date.today())
+        if feast:
+            self._navigate_to_verse(feast[0])
+
+    def action_progress(self) -> None:
+        def on_result(ref: str | None) -> None:
+            if ref:
+                self._navigate_to_verse(ref)
+
+        self.app.push_screen(ProgressScreen(self.conn), on_result)
+
+    def action_glossary(self) -> None:
+        self.app.push_screen(GlossaryScreen(self.conn))
 
     def action_toggle_theme(self) -> None:
         screen = self.app.screen

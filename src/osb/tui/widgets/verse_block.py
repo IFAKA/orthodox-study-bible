@@ -25,6 +25,7 @@ class VerseBlock(Widget):
     highlight_color: reactive[str | None] = reactive(None)
     has_annotation: reactive[bool] = reactive(False)
     has_bookmark: reactive[bool] = reactive(False)
+    has_crossref: reactive[bool] = reactive(False)
 
     def __init__(
         self,
@@ -58,12 +59,17 @@ class VerseBlock(Widget):
     def watch_has_bookmark(self, has: bool) -> None:
         self._update_glyph()
 
+    def watch_has_crossref(self, has: bool) -> None:
+        self._update_glyph()
+
     def _update_glyph(self) -> None:
         glyph = ""
         if self.has_bookmark:
             glyph = "♦"
         elif self.has_annotation:
             glyph = "*"
+        elif self.has_crossref:
+            glyph = "→"
         try:
             self.query_one(f"#vglyph-{self.verse_ref}", Label).update(glyph)
         except Exception:
@@ -74,7 +80,9 @@ class VerseBlock(Widget):
         highlight_color: str | None = None,
         has_annotation: bool = False,
         has_bookmark: bool = False,
+        has_crossref: bool = False,
     ) -> None:
         self.highlight_color = highlight_color
         self.has_annotation = has_annotation
         self.has_bookmark = has_bookmark
+        self.has_crossref = has_crossref

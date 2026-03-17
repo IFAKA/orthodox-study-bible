@@ -16,6 +16,7 @@ class AppHeader(Static):
     def compose(self) -> ComposeResult:
         yield Label(self.title_text, id="header-title")
         yield Label("", id="header-lectionary")
+        yield Label("", id="header-progress")
 
     def update_title(self, title: str) -> None:
         self.title_text = title
@@ -27,5 +28,11 @@ class AppHeader(Static):
     def update_lectionary(self, info: str) -> None:
         try:
             self.query_one("#header-lectionary", Label).update(info)
+        except Exception:
+            pass
+
+    def update_progress(self, text: str) -> None:
+        try:
+            self.query_one("#header-progress", Label).update(text)
         except Exception:
             pass

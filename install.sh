@@ -15,7 +15,7 @@ if ! command -v uv >/dev/null 2>&1; then
 fi
 
 echo "Installing Orthodox Study Bible…"
-uv tool install "git+${REPO}"
+uv tool install --force "git+${REPO}"
 
 echo ""
 echo "Done! Run:  osb"

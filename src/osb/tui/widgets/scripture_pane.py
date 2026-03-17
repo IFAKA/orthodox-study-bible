@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sqlite3
+import subprocess
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal
@@ -11,7 +12,11 @@ from textual.widget import Widget
 from textual.widgets import Input, Label
 
 from osb.db import queries
-from osb.db.queries import get_annotated_verse_refs_for_chapter, get_bookmarked_verse_refs_for_chapter
+from osb.db.queries import (
+    get_annotated_verse_refs_for_chapter,
+    get_bookmarked_verse_refs_for_chapter,
+    get_verse_refs_with_crossrefs_for_chapter,
+)
 from osb.tui.mixins.chord_handler import ChordMixin
 from osb.tui.widgets.verse_block import VerseBlock
 
@@ -33,6 +38,9 @@ class ScripturePane(ChordMixin, Widget):
         Binding("b", "bookmark", "Bookmark", show=True),
         Binding("m", "cycle_highlight", "Highlight", show=True),
         Binding("o", "annotate", "Annotate", show=True),
+        Binding("x", "crossrefs", "Cross-refs", show=True),
+        Binding("y", "copy_verse", "Copy", show=True),
+        Binding("C", "toggle_complete", "Complete", show=True),
         Binding("G", "last_verse", "Last verse", show=False),
         Binding("space", "page_down", "Page down", show=False),
         Binding("ctrl+d", "half_page_down", "Half page", show=False),
@@ -48,6 +56,11 @@ class ScripturePane(ChordMixin, Widget):
         def __init__(self, direction: int) -> None:  # +1 or -1
             super().__init__()
             self.direction = direction
+
+    class ChapterCompletionChanged(Message):
+        def __init__(self, chapter_ref: str) -> None:
+            super().__init__()
+            self.chapter_ref = chapter_ref
 
     def __init__(self, conn: sqlite3.Connection, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -93,6 +106,7 @@ class ScripturePane(ChordMixin, Widget):
         highlights = queries.get_highlights_for_chapter(self.conn, self._chapter_ref)
         annotations = get_annotated_verse_refs_for_chapter(self.conn, self._chapter_ref)
         bookmarks_set = get_bookmarked_verse_refs_for_chapter(self.conn, self._chapter_ref)
+        crossrefs_set = get_verse_refs_with_crossrefs_for_chapter(self.conn, self._chapter_ref)
 
         blocks: list[VerseBlock] = []
         for v in verses:
@@ -106,6 +120,7 @@ class ScripturePane(ChordMixin, Widget):
                 highlight_color=highlights.get(v.ref),
                 has_annotation=v.ref in annotations,
                 has_bookmark=v.ref in bookmarks_set,
+                has_crossref=v.ref in crossrefs_set,
             )
             self._verse_refs.append(v.ref)
             self._blocks[v.ref] = block
@@ -218,6 +233,54 @@ class ScripturePane(ChordMixin, Widget):
             block = self._blocks.get(ref)
             if block:
                 block.has_bookmark = added
+
+    def action_crossrefs(self) -> None:
+        if not self._chapter_ref or not self._verse_refs:
+            return
+        verse_ref = self._verse_refs[self._focused_idx]
+        xrefs = queries.get_cross_refs(self.conn, verse_ref)
+        if not xrefs:
+            self.app.notify("No cross-references for this verse", timeout=2)
+            return
+        from osb.tui.screens.crossref_screen import CrossRefScreen
+        from osb.tui.screens.main_screen import MainScreen
+
+        def callback(ref: str | None) -> None:
+            if ref is not None:
+                self.app.query_one(MainScreen)._navigate_to_verse(ref)
+
+        self.app.push_screen(CrossRefScreen(self.conn, verse_ref), callback)
+
+    def action_copy_verse(self) -> None:
+        ref = self.focused_verse_ref
+        if not ref:
+            return
+        v = queries.get_verse(self.conn, ref)
+        if not v:
+            return
+        parts = ref.split("-")
+        book_ref = parts[0]
+        ch_num = parts[1] if len(parts) > 1 else "?"
+        v_num = parts[2] if len(parts) > 2 else "?"
+        book = queries.get_book(self.conn, book_ref)
+        book_name = book.name if book else book_ref
+        text = f"{book_name} {ch_num}:{v_num} — {v.text}"
+        try:
+            subprocess.run(["pbcopy"], input=text.encode(), check=True)
+            self.app.notify("Verse copied", timeout=2)
+        except Exception:
+            self.app.notify("Copy failed (pbcopy not available)", timeout=2)
+
+    def action_toggle_complete(self) -> None:
+        if not self._chapter_ref:
+            return
+        if queries.is_chapter_complete(self.conn, self._chapter_ref):
+            queries.unmark_chapter_complete(self.conn, self._chapter_ref)
+            self.app.notify("Chapter unmarked", timeout=2)
+        else:
+            queries.mark_chapter_complete(self.conn, self._chapter_ref)
+            self.app.notify("Chapter marked complete ✓", timeout=2)
+        self.post_message(ScripturePane.ChapterCompletionChanged(self._chapter_ref))
 
     def action_start_search(self) -> None:
         self._search_mode = True

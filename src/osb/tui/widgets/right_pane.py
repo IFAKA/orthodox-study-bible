@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
 import subprocess
 import threading
@@ -17,7 +18,30 @@ from textual.widgets import Input, Label, Markdown, Static, TabbedContent, TabPa
 
 from osb import config
 from osb.db import queries
+from osb.importer.structure import normalize_book_name
 from osb.tui.widgets.book_tree import BookTree
+
+
+def _parse_refs(text: str, conn: sqlite3.Connection) -> list[tuple[str, str]]:
+    """Return deduplicated list of (verse_ref, display_label) extracted from AI response text."""
+    pattern = re.compile(
+        r'(?<!\w)(\d?\s*[A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(\d+):(\d+)(?:-\d+)?(?!\d)'
+    )
+    seen: set[str] = set()
+    results: list[tuple[str, str]] = []
+    for m in pattern.finditer(text):
+        book_raw, chapter, verse = m.group(1).strip(), m.group(2), m.group(3)
+        abbrev = normalize_book_name(book_raw)
+        if not abbrev:
+            continue
+        verse_ref = f"{abbrev}-{chapter}-{verse}"
+        if verse_ref in seen:
+            continue
+        if queries.get_verse(conn, verse_ref) is None:
+            continue
+        seen.add(verse_ref)
+        results.append((verse_ref, f"{book_raw.title()} {chapter}:{verse}"))
+    return results
 
 
 class _ChatInput(Input):
@@ -42,8 +66,9 @@ class RightPane(Widget):
         Binding("a", "toggle_tab", "Tab", show=True),
         Binding("escape", "escape_pane", "Back", show=True, priority=True),
         Binding("i", "focus_input", "Type", show=True),
-        Binding("j", "scroll_down", "↓", show=True),
-        Binding("k", "scroll_up", "↑", show=True),
+        Binding("j", "scroll_down", "↓", show=False),
+        Binding("k", "scroll_up", "↑", show=False),
+        Binding("r", "browse_refs", "Refs", show=True),
         Binding("y", "copy_last_response", "Copy", show=True),
         Binding("C", "clear_chat", "Clear chat", show=True),
         Binding("d", "toggle_debug", "Debug", show=False),
@@ -77,6 +102,7 @@ class RightPane(Widget):
         self._streaming_widget: Static | None = None
         self._last_messages: list[dict] = []
         self._last_response: str = ""
+        self._last_refs: list[tuple[str, str]] = []
         self._save_timer: Timer | None = None
 
     def compose(self) -> ComposeResult:
@@ -168,6 +194,19 @@ class RightPane(Widget):
         except Exception as e:
             self.app.notify(f"Copy failed: {e}", severity="error")
 
+    def action_browse_refs(self) -> None:
+        if not self._last_refs:
+            self.app.notify("No references in last response", severity="warning")
+            return
+        from osb.tui.screens.chat_refs_screen import ChatRefScreen
+        from osb.tui.screens.main_screen import MainScreen
+
+        def callback(ref: str | None) -> None:
+            if ref:
+                self.app.query_one(MainScreen)._navigate_to_verse(ref)
+
+        self.app.push_screen(ChatRefScreen(self._last_refs), callback)
+
     def action_clear_chat(self) -> None:
         if not self._current_chapter_ref:
             return
@@ -175,6 +214,7 @@ class RightPane(Widget):
         self._update_tree_chat_indicator(self._current_chapter_ref, has_chat=False)
         self._last_response = ""
         self._last_messages = []
+        self._last_refs = []
         self._streaming = False
         self._streaming_widget = None
         self._accumulated_response = ""
@@ -375,6 +415,7 @@ class RightPane(Widget):
             if event.chapter_ref:
                 queries.append_chat_message(self.conn, event.chapter_ref, "assistant", event.response)
                 self._update_tree_chat_indicator(event.chapter_ref, has_chat=True)
+            self._last_refs = _parse_refs(event.response, self.conn)
         self._finish_stream_widget(event.response)
 
     # ── Chat message widget helpers ───────────────────────────────────────────
@@ -419,7 +460,11 @@ class RightPane(Widget):
         """Finalize the AI response widget (remove cursor)."""
         if self._streaming_widget:
             if text:
-                self._streaming_widget.update(f"{_AI_HEADER}\n{text}")
+                hint = ""
+                if self._last_refs:
+                    n = len(self._last_refs)
+                    hint = f"\n[dim]↳ {n} {'reference' if n == 1 else 'references'} · r to browse[/]"
+                self._streaming_widget.update(f"{_AI_HEADER}\n{text}{hint}")
             else:
                 # No response received — remove the dangling cursor widget
                 try:
@@ -455,7 +500,8 @@ class RightPane(Widget):
             f"The user is reading the Orthodox Study Bible ({config.JURISDICTION}). "
             f"Answer questions about the text, historical context, biblical geography, "
             f"theological terms, and patristic interpretation. "
-            f"Stay grounded in the provided context. Do not give pastoral advice. Be clear, not academic.\n\n"
+            f"Stay grounded in the provided context. Do not give pastoral advice. Be clear, not academic. "
+            f"When citing scripture, use standard format: 'Book Chapter:Verse' (e.g., 'Gen 1:1', '1 Cor 3:16', 'Ps 22:3').\n\n"
             f"Passage: {book_chapter}\n"
             f"Text: {verse_text}\n"
             f"OSB notes: {commentary_text}"
@@ -501,15 +547,15 @@ class RightPane(Widget):
             active = self.query_one("#right-tabs", TabbedContent).active
         except Exception:
             return True
-        # chat-only actions
-        if action in {"copy_last_response", "clear_chat", "toggle_debug"}:
-            return active == "tab-chat"
+        # chat-only actions — hide from footer entirely when not on chat tab
+        if action in {"copy_last_response", "clear_chat", "toggle_debug", "browse_refs"}:
+            return True if active == "tab-chat" else None
         # chat + notes (has a text input to focus)
         if action == "focus_input":
-            return active in ("tab-chat", "tab-notes")
+            return True if active in ("tab-chat", "tab-notes") else None
         # scroll only on tabs that have scrollable content
         if action in {"scroll_down", "scroll_up"}:
-            return active in ("tab-chat", "tab-commentary")
+            return True if active in ("tab-chat", "tab-commentary") else None
         return True
 
     def action_toggle_tab(self) -> None:

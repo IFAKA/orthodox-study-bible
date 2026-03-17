@@ -42,7 +42,9 @@ class DailyScreen(ModalScreen[str | None]):
         label = self.query_one("#daily-readings", Label)
         goto_btn = self.query_one("#goto-btn", Button)
         if self._readings:
-            lines = []
+            feast_names = {r["feast_name"] for r in self._readings if r.get("feast_name")}
+            feast_line = f"  {' · '.join(sorted(feast_names))}\n" if feast_names else ""
+            lines = [feast_line] if feast_line else []
             for r in self._readings:
                 lines.append(f"{r['service'].capitalize()}: {r['reading_ref']} ({r['source']})")
             label.update("\n".join(lines))

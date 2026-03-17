@@ -14,7 +14,6 @@ from textual.screen import Screen
 from textual.widgets import Button, Footer, Label, ProgressBar
 
 from osb.db.queries import get_verse_count
-from osb.importer.epub_parser import ParseError, run_import
 from osb.tui.widgets.app_header import AppHeader
 from osb.tui.widgets.quit_modal import QuitModal
 
@@ -62,6 +61,8 @@ class ImportScreen(Screen):
 
     def _start_import(self) -> None:
         def worker():
+            from osb.importer.epub_parser import ParseError, run_import
+
             def progress_cb(current: int, total: int, message: str) -> None:
                 if total > 0:
                     pct = int(current / total * 100)

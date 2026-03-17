@@ -2,7 +2,8 @@
 
 A fully offline TUI app for studying the Orthodox Study Bible. Built with Python + Textual.
 
-![dark theme screenshot placeholder](https://placehold.co/800x400/1a1a1a/c9a84c?text=Orthodox+Study+Bible+TUI)
+![dark theme screenshot placeholder](https://github.com/user-attachments/assets/af3cadd5-ec3e-4c24-be60-04090d966d3b)
+
 
 ## Features
 

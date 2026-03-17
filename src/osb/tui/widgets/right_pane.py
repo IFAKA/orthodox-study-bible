@@ -480,13 +480,39 @@ class RightPane(Widget):
         """Clear and rebuild all chat message widgets from DB."""
         if not self._current_chapter_ref:
             return
+        self._last_refs = []
+        self._last_response = ""
         try:
             container = self.query_one("#chat-history", VerticalScroll)
             container.remove_children()
             self._streaming_widget = None
             history = queries.get_chat_history(self.conn, self._current_chapter_ref)
-            for msg in history:
-                self._append_message(msg["role"], msg["content"])
+            if not history:
+                return
+            # Mount all but the last assistant message normally
+            last_assistant_idx = None
+            for i in range(len(history) - 1, -1, -1):
+                if history[i]["role"] == "assistant":
+                    last_assistant_idx = i
+                    break
+            for i, msg in enumerate(history):
+                if i == last_assistant_idx:
+                    # Restore refs and hint for the last assistant response
+                    content = msg["content"]
+                    self._last_response = content
+                    self._last_refs = _parse_refs(content, self.conn)
+                    hint = ""
+                    if self._last_refs:
+                        n = len(self._last_refs)
+                        hint = f"\n[dim]↳ {n} {'reference' if n == 1 else 'references'} · r to browse[/]"
+                    widget = Static(
+                        f"{_AI_HEADER}\n{content}{hint}",
+                        classes="chat-msg chat-assistant",
+                    )
+                    container.mount(widget)
+                else:
+                    self._append_message(msg["role"], msg["content"])
+            container.scroll_end(animate=False)
         except Exception:
             pass
 

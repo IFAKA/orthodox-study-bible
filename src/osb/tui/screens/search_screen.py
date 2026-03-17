@@ -145,6 +145,7 @@ class SearchScreen(ModalScreen[str | None]):
                 )
                 item._verse_ref = ref  # type: ignore[attr-defined]
                 lv.append(item)
+            lv.scroll_home(animate=False)
         except Exception:
             pass
 

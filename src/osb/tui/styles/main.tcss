@@ -168,7 +168,7 @@ VerseBlock.hl-pink   { background: $hl-pink;   }
 
 /* ── In-chapter search bar ────────────────────────────────────────── */
 #sp-search-bar {
-    height: 1;
+    height: 2;
     dock: bottom;
     background: $surface-alt;
     border-top: solid $border;
@@ -200,6 +200,12 @@ VerseBlock.hl-pink   { background: $hl-pink;   }
 #sp-search-help {
     color: $text-muted;
     width: auto;
+}
+
+VerseBlock.search-match {
+    background: $surface-alt;
+    border-left: thick $accent;
+    padding-left: 2;
 }
 
 VerseBlock.search-dim {

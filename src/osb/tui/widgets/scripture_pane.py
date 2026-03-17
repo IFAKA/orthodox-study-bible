@@ -241,19 +241,46 @@ class ScripturePane(ChordMixin, Widget):
             return False
 
     def _apply_search_filter(self, query: str) -> None:
+        from rich.text import Text
+        from textual.widgets import Label as TLabel
         self._match_refs = []
         if not query:
-            for block in self._blocks.values():
+            for ref, block in self._blocks.items():
                 block.remove_class("search-match")
                 block.remove_class("search-dim")
+                try:
+                    block.query_one(f"#vtext-{ref}", TLabel).update(block.verse_text)
+                except Exception:
+                    pass
             return
         q = query.lower()
         for ref, block in self._blocks.items():
-            if q in block.verse_text.lower():
+            text = block.verse_text
+            if q in text.lower():
+                # Build Rich text with highlighted matches
+                rich = Text()
+                lower_text = text.lower()
+                pos = 0
+                while True:
+                    idx = lower_text.find(q, pos)
+                    if idx == -1:
+                        rich.append(text[pos:])
+                        break
+                    rich.append(text[pos:idx])
+                    rich.append(text[idx:idx + len(q)], style="bold yellow on #3a3000")
+                    pos = idx + len(q)
+                try:
+                    block.query_one(f"#vtext-{ref}", TLabel).update(rich)
+                except Exception:
+                    pass
                 block.add_class("search-match")
                 block.remove_class("search-dim")
                 self._match_refs.append(ref)
             else:
+                try:
+                    block.query_one(f"#vtext-{ref}", TLabel).update(text)
+                except Exception:
+                    pass
                 block.remove_class("search-match")
                 block.add_class("search-dim")
         self._match_idx = 0
@@ -271,12 +298,17 @@ class ScripturePane(ChordMixin, Widget):
         self._set_focus_idx(self._verse_refs.index(self._match_refs[self._match_idx]))
 
     def _clear_search(self) -> None:
+        from textual.widgets import Label as TLabel
         self._search_mode = False
         self._match_refs = []
         self._match_idx = 0
-        for block in self._blocks.values():
+        for ref, block in self._blocks.items():
             block.remove_class("search-match")
             block.remove_class("search-dim")
+            try:
+                block.query_one(f"#vtext-{ref}", TLabel).update(block.verse_text)
+            except Exception:
+                pass
         try:
             self.query_one("#sp-search-bar").add_class("hidden")
             self.query_one("#sp-search-input", Input).clear()

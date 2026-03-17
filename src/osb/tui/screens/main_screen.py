@@ -108,7 +108,8 @@ class MainScreen(Screen):
     # ── Navigation from BookTree ──────────────────────────────────────────────
 
     def on_book_tree_chapter_selected(self, event: BookTree.ChapterSelected) -> None:
-        self._load_chapter(event.chapter_ref)
+        if event.chapter_ref != self._current_chapter_ref:
+            self._load_chapter(event.chapter_ref)
 
     # ── Verse focus ───────────────────────────────────────────────────────────
 

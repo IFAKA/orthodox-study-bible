@@ -513,6 +513,15 @@ DailyScreen {
     margin-bottom: 1;
 }
 
+#daily-buttons {
+    height: auto;
+    align: center middle;
+}
+
+#daily-buttons Button {
+    margin: 0 1;
+}
+
 /* ── Splash screen ──────────────────────────────────────────────────── */
 SplashScreen {
     align: center middle;

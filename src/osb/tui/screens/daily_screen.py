@@ -7,7 +7,7 @@ from datetime import date
 
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Vertical
+from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen
 from textual.widgets import Button, Label
 
@@ -21,8 +21,8 @@ class DailyScreen(ModalScreen[str | None]):
     """
 
     BINDINGS = [
-        Binding("escape", "dismiss_none", "Close"),
-        Binding("q", "dismiss_none", "Close"),
+        Binding("escape,q", "dismiss_none", "Close"),
+        Binding("g", "goto", "Go to first reading"),
     ]
 
     def __init__(self, **kwargs) -> None:
@@ -34,30 +34,33 @@ class DailyScreen(ModalScreen[str | None]):
         with Vertical(id="daily-dialog", classes="modal-dialog"):
             yield Label(f"Today's Readings — {today}", id="daily-title", classes="modal-title")
             yield Label("", id="daily-readings")
-            yield Button("Go to first reading", id="goto-btn", variant="primary")
-            yield Button("Close", id="close-btn")
+            with Horizontal(id="daily-buttons"):
+                yield Button("Go to first reading  [g]", id="goto-btn", variant="primary")
+                yield Button("Close  [q]", id="close-btn")
 
     def on_mount(self) -> None:
-        self.query_one("#goto-btn", Button).focus()
         label = self.query_one("#daily-readings", Label)
+        goto_btn = self.query_one("#goto-btn", Button)
         if self._readings:
             lines = []
             for r in self._readings:
                 lines.append(f"{r['service'].capitalize()}: {r['reading_ref']} ({r['source']})")
             label.update("\n".join(lines))
+            goto_btn.focus()
         else:
             label.update("No specific readings found for today.")
-            try:
-                btn = self.query_one("#goto-btn", Button)
-                btn.disabled = True
-            except Exception:
-                pass
+            goto_btn.disabled = True
+            self.query_one("#close-btn", Button).focus()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "goto-btn" and self._readings:
-            self.dismiss(self._readings[0]["reading_ref"])
+        if event.button.id == "goto-btn":
+            self.action_goto()
         else:
             self.dismiss(None)
+
+    def action_goto(self) -> None:
+        if self._readings:
+            self.dismiss(self._readings[0]["reading_ref"])
 
     def action_dismiss_none(self) -> None:
         self.dismiss(None)

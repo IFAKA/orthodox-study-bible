@@ -64,6 +64,59 @@ The first run shows an import screen (~30–60 seconds). After that, it goes str
 | `E` | export annotations to Markdown |
 | `q` | quit / close modal |
 
+## Developer: verifying features
+
+After setup, use these steps to manually verify every major feature:
+
+**Navigation**
+- `j` / `k` — move between verses; commentary updates in right pane
+- `J` / `K` — jump between chapters; book tree selection follows
+- `g g` — jump to first verse of chapter
+- `G` — jump to last verse of chapter
+- `h` / `l` — shift focus between BookTree ↔ ScripturePane ↔ RightPane
+
+**Search**
+- `/` — open search, type a word (e.g. `mercy`), `Enter` to jump, `Escape` to cancel
+
+**Annotations & highlights**
+- `o` — open annotation editor on focused verse, type a note, save
+- `m` — cycle highlight color on focused verse (yellow → green → blue → pink → off)
+- `b` — bookmark focused verse
+
+**My Notes screen**
+- `N` — open Notes screen showing all annotations and bookmarks; `Escape` to return
+
+**Lectionary**
+- `L` — open today's lectionary modal (shows readings if it's a feast day, otherwise "No specific readings found for today" — this is correct for non-feast days)
+
+**Tabs**
+- `a` — toggle Commentary ↔ Chat tab in right pane
+
+**Theme**
+- `T` — toggle dark ↔ sepia theme
+
+**Export**
+- `E` — export all annotations to a Markdown file (check terminal output for path)
+
+**Sidebar**
+- `t` — toggle BookTree sidebar visibility
+
+**Quit modal**
+- `q` — open quit confirmation; `y` to quit, `n` / `Escape` to cancel
+
+**CLI flags**
+```bash
+uv run osb --reimport     # re-parse EPUB (keeps notes/bookmarks)
+uv run osb --reset        # wipe personal data, keep scripture
+uv run osb --db-path      # print DB file path
+uv run osb --uninstall    # remove all app data
+```
+
+**Tests** (requires EPUB at project root)
+```bash
+pytest tests/test_parser.py
+```
+
 ## AI Chat (optional)
 
 Install and run [Ollama](https://ollama.ai), then switch to the Chat tab with `a`. The app works fully without it.

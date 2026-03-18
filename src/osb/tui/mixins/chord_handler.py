@@ -66,8 +66,6 @@ class ChordMixin:
             event.stop()
             return True
 
-        # Key was not consumed — discard any stale count prefix.
-        self._consume_vim_count()
         return False
 
     def _consume_vim_count(self, default: int = 0) -> int:

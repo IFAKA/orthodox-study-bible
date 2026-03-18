@@ -176,6 +176,10 @@ class RpChatMixin:
             f"Respond with ONLY the title — no punctuation, no quotes, no explanation."
         )
 
+        # Show generating state
+        self._temp_name = f"{prefix} · (generating...)" if prefix else "(generating...)"
+        self.app.call_from_thread(self._refresh_temp_name_display)
+
         def worker():
             try:
                 resp = httpx.post(
@@ -184,12 +188,21 @@ class RpChatMixin:
                     timeout=httpx.Timeout(connect=5.0, read=30.0, write=5.0, pool=5.0),
                 )
                 title = resp.json().get("response", "").strip()
-                title = re.sub(r'[*_`#\[\]"\'.]', "", title).strip()
-                if title:
+                # Clean up the title, but be less aggressive
+                title = re.sub(r'[*_`#\[\]"\']', "", title).strip()
+                # Remove leading/trailing dots and dashes
+                title = title.strip('.-')
+                if title and len(title) > 1:  # Ensure meaningful content
                     self._temp_name = f"{prefix} · {title}" if prefix else title
                     self.app.call_from_thread(self._refresh_temp_name_display)
-            except Exception:
-                pass  # Keep the placeholder prefix name
+                else:
+                    # If generation produced no title, revert to prefix
+                    self._temp_name = prefix
+                    self.app.call_from_thread(self._refresh_temp_name_display)
+            except Exception as e:
+                # Revert to prefix on failure
+                self._temp_name = prefix
+                self.app.call_from_thread(self._refresh_temp_name_display)
 
         threading.Thread(target=worker, daemon=True).start()
 
@@ -215,7 +228,9 @@ class RpChatMixin:
         self._streaming_widget = None
         self._accumulated_response = ""
         try:
-            self.query_one("#chat-history", VerticalScroll).remove_children()
+            container = self.query_one("#chat-history", VerticalScroll)
+            container.remove_children()
+            container.refresh()
         except Exception:
             pass
         self._update_collections_tab_label()

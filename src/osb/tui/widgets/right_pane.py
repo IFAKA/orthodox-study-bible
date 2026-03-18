@@ -187,6 +187,27 @@ class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixi
         except Exception:
             pass
 
+    def _scroll_to_percentage(self, percent: int) -> None:
+        """Scroll to N% through the active pane (1-100)."""
+        percent = max(1, min(percent, 100))
+        try:
+            active = self.query_one("#right-tabs", TabbedContent).active
+            if active == "tab-chat":
+                widget = self.query_one("#chat-history", VerticalScroll)
+            elif active == "tab-commentary":
+                widget = self.query_one("#commentary-text", Markdown)
+            else:
+                return
+
+            # Calculate scroll position based on content height
+            scrollable_region = widget.scrollable_content_region
+            if scrollable_region.height > 0:
+                max_scroll = max(0, scrollable_region.height - widget.container_size.height)
+                target_y = int(max_scroll * percent / 100)
+                widget.scroll_to(0, target_y, animate=True, duration=0.3, easing="out_cubic")
+        except Exception:
+            pass
+
     def on_key(self, event) -> None:
         focused_id = getattr(self.app.focused, "id", None)
         if focused_id in ("chat-input", "notes-editor", "collections-add-input"):
@@ -198,8 +219,13 @@ class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixi
         self._scroll_active_edge(end=False)
 
     def action_last_verse(self) -> None:
-        self._consume_vim_count()  # no verse index in right pane
-        self._scroll_active_edge(end=True)
+        n = self._consume_vim_count()
+        if n > 0:
+            # [N]G: jump to N% of the way through content
+            self._scroll_to_percentage(n)
+        else:
+            # G: jump to end
+            self._scroll_active_edge(end=True)
 
     def action_toggle_tab(self) -> None:
         try:

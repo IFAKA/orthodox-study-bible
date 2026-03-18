@@ -88,6 +88,10 @@ class ChordMixin:
         if first == "g" and second == "g":
             self.action_goto_first_verse()
             return True
+        if first == "g" and second == "G":
+            # Handle gG same as G for vim-style consistency
+            self.action_last_verse()
+            return True
         if first == "g" and second == "?":
             self.screen.action_glossary()
             return True

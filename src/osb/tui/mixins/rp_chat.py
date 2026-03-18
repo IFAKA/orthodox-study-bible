@@ -229,15 +229,17 @@ class RpChatMixin:
         self._accumulated_response = ""
         try:
             container = self.query_one("#chat-history", VerticalScroll)
-            container.remove_children()
+            # Explicitly remove all children
+            for child in list(container.children):
+                child.remove()
             container.scroll_home()
-        except Exception:
-            pass
+        except Exception as e:
+            self.app.log(f"Error clearing chat: {e}")
         try:
             chat_input = self.query_one("#chat-input", Input)
             chat_input.value = ""
-        except Exception:
-            pass
+        except Exception as e:
+            self.app.log(f"Error clearing input: {e}")
         self._update_collections_tab_label()
         try:
             from textual.widgets import TabbedContent

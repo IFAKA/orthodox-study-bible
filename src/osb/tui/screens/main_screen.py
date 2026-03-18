@@ -9,24 +9,19 @@ from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal
 from textual.screen import Screen
-from textual.widgets import Input, Label
 
 from osb.db import queries
 from osb.importer.lectionary import get_primary_feast
-from osb.tui.screens.daily_screen import DailyScreen
-from osb.tui.screens.glossary_screen import GlossaryScreen
-from osb.tui.screens.help_screen import HelpScreen, build_help_text
-from osb.tui.screens.my_notes_screen import MyNotesScreen
-from osb.tui.screens.progress_screen import ProgressScreen
-from osb.tui.screens.search_screen import SearchScreen
+from osb.tui.screens.help_screen import HelpScreen
+from osb.tui.screens.main_screen_actions import MainScreenActionsMixin
+from osb.tui.screens.main_screen_context import build_context_help, get_focus_context
 from osb.tui.widgets.book_tree import BookTree
-from osb.tui.widgets.quit_modal import QuitModal
 from osb.tui.widgets.right_pane import RightPane
 from osb.tui.widgets.scripture_pane import ScripturePane
 from osb.tui.widgets.status_bar import StatusBar
 
 
-class MainScreen(Screen):
+class MainScreen(MainScreenActionsMixin, Screen):
     """Primary 3-pane reading screen."""
 
     BINDINGS = [
@@ -162,160 +157,6 @@ class MainScreen(Screen):
         self._update_header(event.chapter_ref)
         self._update_progress()
 
-    # ── Actions ───────────────────────────────────────────────────────────────
-
-    def action_toggle_sidebar(self) -> None:
-        self._sidebar_visible = not self._sidebar_visible
-        try:
-            sidebar = self.query_one("#sidebar", BookTree)
-            if self._sidebar_visible:
-                sidebar.remove_class("hidden")
-                ref = self._current_chapter_ref
-                if ref:
-                    self.call_after_refresh(
-                        lambda r=ref: sidebar.navigate_to_chapter(r)
-                    )
-                self.call_after_refresh(sidebar.focus)
-            else:
-                sidebar.add_class("hidden")
-                self.call_after_refresh(
-                    lambda: self.query_one("#scripture-pane", ScripturePane).focus()
-                )
-        except Exception:
-            pass
-
-    def action_search(self) -> None:
-        def on_result(verse_ref: str | None) -> None:
-            if verse_ref:
-                self._navigate_to_verse(verse_ref)
-
-        self.app.push_screen(SearchScreen(self.conn), on_result)
-
-    def action_notes(self) -> None:
-        self.app.push_screen(MyNotesScreen(self.conn))
-
-    def action_lectionary(self) -> None:
-        feast = get_primary_feast(date.today())
-        if feast:
-            self._navigate_to_verse(feast[0])
-
-    def action_progress(self) -> None:
-        def on_result(ref: str | None) -> None:
-            if ref:
-                self._navigate_to_verse(ref)
-
-        self.app.push_screen(ProgressScreen(self.conn), on_result)
-
-    def _right_pane_tab(self) -> str:
-        try:
-            tabs = self.query_one("#right-tabs")
-            return getattr(tabs, "active", "tab-commentary")
-        except Exception:
-            return "tab-commentary"
-
-    def _get_focus_context(self) -> str:
-        node = self.app.focused
-        while node is not None:
-            nid = getattr(node, "id", None)
-            if nid == "sidebar":
-                return "sidebar"
-            if nid == "right-pane":
-                return self._right_pane_tab()  # returns "tab-chat" etc.
-            if nid == "scripture-pane":
-                return "scripture"
-            node = getattr(node, "parent", None)
-        return "scripture"
-
-    def _build_context_help(self, context: str) -> tuple[str, str]:
-        app_bindings = list(MainScreen.BINDINGS)
-
-        if context == "sidebar":
-            # BookTree._Tree bindings are on the inner class; show known explicit list
-            # (sidebar bindings rarely change so a static fallback is acceptable)
-            from textual.binding import Binding as B
-            sidebar_bindings = [
-                B("j", "cursor_down", "Move cursor down"),
-                B("k", "cursor_up", "Move cursor up"),
-                B("l", "expand_or_select", "Expand / select chapter"),
-                B("h", "collapse_or_parent", "Collapse / go to parent"),
-                B("g", "goto_top", "Jump to top"),
-                B("G", "goto_bottom", "Jump to bottom"),
-                B("space", "toggle_node", "Toggle expand / collapse"),
-            ]
-            return "Sidebar — Keyboard Reference", build_help_text(sidebar_bindings, app_bindings)
-
-        if context.startswith("tab-"):
-            tab_keys = set(RightPane.TAB_BINDINGS.get(context, []))
-            bindings = [b for b in RightPane.BINDINGS if b.key in tab_keys]
-            tab_name = context.removeprefix("tab-").capitalize()
-            return f"Right Pane — {tab_name}", build_help_text(bindings, app_bindings)
-
-        # default: scripture
-        return "Scripture — Keyboard Reference", build_help_text(
-            list(ScripturePane.BINDINGS), app_bindings
-        )
-
-    def action_glossary(self) -> None:
-        self.app.push_screen(GlossaryScreen(self.conn))
-
-    def action_help(self) -> None:
-        context = self._get_focus_context()
-        title, text = self._build_context_help(context)
-        self.app.push_screen(HelpScreen(title, text))
-
-    def action_toggle_theme(self) -> None:
-        screen = self.app.screen
-        if screen.has_class("sepia"):
-            screen.remove_class("sepia")
-        else:
-            screen.add_class("sepia")
-
-    def action_quit_app(self) -> None:
-        def _on_confirm(confirmed: bool | None) -> None:
-            if confirmed:
-                self.app.fade_and_exit()
-
-        self.app.push_screen(QuitModal(), _on_confirm)
-
-    def action_focus_scripture(self) -> None:
-        self._vim_mode = "NORMAL"
-        try:
-            self.query_one(StatusBar).update_mode("NORMAL")
-        except Exception:
-            pass
-        try:
-            self.query_one("#scripture-pane", ScripturePane).focus()
-        except Exception:
-            pass
-
-    def action_toggle_right(self) -> None:
-        rp = self.query_one("#right-pane", RightPane)
-        self._right_pane_visible = not self._right_pane_visible
-        if self._right_pane_visible:
-            self._vim_mode = "RIGHT"
-            try:
-                self.query_one(StatusBar).update_mode("RIGHT")
-            except Exception:
-                pass
-            rp.remove_class("hidden")
-            rp.focus()
-        else:
-            self._vim_mode = "NORMAL"
-            try:
-                self.query_one(StatusBar).update_mode("NORMAL")
-            except Exception:
-                pass
-            rp.add_class("hidden")
-            self.query_one("#scripture-pane", ScripturePane).focus()
-
-    def action_command_mode(self) -> None:
-        self._vim_mode = "COMMAND"
-        try:
-            sb = self.query_one(StatusBar)
-            sb.update_mode("COMMAND")
-            sb.enter_command_mode()
-        except Exception:
-            pass
 
     def on_status_bar_command_submitted(self, event: StatusBar.CommandSubmitted) -> None:
         cmd = event.command.strip()
@@ -334,96 +175,8 @@ class MainScreen(Screen):
             pass
         self.query_one("#scripture-pane", ScripturePane).focus()
 
-    def _handle_command(self, cmd: str) -> None:
-        """Dispatch a colon command. Supported: q, and verse refs like 'Gen 3:5'."""
-        if cmd == "q":
-            self.action_quit_app()
-            return
+    def _get_focus_context(self) -> str:
+        return get_focus_context(self.app)
 
-        # Try to parse as a verse reference: "Book Chapter:Verse" or "Book Chapter Verse"
-        # Uses the same DB lookup as the search system
-        import re
-        # Pattern: optional book name, required chapter, optional verse
-        # Examples: "Gen 3:5", "Genesis 3 5", "3:5" (current book), "Ps 50"
-        match = re.match(
-            r'^([1-3]?\s*[A-Za-z]+\.?\s*)?(\d+)(?:[:\s](\d+))?$',
-            cmd.strip()
-        )
-        if match:
-            book_part = (match.group(1) or "").strip().rstrip(".")
-            chapter_num = int(match.group(2))
-            verse_num = int(match.group(3)) if match.group(3) else 1
-
-            if book_part:
-                # Resolve book name to ref using DB
-                from osb.db import queries as q
-                books = q.get_all_books(self.conn)
-                book_ref = None
-                book_part_lower = book_part.lower()
-                for book in books:
-                    if (book.name.lower().startswith(book_part_lower) or
-                            book.ref.lower().startswith(book_part_lower)):
-                        book_ref = book.ref
-                        break
-                if book_ref is None:
-                    self._status_error(f"Unknown book: {book_part}")
-                    return
-            else:
-                # No book given — use current book
-                if self._current_chapter_ref:
-                    book_ref = self._current_chapter_ref.split("-")[0]
-                else:
-                    self._status_error("No current book")
-                    return
-
-            chapter_ref = f"{book_ref}-{chapter_num}"
-            verse_ref = f"{book_ref}-{chapter_num}-{verse_num}"
-            self._load_chapter(chapter_ref, focus_verse_ref=verse_ref)
-            self.query_one("#scripture-pane", ScripturePane).focus()
-        else:
-            self._status_error(f"Unknown command: {cmd}")
-
-    def _status_error(self, msg: str) -> None:
-        """Flash an error message in the status bar ref area."""
-        try:
-            sb = self.query_one(StatusBar)
-            sb.update_ref(f"[red]{msg}[/red]")
-            self.set_timer(2.0, lambda: sb.update_ref(""))
-        except Exception:
-            pass
-
-    def action_annotate(self, verse_ref: str) -> None:
-        try:
-            rp = self.query_one("#right-pane", RightPane)
-            rp.focus_notes_editor()
-        except Exception:
-            pass
-
-    def _navigate_to_verse(self, verse_ref: str) -> None:
-        """Navigate to a verse ref like 'GEN-1-1' or 'MAT-5-1'."""
-        parts = verse_ref.split("-")
-        if len(parts) < 2:
-            return
-        ch_ref = "-".join(parts[:2])
-        if ch_ref != self._current_chapter_ref:
-            self._load_chapter(ch_ref, focus_verse_ref=verse_ref)
-        else:
-            try:
-                sp = self.query_one("#scripture-pane", ScripturePane)
-                sp.focus_verse(verse_ref)
-            except Exception:
-                pass
-
-    def show_daily_if_needed(self) -> None:
-        """Show the daily lectionary overlay if this is the first launch today."""
-        last_date = queries.get_session(self.conn, "last_session_date", "")
-        today_str = date.today().isoformat()
-        if last_date != today_str:
-            queries.set_session(self.conn, "last_session_date", today_str)
-            verse_count = queries.get_verse_count(self.conn)
-            if verse_count > 0:
-                def on_result(verse_ref: str | None) -> None:
-                    if verse_ref:
-                        self._navigate_to_verse(verse_ref)
-
-                self.app.push_screen(DailyScreen(), on_result)
+    def _build_context_help(self, context: str) -> tuple[str, str]:
+        return build_context_help(context, MainScreen.BINDINGS)

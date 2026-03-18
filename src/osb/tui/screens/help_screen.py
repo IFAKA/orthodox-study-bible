@@ -7,41 +7,29 @@ from textual.binding import Binding
 from textual.screen import ModalScreen
 from textual.widgets import Label, Static
 
-_HELP_TEXT = """\
-[bold yellow]Navigation[/]
-  j / k          Next / previous verse
-  J / K          Previous / next chapter
-  gg / gG        First / last verse
-  space          Page down
-  ctrl+d / u     Half page down / up
 
-[bold yellow]Actions[/]
-  b              Bookmark verse
-  m              Cycle highlight color
-  o              Annotate verse
-  x              Cross-references
-  y              Copy verse to clipboard
-  C              Toggle chapter complete
-  a              Add to collection
+def build_help_text(
+    widget_bindings: list,
+    app_bindings: list,
+) -> str:
+    """Render help text from two BINDINGS lists.
 
-[bold yellow]Panes & Navigation[/]
-  t              Toggle book tree sidebar
-  l              Toggle commentary / chat pane
-  h              Focus scripture (from any pane)
-  :Book Ch:V     Go to verse  (e.g.  :Gen 3:5)
-  :q             Quit
-  /              Search in current chapter
-  F              Search entire Bible
+    Includes all bindings that have a non-empty description.
+    widget_bindings → "Shortcuts" section
+    app_bindings    → "App" section
+    """
+    def _render_section(title: str, bindings: list) -> str:
+        lines = [f"[bold yellow]{title}[/]"]
+        for b in bindings:
+            if b.description:
+                lines.append(f"  {b.key_display or b.key:<14} {b.description}")
+        lines.append("")
+        return "\n".join(lines)
 
-[bold yellow]App[/]
-  N              My notes
-  L              Daily lectionary
-  p              Progress tracker
-  T              Toggle theme (dark / sepia)
-  ?              This help screen
-  g?             Glossary
-  q              Quit
-"""
+    return (
+        _render_section("Shortcuts", widget_bindings)
+        + _render_section("App", app_bindings)
+    )
 
 
 class HelpScreen(ModalScreen):
@@ -53,7 +41,12 @@ class HelpScreen(ModalScreen):
         Binding("q", "dismiss", show=False),
     ]
 
+    def __init__(self, title: str, text: str) -> None:
+        super().__init__()
+        self._title = title
+        self._text = text
+
     def compose(self) -> ComposeResult:
         with Static(id="help-dialog"):
-            yield Label("[bold]Keyboard Reference[/bold]", id="help-title")
-            yield Static(_HELP_TEXT, id="help-body")
+            yield Label(f"[bold]{self._title}[/bold]", id="help-title")
+            yield Static(self._text, id="help-body")

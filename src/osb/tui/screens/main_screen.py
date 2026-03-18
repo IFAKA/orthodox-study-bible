@@ -15,7 +15,7 @@ from osb.db import queries
 from osb.importer.lectionary import get_primary_feast
 from osb.tui.screens.daily_screen import DailyScreen
 from osb.tui.screens.glossary_screen import GlossaryScreen
-from osb.tui.screens.help_screen import HelpScreen
+from osb.tui.screens.help_screen import HelpScreen, build_help_text
 from osb.tui.screens.my_notes_screen import MyNotesScreen
 from osb.tui.screens.progress_screen import ProgressScreen
 from osb.tui.screens.search_screen import SearchScreen
@@ -206,11 +206,62 @@ class MainScreen(Screen):
 
         self.app.push_screen(ProgressScreen(self.conn), on_result)
 
+    def _right_pane_tab(self) -> str:
+        try:
+            tabs = self.query_one("#right-tabs")
+            return getattr(tabs, "active", "tab-commentary")
+        except Exception:
+            return "tab-commentary"
+
+    def _get_focus_context(self) -> str:
+        node = self.app.focused
+        while node is not None:
+            nid = getattr(node, "id", None)
+            if nid == "sidebar":
+                return "sidebar"
+            if nid == "right-pane":
+                return self._right_pane_tab()  # returns "tab-chat" etc.
+            if nid == "scripture-pane":
+                return "scripture"
+            node = getattr(node, "parent", None)
+        return "scripture"
+
+    def _build_context_help(self, context: str) -> tuple[str, str]:
+        app_bindings = list(MainScreen.BINDINGS)
+
+        if context == "sidebar":
+            # BookTree._Tree bindings are on the inner class; show known explicit list
+            # (sidebar bindings rarely change so a static fallback is acceptable)
+            from textual.binding import Binding as B
+            sidebar_bindings = [
+                B("j", "cursor_down", "Move cursor down"),
+                B("k", "cursor_up", "Move cursor up"),
+                B("l", "expand_or_select", "Expand / select chapter"),
+                B("h", "collapse_or_parent", "Collapse / go to parent"),
+                B("g", "goto_top", "Jump to top"),
+                B("G", "goto_bottom", "Jump to bottom"),
+                B("space", "toggle_node", "Toggle expand / collapse"),
+            ]
+            return "Sidebar — Keyboard Reference", build_help_text(sidebar_bindings, app_bindings)
+
+        if context.startswith("tab-"):
+            tab_keys = set(RightPane.TAB_BINDINGS.get(context, []))
+            bindings = [b for b in RightPane.BINDINGS if b.key in tab_keys]
+            tab_name = context.removeprefix("tab-").capitalize()
+            return f"Right Pane — {tab_name}", build_help_text(bindings, app_bindings)
+
+        # default: scripture
+        return "Scripture — Keyboard Reference", build_help_text(
+            list(ScripturePane.BINDINGS), app_bindings
+        )
+
     def action_glossary(self) -> None:
         self.app.push_screen(GlossaryScreen(self.conn))
 
     def action_help(self) -> None:
-        self.app.push_screen(HelpScreen())
+        context = self._get_focus_context()
+        title, text = self._build_context_help(context)
+        self.app.push_screen(HelpScreen(title, text))
 
     def action_toggle_theme(self) -> None:
         screen = self.app.screen

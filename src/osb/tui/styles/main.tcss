@@ -592,6 +592,73 @@ QuitModal {
     margin: 0 1;
 }
 
+/* ── Collections tab ────────────────────────────────────────────────── */
+#collections-list {
+    height: 1fr;
+    background: $surface;
+    border: none;
+    padding: 0;
+}
+
+#collections-list > ListItem {
+    background: $surface;
+    color: $text;
+    padding: 0 1;
+}
+
+#collections-list > ListItem.-highlight {
+    background: $surface-alt;
+    color: $text;
+    text-style: bold;
+}
+
+#collections-header {
+    height: 2;
+    padding: 0 1;
+    background: $surface;
+    color: $accent;
+    text-style: bold;
+    border-bottom: solid $accent-dim;
+}
+
+#collections-header.col-header-detail {
+    border-bottom: solid $accent;
+}
+
+#collections-hints {
+    height: 2;
+    padding: 0 1;
+    color: $text-muted;
+    border-bottom: solid $border;
+}
+
+#collections-add-bar {
+    height: 3;
+    border-top: solid $border;
+    padding: 0 1;
+}
+
+#collections-add-bar.hidden {
+    display: none;
+}
+
+#collections-add-prefix {
+    color: $accent;
+    width: auto;
+}
+
+#collections-add-input {
+    width: 1fr;
+    background: $surface-alt;
+    border: solid $border;
+    color: $text;
+    padding: 0 1;
+}
+
+#collections-add-input:focus {
+    border: tall $accent;
+}
+
 /* ── Lectionary bar ─────────────────────────────────────────────────── */
 LectionaryBar {
     height: 1;

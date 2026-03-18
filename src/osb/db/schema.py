@@ -136,6 +136,21 @@ CREATE TABLE IF NOT EXISTS glossary (
     term       TEXT PRIMARY KEY,
     definition TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS collections (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    name       TEXT    NOT NULL,
+    created_at TEXT    NOT NULL DEFAULT (datetime('now')),
+    updated_at TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS collection_items (
+    id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    collection_id INTEGER NOT NULL REFERENCES collections(id) ON DELETE CASCADE,
+    verse_ref     TEXT    NOT NULL REFERENCES verses(ref),
+    position      INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(collection_id, verse_ref)
+);
 """
 
 

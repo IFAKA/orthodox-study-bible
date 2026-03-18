@@ -54,3 +54,19 @@ class Bookmark:
 class Highlight:
     verse_ref: str
     color: str = "yellow"  # yellow, green, blue, pink
+
+
+@dataclass
+class Collection:
+    id: int
+    name: str
+    created_at: str = ""
+    updated_at: str = ""
+
+
+@dataclass
+class CollectionItem:
+    id: int
+    collection_id: int
+    verse_ref: str
+    position: int = 0

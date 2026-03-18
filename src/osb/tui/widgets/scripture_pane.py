@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sqlite3
-import subprocess
+
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal
@@ -18,14 +18,14 @@ from osb.db.queries import (
     get_verse_refs_with_crossrefs_for_chapter,
 )
 from osb.tui.mixins.chord_handler import ChordMixin
+from osb.tui.mixins.sp_navigation import SpNavigationMixin
+from osb.tui.mixins.sp_search import SpSearchMixin
+from osb.tui.mixins.sp_verse_actions import SpVerseActionsMixin
 from osb.tui.widgets.verse_block import VerseBlock
 
 
-class ScripturePane(ChordMixin, Widget):
-    """Left pane rendering chapter verses with keyboard navigation.
-
-    Emits VerseFocused when the focused verse changes.
-    """
+class ScripturePane(ChordMixin, SpNavigationMixin, SpSearchMixin, SpVerseActionsMixin, Widget):
+    """Left pane rendering chapter verses with keyboard navigation."""
 
     can_focus = True
 
@@ -41,6 +41,7 @@ class ScripturePane(ChordMixin, Widget):
         Binding("x", "crossrefs", "Cross-refs", show=True),
         Binding("y", "copy_verse", "Copy", show=True),
         Binding("C", "toggle_complete", "Complete", show=True),
+        Binding("a", "add_to_collection", "Add to collection", show=False),
         Binding("G", "last_verse", "Last verse", show=False),
         Binding("space", "page_down", "Page down", show=False),
         Binding("ctrl+d", "half_page_down", "Half page", show=False),
@@ -53,7 +54,7 @@ class ScripturePane(ChordMixin, Widget):
             self.verse_ref = verse_ref
 
     class ChapterChangeRequested(Message):
-        def __init__(self, direction: int) -> None:  # +1 or -1
+        def __init__(self, direction: int) -> None:
             super().__init__()
             self.direction = direction
 
@@ -72,6 +73,9 @@ class ScripturePane(ChordMixin, Widget):
         self._search_mode: bool = False
         self._match_refs: list[str] = []
         self._match_idx: int = 0
+        self._accel_count: int = 0
+        self._last_nav_time: float = 0.0
+        self._last_nav_dir: int = 0
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="sp-search-bar", classes="hidden"):
@@ -86,7 +90,6 @@ class ScripturePane(ChordMixin, Widget):
         self._verse_refs = []
         self._blocks = {}
         self._focused_idx = 0
-        # Remove only VerseBlocks so the search bar is preserved
         for block in self.query(VerseBlock):
             block.remove()
         self._search_mode = False
@@ -110,12 +113,7 @@ class ScripturePane(ChordMixin, Widget):
 
         blocks: list[VerseBlock] = []
         for v in verses:
-            block = VerseBlock(
-                verse_ref=v.ref,
-                verse_num=v.number,
-                text=v.text,
-                id=f"vb-{v.ref}",
-            )
+            block = VerseBlock(verse_ref=v.ref, verse_num=v.number, text=v.text, id=f"vb-{v.ref}")
             block.update_state(
                 highlight_color=highlights.get(v.ref),
                 has_annotation=v.ref in annotations,
@@ -130,8 +128,7 @@ class ScripturePane(ChordMixin, Widget):
             self.mount(*blocks)
 
         if focus_verse_ref and focus_verse_ref in self._blocks:
-            idx = self._verse_refs.index(focus_verse_ref)
-            self._set_focus_idx(idx)
+            self._set_focus_idx(self._verse_refs.index(focus_verse_ref))
         elif self._verse_refs:
             self._set_focus_idx(0)
 
@@ -143,10 +140,9 @@ class ScripturePane(ChordMixin, Widget):
 
     def focus_verse(self, verse_ref: str) -> None:
         if verse_ref in self._blocks:
-            idx = self._verse_refs.index(verse_ref)
-            self._set_focus_idx(idx)
+            self._set_focus_idx(self._verse_refs.index(verse_ref))
 
-    # ── Keyboard handling ─────────────────────────────────────────────────────
+    # ── Keyboard ──────────────────────────────────────────────────────────────
 
     def on_focus(self) -> None:
         self.add_class("active-pane")
@@ -175,250 +171,7 @@ class ScripturePane(ChordMixin, Widget):
         if self.handle_chord(event):
             return
 
-    def action_next_verse(self) -> None:
-        if self._focused_idx < len(self._verse_refs) - 1:
-            self._set_focus_idx(self._focused_idx + 1)
-        else:
-            self.post_message(self.ChapterChangeRequested(+1))
-
-    def action_prev_verse(self) -> None:
-        if self._focused_idx > 0:
-            self._set_focus_idx(self._focused_idx - 1)
-        else:
-            self.post_message(self.ChapterChangeRequested(-1))
-
-    def action_next_chapter(self) -> None:
-        self.post_message(self.ChapterChangeRequested(+1))
-
-    def action_prev_chapter(self) -> None:
-        self.post_message(self.ChapterChangeRequested(-1))
-
-    def action_goto_first_verse(self) -> None:
-        if self._verse_refs:
-            self._set_focus_idx(0)
-
-    def action_last_verse(self) -> None:
-        if self._verse_refs:
-            self._set_focus_idx(len(self._verse_refs) - 1)
-
-    def action_goto_reference(self) -> None:
-        self.screen.action_goto_reference()
-
-    def action_page_down(self) -> None:
-        self.scroll_page_down()
-
-    def action_half_page_down(self) -> None:
-        self.scroll_down(self.size.height // 2)
-
-    def action_half_page_up(self) -> None:
-        self.scroll_up(self.size.height // 2)
-
-    def action_annotate(self) -> None:
-        ref = self.focused_verse_ref
-        if ref:
-            self.app.screen.action_annotate(ref)
-
-    def action_cycle_highlight(self) -> None:
-        ref = self.focused_verse_ref
-        if ref:
-            new_color = queries.cycle_highlight(self.conn, ref)
-            block = self._blocks.get(ref)
-            if block:
-                block.highlight_color = new_color
-
-    def action_bookmark(self) -> None:
-        ref = self.focused_verse_ref
-        if ref:
-            added = queries.toggle_bookmark(self.conn, ref)
-            block = self._blocks.get(ref)
-            if block:
-                block.has_bookmark = added
-
-    def action_crossrefs(self) -> None:
-        if not self._chapter_ref or not self._verse_refs:
-            return
-        verse_ref = self._verse_refs[self._focused_idx]
-        xrefs = queries.get_cross_refs(self.conn, verse_ref)
-        if not xrefs:
-            self.app.notify("No cross-references for this verse", timeout=2)
-            return
-        from osb.tui.screens.crossref_screen import CrossRefScreen
-        from osb.tui.screens.main_screen import MainScreen
-
-        def callback(ref: str | None) -> None:
-            if ref is not None:
-                self.app.query_one(MainScreen)._navigate_to_verse(ref)
-
-        self.app.push_screen(CrossRefScreen(self.conn, verse_ref), callback)
-
-    def action_copy_verse(self) -> None:
-        ref = self.focused_verse_ref
-        if not ref:
-            return
-        v = queries.get_verse(self.conn, ref)
-        if not v:
-            return
-        parts = ref.split("-")
-        book_ref = parts[0]
-        ch_num = parts[1] if len(parts) > 1 else "?"
-        v_num = parts[2] if len(parts) > 2 else "?"
-        book = queries.get_book(self.conn, book_ref)
-        book_name = book.name if book else book_ref
-        text = f"{book_name} {ch_num}:{v_num} — {v.text}"
-        try:
-            subprocess.run(["pbcopy"], input=text.encode(), check=True)
-            self.app.notify("Verse copied", timeout=2)
-        except Exception:
-            self.app.notify("Copy failed (pbcopy not available)", timeout=2)
-
-    def action_toggle_complete(self) -> None:
-        if not self._chapter_ref:
-            return
-        if queries.is_chapter_complete(self.conn, self._chapter_ref):
-            queries.unmark_chapter_complete(self.conn, self._chapter_ref)
-            self.app.notify("Chapter unmarked", timeout=2)
-        else:
-            queries.mark_chapter_complete(self.conn, self._chapter_ref)
-            self.app.notify("Chapter marked complete ✓", timeout=2)
-        self.post_message(ScripturePane.ChapterCompletionChanged(self._chapter_ref))
-
-    def action_start_search(self) -> None:
-        self._search_mode = True
-        try:
-            self.query_one("#sp-search-bar").remove_class("hidden")
-            self.call_after_refresh(lambda: self.query_one("#sp-search-input", Input).focus())
-        except Exception:
-            pass
-
-    def on_input_changed(self, event: Input.Changed) -> None:
-        if event.input.id == "sp-search-input":
-            self._apply_search_filter(event.value)
-
-    def on_input_submitted(self, event: Input.Submitted) -> None:
-        if event.input.id == "sp-search-input":
-            if self._match_refs:
-                self._match_idx = 0
-                self._set_focus_idx(self._verse_refs.index(self._match_refs[0]))
-            self.focus()
-
-    def _is_search_focused(self) -> bool:
-        try:
-            return self.query_one("#sp-search-input", Input).has_focus
-        except Exception:
-            return False
-
-    def _apply_search_filter(self, query: str) -> None:
-        from rich.text import Text
-        from textual.widgets import Label as TLabel
-        self._match_refs = []
-        if not query:
-            for ref, block in self._blocks.items():
-                block.remove_class("search-match")
-                block.remove_class("search-dim")
-                block.remove_class("search-current")
-                try:
-                    block.query_one(f"#vtext-{ref}", TLabel).update(block.verse_text)
-                except Exception:
-                    pass
-            return
-        q = query.lower()
-        for ref, block in self._blocks.items():
-            text = block.verse_text
-            if q in text.lower():
-                # Build Rich text with highlighted matches
-                rich = Text()
-                lower_text = text.lower()
-                pos = 0
-                while True:
-                    idx = lower_text.find(q, pos)
-                    if idx == -1:
-                        rich.append(text[pos:])
-                        break
-                    rich.append(text[pos:idx])
-                    rich.append(text[idx:idx + len(q)], style="bold yellow on #3a3000")
-                    pos = idx + len(q)
-                try:
-                    block.query_one(f"#vtext-{ref}", TLabel).update(rich)
-                except Exception:
-                    pass
-                block.add_class("search-match")
-                block.remove_class("search-dim")
-                self._match_refs.append(ref)
-            else:
-                try:
-                    block.query_one(f"#vtext-{ref}", TLabel).update(text)
-                except Exception:
-                    pass
-                block.remove_class("search-match")
-                block.add_class("search-dim")
-        self._match_idx = 0
-        self._update_search_current()
-
-    def _update_search_current(self) -> None:
-        for ref, block in self._blocks.items():
-            block.remove_class("search-current")
-        if self._match_refs:
-            cur_ref = self._match_refs[self._match_idx]
-            block = self._blocks.get(cur_ref)
-            if block:
-                block.add_class("search-current")
-
-    def _next_match(self) -> None:
-        if not self._match_refs:
-            return
-        self._match_idx = (self._match_idx + 1) % len(self._match_refs)
-        self._update_search_current()
-        self._set_focus_idx(self._verse_refs.index(self._match_refs[self._match_idx]))
-
-    def _prev_match(self) -> None:
-        if not self._match_refs:
-            return
-        self._match_idx = (self._match_idx - 1) % len(self._match_refs)
-        self._update_search_current()
-        self._set_focus_idx(self._verse_refs.index(self._match_refs[self._match_idx]))
-
-    def _clear_search(self) -> None:
-        from textual.widgets import Label as TLabel
-        self._search_mode = False
-        self._match_refs = []
-        self._match_idx = 0
-        for ref, block in self._blocks.items():
-            block.remove_class("search-match")
-            block.remove_class("search-dim")
-            block.remove_class("search-current")
-            try:
-                block.query_one(f"#vtext-{ref}", TLabel).update(block.verse_text)
-            except Exception:
-                pass
-        try:
-            self.query_one("#sp-search-bar").add_class("hidden")
-            self.query_one("#sp-search-input", Input).clear()
-        except Exception:
-            pass
-        self.focus()
-
-    # ── Internal ─────────────────────────────────────────────────────────────
-
-    def _set_focus_idx(self, idx: int) -> None:
-        # Unfocus old
-        if self._verse_refs and 0 <= self._focused_idx < len(self._verse_refs):
-            old_ref = self._verse_refs[self._focused_idx]
-            old_block = self._blocks.get(old_ref)
-            if old_block:
-                old_block.focused = False
-
-        self._focused_idx = idx
-
-        if self._verse_refs and 0 <= idx < len(self._verse_refs):
-            new_ref = self._verse_refs[idx]
-            new_block = self._blocks.get(new_ref)
-            if new_block:
-                new_block.focused = True
-                new_block.scroll_visible()
-            self.post_message(self.VerseFocused(new_ref))
-
     def refresh_verse_state(self, verse_ref: str) -> None:
-        """Refresh a single verse block's decoration state."""
         block = self._blocks.get(verse_ref)
         if not block:
             return

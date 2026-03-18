@@ -227,19 +227,24 @@ class RpChatMixin:
         self._streaming = False
         self._streaming_widget = None
         self._accumulated_response = ""
+
+        # Clear chat history display
         try:
             container = self.query_one("#chat-history", VerticalScroll)
-            # Explicitly remove all children
-            for child in list(container.children):
-                child.remove()
-            container.scroll_home()
-        except Exception as e:
-            self.app.log(f"Error clearing chat: {e}")
+            container.remove_children()
+        except Exception:
+            pass
+
+        # Clear input field
         try:
             chat_input = self.query_one("#chat-input", Input)
             chat_input.value = ""
-        except Exception as e:
-            self.app.log(f"Error clearing input: {e}")
+        except Exception:
+            pass
+
+        # Rebuild chat history to show empty state
+        self._rebuild_chat_history()
+
         self._update_collections_tab_label()
         try:
             from textual.widgets import TabbedContent

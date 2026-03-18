@@ -67,11 +67,11 @@ class ChordMixin:
         if first == "g" and second == "g":
             self.action_goto_first_verse()
             return True
-        if first == "g" and second == "r":
-            self.action_goto_reference()
-            return True
         if first == "g" and second == "G":
             self.action_last_verse()
+            return True
+        if first == "g" and second == "?":
+            self.screen.action_glossary()
             return True
         return False
 
@@ -97,6 +97,3 @@ class ChordMixin:
 
     def action_last_verse(self) -> None:
         """Jump to last verse of current chapter. Override in widget."""
-
-    def action_goto_reference(self) -> None:
-        """Open goto-reference dialog. Override in widget."""

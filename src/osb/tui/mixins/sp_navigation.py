@@ -41,9 +41,6 @@ class SpNavigationMixin:
         if self._verse_refs:
             self._set_focus_idx(len(self._verse_refs) - 1)
 
-    def action_goto_reference(self) -> None:
-        self.screen.action_goto_reference()
-
     def action_page_down(self) -> None:
         self.scroll_page_down()
 

@@ -6,7 +6,7 @@ import sqlite3
 
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal
+from textual.containers import Horizontal, Vertical
 from textual.message import Message
 from textual.widget import Widget
 from textual.widgets import Input, Label
@@ -82,6 +82,7 @@ class ScripturePane(ChordMixin, SpNavigationMixin, SpSearchMixin, SpVerseActions
             yield Label("/", id="sp-search-prefix")
             yield Input(id="sp-search-input", placeholder="")
             yield Label("  n/N · Esc", id="sp-search-help")
+        yield Vertical(id="sp-content")
 
     # ── Public API ────────────────────────────────────────────────────────────
 
@@ -125,7 +126,7 @@ class ScripturePane(ChordMixin, SpNavigationMixin, SpSearchMixin, SpVerseActions
             blocks.append(block)
 
         if blocks:
-            self.mount(*blocks)
+            self.query_one("#sp-content").mount(*blocks)
 
         if focus_verse_ref and focus_verse_ref in self._blocks:
             self._set_focus_idx(self._verse_refs.index(focus_verse_ref))

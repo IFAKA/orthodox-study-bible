@@ -138,19 +138,6 @@ def get_daily_readings(today: date | None = None) -> list[dict]:
     return readings
 
 
-def get_primary_reading(today: date | None = None) -> str | None:
-    """Return the most prominent reading ref for today, or None."""
-    if today is None:
-        today = date.today()
-    readings = get_daily_readings(today)
-    # Prefer paschal liturgy, then matins, then menaion
-    paschal = [r for r in readings if r["source"] == "paschal"]
-    if paschal:
-        return paschal[0]["reading_ref"]
-    if readings:
-        return readings[0]["reading_ref"]
-    return None
-
 
 def get_primary_feast(today: date | None = None) -> tuple[str, str | None] | None:
     """Return (reading_ref, feast_name) for the primary reading today, or None."""

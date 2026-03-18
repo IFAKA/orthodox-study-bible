@@ -43,20 +43,55 @@ Screen {
     color: $text-muted;
 }
 
-/* ── Footer ────────────────────────────────────────────────────── */
-Footer {
+/* ── Status bar ────────────────────────────────────────────────────── */
+StatusBar {
+    height: 1;
+    dock: bottom;
+    layout: horizontal;
     background: $surface;
-    color: $text-muted;
 }
 
-Footer > .footer--key {
-    background: $surface-alt;
-    color: $accent;
-}
-
-Footer > .footer--highlight {
+#status-mode {
+    width: auto;
     background: $accent;
     color: $bg;
+    padding: 0 1;
+    text-style: bold;
+}
+
+#status-ref {
+    width: 1fr;
+    color: $text-muted;
+    padding: 0 1;
+}
+
+#status-progress {
+    width: auto;
+    color: $text-muted;
+    padding: 0 2;
+}
+
+#status-cmd-prefix {
+    width: auto;
+    color: $accent;
+    padding: 0 0 0 1;
+}
+
+#status-cmd-input {
+    width: 1fr;
+    background: $surface;
+    border: none;
+    color: $text;
+    padding: 0;
+    height: 1;
+}
+
+#status-cmd-input:focus {
+    border: none;
+}
+
+StatusBar .hidden {
+    display: none;
 }
 
 /* ── Focus States (targeted — avoid breaking container layouts) ── */
@@ -94,6 +129,10 @@ Button:focus {
     display: none;
 }
 
+#right-pane.hidden {
+    display: none;
+}
+
 BookTree {
     background: $surface;
     color: $text;
@@ -119,13 +158,19 @@ BookTree .tree--cursor {
     width: 1fr;
     background: $bg;
     overflow-y: auto;
+    padding: 0;
+    align: center top;
+}
+
+#sp-content {
+    width: 90;
+    height: auto;
     padding: 0 3;
 }
 
 /* Active pane indicator: toggled via .active-pane class in ScripturePane.on_focus */
 #scripture-pane.active-pane {
     border-left: thick $accent;
-    padding-left: 2;
 }
 
 /* ── Verse blocks ─────────────────────────────────────────────────── */
@@ -659,11 +704,29 @@ QuitModal {
     border: tall $accent;
 }
 
-/* ── Lectionary bar ─────────────────────────────────────────────────── */
-LectionaryBar {
-    height: 1;
+/* ── Help screen ────────────────────────────────────────────────── */
+HelpScreen {
+    align: center middle;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+#help-dialog {
+    width: 60;
+    height: auto;
+    max-height: 80%;
     background: $surface;
-    color: $text-muted;
-    padding: 0 1;
-    dock: bottom;
+    border: thick $accent;
+    padding: 1 2;
+    overflow-y: auto;
+}
+
+#help-title {
+    color: $accent;
+    text-style: bold;
+    text-align: center;
+    margin-bottom: 1;
+}
+
+#help-body {
+    color: $text;
 }

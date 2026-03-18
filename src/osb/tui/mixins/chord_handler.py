@@ -23,6 +23,8 @@ class ChordMixin:
 
     _pending_chord_key: str | None = None
     _chord_timer = None
+    _vim_count: int = 0
+    _vim_count_digits: str = ""
 
     def handle_chord(self, event) -> bool:
         """Process a key event for chord sequences.
@@ -31,6 +33,14 @@ class ChordMixin:
         process further). Returns False if not part of a chord.
         """
         key = event.key
+
+        # Absorb digit prefixes for vim count (e.g. 5G, 10G).
+        # "0" is only a digit here when a count is already started (e.g. 10, 20).
+        if key.isdigit() and (key != "0" or self._vim_count_digits):
+            self._vim_count_digits += key
+            self._vim_count = int(self._vim_count_digits)
+            event.stop()
+            return True
 
         if self._pending_chord_key is not None:
             first = self._pending_chord_key
@@ -56,7 +66,20 @@ class ChordMixin:
             event.stop()
             return True
 
+        # Key was not consumed — discard any stale count prefix.
+        self._consume_vim_count()
         return False
+
+    def _consume_vim_count(self, default: int = 0) -> int:
+        """Return the accumulated vim count and reset it.
+
+        Returns `default` if no count was typed.
+        Always resets the count buffer.
+        """
+        n = self._vim_count if self._vim_count > 0 else default
+        self._vim_count = 0
+        self._vim_count_digits = ""
+        return n
 
     def _chord_first_keys(self) -> set[str]:
         """Keys that could be the start of a chord. Override to extend."""
@@ -66,9 +89,6 @@ class ChordMixin:
         """Dispatch a completed chord. Return True if handled."""
         if first == "g" and second == "g":
             self.action_goto_first_verse()
-            return True
-        if first == "g" and second == "G":
-            self.action_last_verse()
             return True
         if first == "g" and second == "?":
             self.screen.action_glossary()

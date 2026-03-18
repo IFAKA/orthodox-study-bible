@@ -38,8 +38,15 @@ class SpNavigationMixin:
             self._set_focus_idx(0)
 
     def action_last_verse(self) -> None:
-        if self._verse_refs:
-            self._set_focus_idx(len(self._verse_refs) - 1)
+        if not self._verse_refs:
+            return
+        n = self._consume_vim_count(default=0)
+        if n > 0:
+            # [N]G: jump to verse N (1-based, clamped to valid range)
+            idx = max(0, min(n - 1, len(self._verse_refs) - 1))
+        else:
+            idx = len(self._verse_refs) - 1
+        self._set_focus_idx(idx)
 
     def action_page_down(self) -> None:
         self.scroll_page_down()

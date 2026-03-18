@@ -46,6 +46,7 @@ class ScripturePane(ChordMixin, SpNavigationMixin, SpSearchMixin, SpVerseActions
         Binding("space", "page_down", "Page down", show=False),
         Binding("ctrl+d", "half_page_down", "Half page", show=False),
         Binding("ctrl+u", "half_page_up", "Half page up", show=False),
+        Binding("gg", "first_verse_chord", "First verse", show=False),
     ]
 
     class VerseFocused(Message):

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sqlite3
 from textual.binding import Binding
+from osb.tui.mixins.chord_handler import ChordMixin
 from textual.message import Message
 from textual.widgets import Tree
 from textual.widgets.tree import TreeNode
@@ -30,7 +31,7 @@ class BookTree(Widget):
             super().__init__()
             self.chapter_ref = chapter_ref
 
-    class _Tree(Tree):
+    class _Tree(ChordMixin, Tree):
         """Inner tree — all book/chapter navigation logic."""
 
         BINDINGS = [
@@ -41,7 +42,6 @@ class BookTree(Widget):
             Binding("enter", "expand_or_select", "Select", show=False),
             Binding("space", "toggle_node", "Toggle", show=False),
             Binding("o", "toggle_node", "Toggle", show=False),
-            Binding("g", "goto_top", "Top", show=True),
             Binding("G", "goto_bottom", "Bottom", show=True),
             Binding("q", "close_sidebar", "Close", show=False),
         ]
@@ -127,6 +127,22 @@ class BookTree(Widget):
                 node.collapse()
             else:
                 node.expand()
+
+        def on_key(self, event) -> None:
+            if self.handle_chord(event):
+                return
+
+        def _dispatch_single(self, key: str) -> None:
+            """Single g with no second key → go to top (preserves old g behaviour)."""
+            if key == "g":
+                self.action_goto_top()
+
+        def action_goto_first_verse(self) -> None:
+            self.action_goto_top()
+
+        def action_last_verse(self) -> None:
+            self._consume_vim_count()  # count not meaningful in tree
+            self.action_goto_bottom()
 
         def action_goto_top(self) -> None:
             """g: jump to first item."""

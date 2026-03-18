@@ -12,6 +12,7 @@ from textual.timer import Timer
 from textual.widget import Widget
 from textual.widgets import Input, Label, ListItem, ListView, Markdown, Static, TabbedContent, TabPane
 
+from osb.tui.mixins.chord_handler import ChordMixin
 from osb.tui.mixins.rp_chat import RpChatMixin, _ChatInput, _NotesEditor
 from osb.tui.mixins.rp_chat_history import RpChatHistoryMixin
 from osb.tui.mixins.rp_collections import RpCollectionsMixin
@@ -19,7 +20,7 @@ from osb.tui.mixins.rp_collections_render import RpCollectionsRenderMixin
 from osb.tui.mixins.rp_notes import RpNotesMixin
 
 
-class RightPane(Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixin, RpCollectionsMixin, RpCollectionsRenderMixin):
+class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixin, RpCollectionsMixin, RpCollectionsRenderMixin):
     """Right pane with Commentary, Chat, Notes, and Collections tabs."""
 
     can_focus = True
@@ -30,6 +31,7 @@ class RightPane(Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixin, RpCollect
         Binding("i", "focus_input", "Type", show=True),
         Binding("j", "scroll_down", "↓", show=False),
         Binding("k", "scroll_up", "↑", show=False),
+        Binding("G", "last_verse", "Bottom", show=False),
         Binding("r", "browse_refs", "Refs", show=True),
         Binding("y", "copy_last_response", "Copy", show=True),
         Binding("C", "clear_chat", "Clear chat", show=True),
@@ -46,6 +48,13 @@ class RightPane(Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixin, RpCollect
         Binding("s", "col_save_temp", "Save", show=True),
         Binding("c", "col_go_chat", "Chat", show=False),
     ]
+
+    TAB_BINDINGS = {
+        "tab-commentary": ["j", "k", "a"],
+        "tab-chat": ["j", "k", "a", "i", "y", "C", "r"],
+        "tab-notes": ["j", "k", "a", "i"],
+        "tab-collections": ["j", "k", "n", "a", "r", "x", "J", "K", "s"],
+    }
 
     class OllamaChunk(Message):
         def __init__(self, text: str, chapter_ref: str) -> None:
@@ -166,6 +175,31 @@ class RightPane(Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixin, RpCollect
                 lv.action_cursor_down() if down else lv.action_cursor_up()
         except Exception:
             pass
+
+    def _scroll_active_edge(self, end: bool) -> None:
+        method = "scroll_end" if end else "scroll_home"
+        try:
+            active = self.query_one("#right-tabs", TabbedContent).active
+            if active == "tab-chat":
+                getattr(self.query_one("#chat-history", VerticalScroll), method)(animate=True)
+            elif active == "tab-commentary":
+                getattr(self.query_one("#commentary-text", Markdown), method)(animate=True)
+        except Exception:
+            pass
+
+    def on_key(self, event) -> None:
+        focused_id = getattr(self.app.focused, "id", None)
+        if focused_id in ("chat-input", "notes-editor", "collections-add-input"):
+            return
+        if self.handle_chord(event):
+            return
+
+    def action_goto_first_verse(self) -> None:
+        self._scroll_active_edge(end=False)
+
+    def action_last_verse(self) -> None:
+        self._consume_vim_count()  # no verse index in right pane
+        self._scroll_active_edge(end=True)
 
     def action_toggle_tab(self) -> None:
         try:

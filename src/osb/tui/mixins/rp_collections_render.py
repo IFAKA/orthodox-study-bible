@@ -114,19 +114,21 @@ class RpCollectionsRenderMixin:
         except Exception:
             pass
 
-    def _generate_collection_name(self, chapter_ref: str, response: str) -> str:
+    def _make_chapter_prefix(self, chapter_ref: str) -> str:
         parts = chapter_ref.split("-")
         if len(parts) >= 2:
             book = queries.get_book(self.conn, parts[0])
             book_name = book.name if book else parts[0]
-            prefix = f"{book_name} {parts[1]}"
-        else:
-            prefix = chapter_ref
-        clean = re.sub(r'[*_`#\[\]]', '', response)
-        clean = re.sub(r'\s+', ' ', clean).strip()
-        if len(clean) > 40:
-            clean = clean[:40].rsplit(' ', 1)[0]
-        return f"{prefix} · {clean}" if clean else prefix
+            return f"{book_name} {parts[1]}"
+        return chapter_ref
+
+    def _refresh_temp_name_display(self) -> None:
+        self._update_collections_tab_label()
+        try:
+            if self.query_one("#right-tabs", TabbedContent).active == "tab-collections":
+                self._render_collections_list()
+        except Exception:
+            pass
 
     # ── Add-bar ───────────────────────────────────────────────────────────────
 

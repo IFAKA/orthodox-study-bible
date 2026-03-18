@@ -161,11 +161,37 @@ class RpChatMixin:
             self._last_refs = parse_refs(event.response, self.conn)
             if self._last_refs:
                 self._temp_refs = list(self._last_refs)
-                self._temp_name = self._generate_collection_name(
-                    event.chapter_ref or "", event.response
-                )
+                self._temp_name = self._make_chapter_prefix(event.chapter_ref or "")
                 self._update_collections_tab_label()
+                self._generate_collection_name_async(event.chapter_ref or "", event.response)
         self._finish_stream_widget(event.response)
+
+    def _generate_collection_name_async(self, chapter_ref: str, response: str) -> None:
+        prefix = self._make_chapter_prefix(chapter_ref)
+        ref_labels = ", ".join(label for _, label in (self._temp_refs or [])[:6])
+        prompt = (
+            f"Generate a short 2-4 word thematic title for a scripture collection based on "
+            f"this biblical discussion. The collection includes: {ref_labels}.\n"
+            f"Discussion:\n{response[:600]}\n\n"
+            f"Respond with ONLY the title — no punctuation, no quotes, no explanation."
+        )
+
+        def worker():
+            try:
+                resp = httpx.post(
+                    f"{config.OLLAMA_BASE_URL}/api/generate",
+                    json={"model": config.OLLAMA_MODEL, "prompt": prompt, "stream": False},
+                    timeout=httpx.Timeout(connect=5.0, read=30.0, write=5.0, pool=5.0),
+                )
+                title = resp.json().get("response", "").strip()
+                title = re.sub(r'[*_`#\[\]"\'.]', "", title).strip()
+                if title:
+                    self._temp_name = f"{prefix} · {title}" if prefix else title
+                    self.app.call_from_thread(self._refresh_temp_name_display)
+            except Exception:
+                pass  # Keep the placeholder prefix name
+
+        threading.Thread(target=worker, daemon=True).start()
 
     def _update_tree_chat_indicator(self, chapter_ref: str, has_chat: bool) -> None:
         try:

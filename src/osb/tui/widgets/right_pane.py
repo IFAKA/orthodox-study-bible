@@ -16,13 +16,14 @@ from osb.tui.mixins.rp_chat import RpChatMixin, _ChatInput, _NotesEditor
 from osb.tui.mixins.rp_chat_history import RpChatHistoryMixin
 from osb.tui.mixins.rp_collections import RpCollectionsMixin
 from osb.tui.mixins.rp_collections_render import RpCollectionsRenderMixin
+from osb.tui.mixins.rp_collections_input import RpCollectionsInputMixin
 from osb.tui.mixins.rp_notes import RpNotesMixin
 from osb.tui.widgets.rp_messages import OllamaChunk, OllamaError, StreamingDone
 from osb.tui.widgets.rp_navigation import RpNavigationMixin
 from osb.tui.widgets.rp_visibility import check_action_visibility
 
 
-class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixin, RpCollectionsMixin, RpCollectionsRenderMixin, RpNavigationMixin):
+class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixin, RpCollectionsMixin, RpCollectionsRenderMixin, RpCollectionsInputMixin, RpNavigationMixin):
     """Right pane with Commentary, Chat, Notes, and Collections tabs."""
 
     can_focus = True

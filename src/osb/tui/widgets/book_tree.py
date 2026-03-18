@@ -12,6 +12,11 @@ from textual.app import ComposeResult
 from textual.widget import Widget
 
 from osb.db.queries import get_all_books, get_chapters_for_book, get_chapters_with_chat
+from osb.tui.widgets.book_tree_navigation import (
+    last_visible_node, navigate_to_chapter, navigate_to_book,
+    highlight_chapter, mark_chapter_chat
+)
+from osb.tui.widgets.book_tree_actions import BookTreeActionsMixin
 
 
 class BookTree(Widget):
@@ -31,7 +36,7 @@ class BookTree(Widget):
             super().__init__()
             self.chapter_ref = chapter_ref
 
-    class _Tree(ChordMixin, Tree):
+    class _Tree(BookTreeActionsMixin, ChordMixin, Tree):
         """Inner tree — all book/chapter navigation logic."""
 
         BINDINGS = [
@@ -93,41 +98,6 @@ class BookTree(Widget):
             if data and data.get("type") == "chapter":
                 self.post_message(BookTree.ChapterSelected(data["ref"]))
 
-        def action_expand_or_select(self) -> None:
-            """l/enter: expand node, or select chapter."""
-            node = self.cursor_node
-            if node is None:
-                return
-            data = node.data
-            if data and data.get("type") == "chapter":
-                self.post_message(BookTree.ChapterSelected(data["ref"]))
-            elif not node.is_expanded:
-                node.expand()
-            else:
-                self.action_cursor_down()
-
-        def action_collapse_or_parent(self) -> None:
-            """h: collapse expanded node, or jump to parent."""
-            node = self.cursor_node
-            if node is None:
-                return
-            if node.is_expanded and node.children:
-                node.collapse()
-            elif node.parent and node.parent is not self.root:
-                parent = node.parent
-                self.select_node(parent)
-                self.scroll_to_node(parent)
-
-        def action_toggle_node(self) -> None:
-            """space/o: toggle expand/collapse."""
-            node = self.cursor_node
-            if node is None:
-                return
-            if node.is_expanded:
-                node.collapse()
-            else:
-                node.expand()
-
         def on_key(self, event) -> None:
             if self.handle_chord(event):
                 return
@@ -137,96 +107,21 @@ class BookTree(Widget):
             if key == "g":
                 self.action_goto_top()
 
-        def action_goto_first_verse(self) -> None:
-            self.action_goto_top()
-
-        def action_last_verse(self) -> None:
-            self._consume_vim_count()  # count not meaningful in tree
-            self.action_goto_bottom()
-
-        def action_goto_top(self) -> None:
-            """g: jump to first item."""
-            if self.root.children:
-                first = self.root.children[0]
-                self.select_node(first)
-                self.scroll_to_node(first)
-
-        def action_goto_bottom(self) -> None:
-            """G: jump to last visible item."""
-            last = self._last_visible_node()
-            if last:
-                self.select_node(last)
-                self.scroll_to_node(last)
-
-        def _last_visible_node(self) -> TreeNode | None:
-            """Return the deepest last-child in the currently expanded tree."""
-            def _walk(node: TreeNode) -> TreeNode:
-                if node.is_expanded and node.children:
-                    return _walk(list(node.children)[-1])
-                return node
-
-            children = list(self.root.children)
-            if children:
-                return _walk(children[-1])
-            return None
-
-        def action_close_sidebar(self) -> None:
-            try:
-                self.screen.action_toggle_sidebar()
-            except Exception:
-                pass
-
         def mark_chapter_chat(self, chapter_ref: str, has_chat: bool) -> None:
             """Add or remove the ◆ chat indicator on a chapter node."""
-            node = self._chapter_nodes.get(chapter_ref)
-            if not node:
-                return
-            if has_chat:
-                self._chapters_with_chat.add(chapter_ref)
-            else:
-                self._chapters_with_chat.discard(chapter_ref)
-            data = node.data
-            if data:
-                base = data.get("base_label", data["ref"])
-                node.set_label(base + (" ◆" if has_chat else ""))
+            mark_chapter_chat(self._chapter_nodes, self._chapters_with_chat, chapter_ref, has_chat)
 
         def highlight_chapter(self, chapter_ref: str) -> None:
             """Scroll to and select the node for the given chapter."""
-            node = self._chapter_nodes.get(chapter_ref)
-            if node:
-                self.select_node(node)
-                self.scroll_to_node(node)
+            highlight_chapter(self, self._chapter_nodes, chapter_ref)
 
         def navigate_to_chapter(self, chapter_ref: str) -> None:
             """Expand the tree to chapter_ref and select it."""
-            book_ref = chapter_ref.split("-")[0]
-            for testament_node in self.root.children:
-                for book_node in testament_node.children:
-                    if book_node.data and book_node.data.get("ref") == book_ref:
-                        if not book_node.data.get("loaded"):
-                            self._load_chapters(book_node, book_ref)
-                            book_node.data["loaded"] = True
-                        testament_node.expand()
-                        book_node.expand()
-                        self.call_after_refresh(
-                            lambda ref=chapter_ref: self.highlight_chapter(ref)
-                        )
-                        return
+            navigate_to_chapter(self, chapter_ref, self.root, self._load_chapters)
 
         def navigate_to_book(self, book_ref: str) -> None:
             """Select and scroll to the book node, expand it."""
-            for testament_node in self.root.children:
-                for book_node in testament_node.children:
-                    if book_node.data and book_node.data.get("ref") == book_ref:
-                        testament_node.expand()
-
-                        def _select(n: TreeNode = book_node) -> None:
-                            self.select_node(n)
-                            self.scroll_to_node(n)
-                            n.expand()
-
-                        self.call_after_refresh(_select)
-                        return
+            navigate_to_book(self, book_ref, self.root)
 
     # ── BookTree public API ──────────────────────────────────────────
 

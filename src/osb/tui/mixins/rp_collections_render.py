@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-import re
-
 from textual.widgets import Input, Label, ListItem, ListView, Static, TabbedContent
 
 from osb.db import queries
-from osb.importer.structure import normalize_book_name
+from osb.tui.mixins.rp_collections_utils import (
+    build_collection_label, build_detail_header, build_detail_hints,
+    build_list_hints, make_chapter_prefix, parse_verse_input
+)
 
 
 class RpCollectionsRenderMixin:
@@ -40,7 +41,7 @@ class RpCollectionsRenderMixin:
 
         for col in cols:
             count = queries.get_collection_item_count(self.conn, col.id)
-            li = ListItem(Label(f"{col.name}  [dim]({count})[/]"))
+            li = ListItem(Label(build_collection_label(col.name, count)))
             li._is_temp = False
             li._collection_id = col.id
             li._col_name = col.name
@@ -52,10 +53,7 @@ class RpCollectionsRenderMixin:
         if has_temp or cols:
             lv.index = 0
 
-        hint_parts = ["↵ open", "n new", "r rename", "d delete"]
-        if has_temp:
-            hint_parts.append("s save")
-        hints.update("[dim]" + "  ·  ".join(hint_parts) + "[/]")
+        hints.update(build_list_hints(has_temp))
         self._update_collections_tab_label()
 
     def _render_collection_detail(self) -> None:
@@ -70,9 +68,9 @@ class RpCollectionsRenderMixin:
 
         items = queries.get_collection_items(self.conn, self._active_collection_id)
         total = len(items)
-        header.update(f"[dim]Collections /[/] {self._active_collection_name}  [dim]{total}[/]")
+        header.update(build_detail_header(self._active_collection_name, total))
         header.add_class("col-header-detail")
-        hints.update("[dim]↵ jump  ·  a add  ·  x remove  ·  J/K reorder  ·  r rename  ·  Esc ← list[/]")
+        hints.update(build_detail_hints())
         lv.clear()
 
         if total == 0:
@@ -115,12 +113,7 @@ class RpCollectionsRenderMixin:
             pass
 
     def _make_chapter_prefix(self, chapter_ref: str) -> str:
-        parts = chapter_ref.split("-")
-        if len(parts) >= 2:
-            book = queries.get_book(self.conn, parts[0])
-            book_name = book.name if book else parts[0]
-            return f"{book_name} {parts[1]}"
-        return chapter_ref
+        return make_chapter_prefix(self.conn, chapter_ref)
 
     def _refresh_temp_name_display(self) -> None:
         self._update_collections_tab_label()
@@ -152,73 +145,4 @@ class RpCollectionsRenderMixin:
             pass
 
     def _parse_verse_input(self, text: str) -> str | None:
-        m = re.match(r'^\s*(\d?\s*[A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(\d+):(\d+)\s*$', text.strip())
-        if not m:
-            return None
-        book_raw, chapter, verse = m.group(1).strip(), m.group(2), m.group(3)
-        abbrev = normalize_book_name(book_raw)
-        if not abbrev:
-            return None
-        verse_ref = f"{abbrev}-{chapter}-{verse}"
-        return verse_ref if queries.get_verse(self.conn, verse_ref) is not None else None
-
-    # ── Input submitted ───────────────────────────────────────────────────────
-
-    def on_input_submitted(self, event: Input.Submitted) -> None:
-        if event.input.id == "chat-input":
-            question = event.value.strip()
-            if question and self._current_chapter_ref:
-                event.input.clear()
-                self._send_chat(question)
-            return
-
-        if event.input.id != "collections-add-input":
-            return
-
-        value = event.value.strip()
-        mode = self._col_input_mode
-        self._hide_add_bar()
-        self.focus()
-        if not value:
-            return
-
-        if mode == "new":
-            queries.create_collection(self.conn, value)
-            self._update_collections_tab_label()
-            self._render_collections_list()
-            self.app.notify(f"Created '{value}'", timeout=2)
-
-        elif mode == "rename":
-            if self._active_collection_id is not None:
-                queries.rename_collection(self.conn, self._active_collection_id, value)
-                self._active_collection_name = value
-                self._render_collection_detail()
-                self._update_collections_tab_label()
-
-        elif mode == "rename_list":
-            col_id = self._rename_list_col_id()
-            if col_id is not None:
-                queries.rename_collection(self.conn, col_id, value)
-                self._render_collections_list()
-                self._update_collections_tab_label()
-
-        elif mode == "add_verse":
-            ref = self._parse_verse_input(value)
-            if ref:
-                if self._active_collection_id is not None:
-                    queries.add_verse_to_collection(self.conn, self._active_collection_id, ref)
-                    self._render_collection_detail()
-                    self.app.notify("Verse added", timeout=2)
-            else:
-                self.app.notify(f"Verse not found: {value}", severity="warning", timeout=3)
-
-        elif mode == "save_temp":
-            if self._temp_refs:
-                col_id = queries.create_collection(self.conn, value)
-                for verse_ref, _ in self._temp_refs:
-                    queries.add_verse_to_collection(self.conn, col_id, verse_ref)
-                self._temp_refs = None
-                self._temp_name = ""
-                self._render_collections_list()
-                self._update_collections_tab_label()
-                self.app.notify(f"Saved as '{value}'", timeout=2)
+        return parse_verse_input(self.conn, text)

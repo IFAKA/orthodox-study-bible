@@ -5,6 +5,7 @@ from __future__ import annotations
 from textual.widgets import ListItem, ListView
 
 from osb.db import queries
+from osb.tui.mixins.rp_collections_helpers import get_current_item, get_current_index, set_list_index
 
 
 class RpCollectionsMixin:
@@ -24,16 +25,10 @@ class RpCollectionsMixin:
     # ── Cursor helpers ────────────────────────────────────────────────────────
 
     def _col_current_item(self) -> ListItem | None:
-        try:
-            return self.query_one("#collections-list", ListView).highlighted_child
-        except Exception:
-            return None
+        return get_current_item(self)
 
     def _col_current_index(self) -> int:
-        try:
-            return self.query_one("#collections-list", ListView).index or 0
-        except Exception:
-            return 0
+        return get_current_index(self)
 
     # ── Select / open ─────────────────────────────────────────────────────────
 
@@ -72,11 +67,7 @@ class RpCollectionsMixin:
             return
         self._visited_refs.add(verse_ref)
         self._render_collection_detail()
-        try:
-            lv = self.query_one("#collections-list", ListView)
-            lv.index = min(idx, len(list(lv.children)) - 1)
-        except Exception:
-            pass
+        set_list_index(self, idx)
         from osb.tui.screens.main_screen import MainScreen
         for screen in self.app.screen_stack:
             if isinstance(screen, MainScreen):
@@ -104,13 +95,7 @@ class RpCollectionsMixin:
         queries.remove_verse_from_collection(self.conn, self._active_collection_id, verse_ref)
         self._visited_refs.discard(verse_ref)
         self._render_collection_detail()
-        try:
-            lv = self.query_one("#collections-list", ListView)
-            children = list(lv.children)
-            if children:
-                lv.index = max(0, min(idx - 1, len(children) - 1))
-        except Exception:
-            pass
+        set_list_index(self, idx - 1)
         self.app.notify("Verse removed", timeout=2)
 
     def action_col_rename(self) -> None:
@@ -156,13 +141,7 @@ class RpCollectionsMixin:
         queries.delete_collection(self.conn, col_id)
         self._render_collections_list()
         self._update_collections_tab_label()
-        try:
-            lv = self.query_one("#collections-list", ListView)
-            children = list(lv.children)
-            if children:
-                lv.index = max(0, min(idx - 1, len(children) - 1))
-        except Exception:
-            pass
+        set_list_index(self, idx - 1)
         self.app.notify(f"Deleted '{col_name}'", timeout=2)
 
     # ── Save temp ─────────────────────────────────────────────────────────────
@@ -206,11 +185,7 @@ class RpCollectionsMixin:
         new_idx = max(0, min(idx + direction, len(items) - 1))
         queries.reorder_item(self.conn, self._active_collection_id, verse_ref, direction)
         self._render_collection_detail()
-        try:
-            lv = self.query_one("#collections-list", ListView)
-            lv.index = min(new_idx, len(list(lv.children)) - 1)
-        except Exception:
-            pass
+        set_list_index(self, new_idx)
 
     # ── Tab switch ────────────────────────────────────────────────────────────
 

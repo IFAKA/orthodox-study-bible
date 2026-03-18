@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if jq -r '.tool_input.command // \"\"' | grep -qE 'git.*(commit|push)'; then bash .claude/lint-max-lines.sh; else true; fi",
+            "statusMessage": "Checking file line limits before commit...",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

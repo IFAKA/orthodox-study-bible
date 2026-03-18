@@ -230,7 +230,12 @@ class RpChatMixin:
         try:
             container = self.query_one("#chat-history", VerticalScroll)
             container.remove_children()
-            container.refresh()
+            container.scroll_home()
+        except Exception:
+            pass
+        try:
+            chat_input = self.query_one("#chat-input", Input)
+            chat_input.value = ""
         except Exception:
             pass
         self._update_collections_tab_label()

@@ -34,8 +34,15 @@ class SpNavigationMixin:
         self.post_message(self.ChapterChangeRequested(-1))
 
     def action_goto_first_verse(self) -> None:
-        if self._verse_refs:
-            self._set_focus_idx(0)
+        if not self._verse_refs:
+            return
+        n = self._consume_vim_count(default=0)
+        if n > 0:
+            # [N]gg: jump to verse N (1-based, clamped to valid range)
+            idx = max(0, min(n - 1, len(self._verse_refs) - 1))
+        else:
+            idx = 0
+        self._set_focus_idx(idx)
 
     def action_last_verse(self) -> None:
         if not self._verse_refs:

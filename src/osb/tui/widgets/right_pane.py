@@ -216,7 +216,13 @@ class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixi
             return
 
     def action_goto_first_verse(self) -> None:
-        self._scroll_active_edge(end=False)
+        n = self._consume_vim_count()
+        if n > 0:
+            # [N]gg: jump to N% of the way through content
+            self._scroll_to_percentage(n)
+        else:
+            # gg: jump to start
+            self._scroll_active_edge(end=False)
 
     def action_last_verse(self) -> None:
         n = self._consume_vim_count()

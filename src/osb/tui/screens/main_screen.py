@@ -19,7 +19,6 @@ from osb.tui.screens.help_screen import HelpScreen
 from osb.tui.screens.my_notes_screen import MyNotesScreen
 from osb.tui.screens.progress_screen import ProgressScreen
 from osb.tui.screens.search_screen import SearchScreen
-from osb.tui.widgets.app_header import AppHeader
 from osb.tui.widgets.book_tree import BookTree
 from osb.tui.widgets.quit_modal import QuitModal
 from osb.tui.widgets.right_pane import RightPane
@@ -54,8 +53,6 @@ class MainScreen(Screen):
         self._vim_mode: str = "NORMAL"
 
     def compose(self) -> ComposeResult:
-        yield AppHeader()
-
         # 3-pane horizontal layout
         with Horizontal(id="main-layout"):
             yield BookTree(self.conn, id="sidebar", classes="hidden")
@@ -110,12 +107,6 @@ class MainScreen(Screen):
         complete = queries.is_chapter_complete(self.conn, chapter_ref)
         complete_str = " ✓" if complete else ""
 
-        try:
-            header = self.query_one(AppHeader)
-            header.update_title(f"{book_name} {ch.number}{complete_str}")
-            header.update_lectionary(self._lectionary_str)
-        except Exception:
-            pass
         try:
             sb = self.query_one(StatusBar)
             book_name_short = book_name.split()[0] if book_name else ""
@@ -219,7 +210,7 @@ class MainScreen(Screen):
         self.app.push_screen(GlossaryScreen(self.conn))
 
     def action_help(self) -> None:
-        self.push_screen(HelpScreen())
+        self.app.push_screen(HelpScreen())
 
     def action_toggle_theme(self) -> None:
         screen = self.app.screen

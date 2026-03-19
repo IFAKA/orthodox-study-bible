@@ -15,12 +15,30 @@ class RpChatStreamingMixin:
     """Ollama streaming logic for RightPane."""
 
     def _send_chat(self, question: str) -> None:
-        if not self._ollama_available:
-            self._append_message("assistant", "Ollama not available. Start with `ollama serve`.")
-            return
         if self._streaming:
             return
 
+        # Check Ollama availability in background
+        def verify_and_send():
+            try:
+                httpx.get(f"{config.OLLAMA_BASE_URL}/api/tags", timeout=2.0)
+                self._ollama_available = True
+                self.app.call_from_thread(self._update_ollama_status, True)
+                # Ollama is available, proceed with sending
+                self.app.call_from_thread(self._send_chat_to_ollama, question)
+            except Exception:
+                self._ollama_available = False
+                self.app.call_from_thread(self._update_ollama_status, False)
+                self.app.call_from_thread(
+                    self._append_message,
+                    "assistant",
+                    f"[red]✗ Ollama not available[/]\nCan't connect to {config.OLLAMA_BASE_URL}\n[dim]Tip: Start Ollama with `ollama serve`[/]"
+                )
+
+        threading.Thread(target=verify_and_send, daemon=True).start()
+
+    def _send_chat_to_ollama(self, question: str) -> None:
+        """Actually send the chat (after Ollama is verified available)."""
         chapter_ref = self._current_chapter_ref
         verse_ref = self._current_verse_ref
         verse_text = ""

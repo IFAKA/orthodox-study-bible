@@ -6,7 +6,8 @@ from textual.containers import VerticalScroll
 from textual.widgets import Static
 
 from osb import config
-from osb.tui.mixins.rp_chat import _AI_HEADER, parse_refs
+from osb.tui.mixins.rp_chat import _AI_HEADER
+from osb.tui.mixins.rp_chat_utils import parse_refs
 
 
 class RpChatHistoryMixin:

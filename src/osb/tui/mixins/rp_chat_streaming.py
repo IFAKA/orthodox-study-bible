@@ -49,8 +49,13 @@ class RpChatStreamingMixin:
                     "POST",
                     f"{config.OLLAMA_BASE_URL}/api/chat",
                     json={"model": config.OLLAMA_MODEL, "messages": messages, "stream": True},
-                    timeout=httpx.Timeout(connect=5.0, read=120.0, write=10.0, pool=5.0),
+                    timeout=httpx.Timeout(connect=5.0, read=30.0, write=5.0, pool=5.0),
                 ) as resp:
+                    if resp.status_code == 404:
+                        raise RuntimeError(f"Model '{config.OLLAMA_MODEL}' not found. Run: ollama pull {config.OLLAMA_MODEL}")
+                    if resp.status_code >= 400:
+                        raise RuntimeError(f"Ollama error (code {resp.status_code})")
+
                     for line in resp.iter_lines():
                         if not line:
                             continue
@@ -69,6 +74,11 @@ class RpChatStreamingMixin:
                                 self.StreamingDone(chapter_ref, self._accumulated_response),
                             )
                             break
+            except httpx.TimeoutException as e:
+                self.app.call_from_thread(
+                    self.post_message,
+                    self.OllamaError(f"Timeout waiting for Ollama response (30s). Is it running?")
+                )
             except Exception as e:
                 self.app.call_from_thread(self.post_message, self.OllamaError(str(e)))
 
@@ -116,8 +126,10 @@ class RpChatStreamingMixin:
                 resp = httpx.post(
                     f"{config.OLLAMA_BASE_URL}/api/generate",
                     json={"model": config.OLLAMA_MODEL, "prompt": prompt, "stream": False},
-                    timeout=httpx.Timeout(connect=5.0, read=30.0, write=5.0, pool=5.0),
+                    timeout=httpx.Timeout(connect=5.0, read=15.0, write=5.0, pool=5.0),
                 )
+                if resp.status_code >= 400:
+                    raise RuntimeError(f"Ollama error (code {resp.status_code})")
                 title = resp.json().get("response", "").strip()
                 title = re.sub(r'[*_`#\[\]"\']', "", title).strip()
                 title = title.strip('.-')

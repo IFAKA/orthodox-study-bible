@@ -58,6 +58,7 @@ class RpNotesMixin:
         notes = queries.get_commentary_for_verse(self.conn, verse_ref)
         xrefs = queries.get_cross_refs(self.conn, verse_ref)
         lines = []
+        has_commentary = bool(notes)
         if notes:
             for note in notes:
                 lines.append(note.note_text)
@@ -74,5 +75,18 @@ class RpNotesMixin:
                     lines.append(f"→ {xr['to_ref_text']}")
         try:
             self.query_one("#commentary-text", Markdown).update("\n".join(lines))
+            self._update_commentary_tab_indicator(has_commentary)
+        except Exception:
+            pass
+
+    def _update_commentary_tab_indicator(self, has_commentary: bool) -> None:
+        """Update Commentary tab label with indicator if commentary exists."""
+        try:
+            from textual.widgets import TabPane, TabbedContent
+            pane = self.query_one("#tab-commentary", TabPane)
+            pane.label = ("● Commentary" if has_commentary else "Commentary")
+            # Refresh the TabbedContent to display the updated label in real time
+            tabs = self.query_one("#right-tabs", TabbedContent)
+            tabs.refresh()
         except Exception:
             pass

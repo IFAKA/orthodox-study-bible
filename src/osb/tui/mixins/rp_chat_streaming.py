@@ -87,11 +87,21 @@ class RpChatStreamingMixin:
     def on_right_pane_ollama_chunk(self, event) -> None:
         self._accumulated_response += event.text
         self._update_stream_widget(self._accumulated_response)
+        # Reset loading timeout since we got a response
+        self._last_chunk_time = __import__('time').time()
 
     def on_right_pane_ollama_error(self, event) -> None:
         self._streaming = False
         self._finish_stream_widget("")
-        self._append_message("assistant", f"Error: {event.error}")
+        error_msg = event.error
+        if "Timeout" in error_msg or "timeout" in error_msg:
+            self._append_message("assistant", f"[red]✗ Timeout[/]\n{error_msg}\n[dim]Tip: Is Ollama running? Try: `ollama serve`[/]")
+        elif "not found" in error_msg.lower():
+            self._append_message("assistant", f"[red]✗ Model not found[/]\n{error_msg}\n[dim]Tip: {error_msg.split('Run:')[-1].strip() if 'Run:' in error_msg else 'Download the model first.'}[/]")
+        elif "Connection" in error_msg or "connect" in error_msg.lower():
+            self._append_message("assistant", f"[red]✗ Can't connect to Ollama[/]\n{error_msg}\n[dim]Tip: Start Ollama with `ollama serve`[/]")
+        else:
+            self._append_message("assistant", f"[red]✗ Error[/]\n{error_msg}")
 
     def on_right_pane_streaming_done(self, event) -> None:
         self._streaming = False

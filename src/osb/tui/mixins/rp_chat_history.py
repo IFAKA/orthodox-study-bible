@@ -25,7 +25,10 @@ class RpChatHistoryMixin:
     def _start_stream_widget(self) -> None:
         try:
             container = self.query_one("#chat-history", VerticalScroll)
-            self._streaming_widget = Static(f"{_AI_HEADER}\n▋", classes="chat-msg chat-assistant")
+            self._streaming_widget = Static(
+                f"{_AI_HEADER}\n[dim]⟳ Connecting to Ollama...[/]",
+                classes="chat-msg chat-assistant"
+            )
             container.mount(self._streaming_widget)
             container.scroll_end(animate=False)
         except Exception:

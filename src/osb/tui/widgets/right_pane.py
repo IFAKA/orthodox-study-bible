@@ -18,7 +18,7 @@ from osb.tui.mixins.rp_collections import RpCollectionsMixin
 from osb.tui.mixins.rp_collections_render import RpCollectionsRenderMixin
 from osb.tui.mixins.rp_collections_input import RpCollectionsInputMixin
 from osb.tui.mixins.rp_notes import RpNotesMixin
-from osb.tui.widgets.rp_messages import OllamaChunk, OllamaError, StreamingDone
+from osb.tui.widgets.rp_messages import StreamingDone
 from osb.tui.widgets.rp_navigation import RpNavigationMixin
 from osb.tui.widgets.rp_visibility import check_action_visibility
 
@@ -66,7 +66,6 @@ class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixi
         self._current_chapter_ref: str | None = None
         self._ollama_available: bool = False
         self._streaming: bool = False
-        self._accumulated_response: str = ""
         self._streaming_widget: Static | None = None
         self._last_messages: list[dict] = []
         self._last_response: str = ""
@@ -128,7 +127,6 @@ class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixi
             self._current_chapter_ref = chapter_ref
             self._streaming = False
             self._streaming_widget = None
-            self._accumulated_response = ""
             self._temp_refs = None
             self._temp_name = ""
             self._update_collections_tab_label()

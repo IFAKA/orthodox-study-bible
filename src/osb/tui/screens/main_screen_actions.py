@@ -52,22 +52,26 @@ class MainScreenActionsMixin:
         self.app.push_screen(MyNotesScreen(self.conn))
 
     def action_lectionary(self) -> None:
-        saved = queries.get_session(
+        # Use the remembered calendar; the readings overlay itself lets the
+        # user switch calendars and move between days.
+        calendar = queries.get_session(
             self.conn, "lectionary_calendar", config.LECTIONARY_CALENDAR
         )
+        self.app.push_screen(DailyScreen(self.conn, calendar), self._open_reading)
 
-        def on_calendar(calendar: str | None) -> None:
-            if not calendar:
-                return
-            queries.set_session(self.conn, "lectionary_calendar", calendar)
+    def _open_reading(self, refs: list[str] | None) -> None:
+        if refs:
+            self.set_active_reading(refs)
 
-            def on_result(verse_ref: str | None) -> None:
-                if verse_ref:
-                    self._navigate_to_verse(verse_ref)
-
-            self.app.push_screen(DailyScreen(self.conn, calendar), on_result)
-
-        self.app.push_screen(CalendarSelectModal(saved), on_calendar)
+    def set_active_reading(self, refs: list[str]) -> None:
+        """Navigate to a lectionary reading and mark its verse range."""
+        if not refs:
+            return
+        try:
+            self.query_one("#scripture-pane", ScripturePane).set_reading_refs(set(refs))
+        except Exception:
+            pass
+        self._navigate_to_verse(refs[0])
 
     def action_progress(self) -> None:
         def on_result(ref: str | None) -> None:
@@ -205,8 +209,4 @@ class MainScreenActionsMixin:
         )
 
     def _push_daily_overlay(self, calendar: str) -> None:
-        def on_result(verse_ref: str | None) -> None:
-            if verse_ref:
-                self._navigate_to_verse(verse_ref)
-
-        self.app.push_screen(DailyScreen(self.conn, calendar), on_result)
+        self.app.push_screen(DailyScreen(self.conn, calendar), self._open_reading)

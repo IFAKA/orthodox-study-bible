@@ -36,14 +36,23 @@ SAMPLE = {
 
 
 def test_passage_to_ref_builds_navigable_ref():
-    assert orthocal._passage_to_ref(SAMPLE["readings"][0]) == "ROM-7-14"
-    assert orthocal._passage_to_ref(SAMPLE["readings"][1]) == "MAT-10-9"
+    assert orthocal._passage_refs(SAMPLE["readings"][0]) == ["ROM-7-14"]
+    assert orthocal._passage_refs(SAMPLE["readings"][1]) == ["MAT-10-9"]
 
 
-def test_passage_to_ref_handles_empty():
-    assert orthocal._passage_to_ref({"passage": []}) is None
-    assert orthocal._passage_to_ref({}) is None
-    assert orthocal._passage_to_ref({"passage": [{"book": "ROM"}]}) is None
+def test_passage_refs_multi_verse():
+    reading = {"passage": [
+        {"book": "ROM", "chapter": 7, "verse": 14},
+        {"book": "ROM", "chapter": 7, "verse": 15},
+        {"book": "ROM", "chapter": 8, "verse": 2},
+    ]}
+    assert orthocal._passage_refs(reading) == ["ROM-7-14", "ROM-7-15", "ROM-8-2"]
+
+
+def test_passage_refs_handles_empty():
+    assert orthocal._passage_refs({"passage": []}) == []
+    assert orthocal._passage_refs({}) == []
+    assert orthocal._passage_refs({"passage": [{"book": "ROM"}]}) == []
 
 
 def test_normalize_shape():
@@ -55,6 +64,7 @@ def test_normalize_shape():
     assert out["fast_note"] == "Wine and Oil are Allowed"
     assert [r["source"] for r in out["readings"]] == ["Epistle", "Gospel"]
     assert out["readings"][0]["ref"] == "ROM-7-14"
+    assert out["readings"][0]["refs"] == ["ROM-7-14"]
     # The verse text is intentionally dropped (app uses its own OSB text).
     assert "content" not in out["readings"][0]
 

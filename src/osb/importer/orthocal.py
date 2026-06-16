@@ -24,29 +24,32 @@ ORTHOCAL_BASE = "https://orthocal.info/api"
 VALID_CALENDARS = ("gregorian", "julian")
 
 
-def _passage_to_ref(reading: dict) -> str | None:
-    """Build a navigable verse ref ('ROM-7-14') from a reading's first verse."""
-    passage = reading.get("passage") or []
-    if not passage:
-        return None
-    first = passage[0]
-    book = first.get("book")
-    chapter = first.get("chapter")
-    verse = first.get("verse")
-    if not (book and chapter and verse):
-        return None
-    return f"{book}-{chapter}-{verse}"
+def _passage_refs(reading: dict) -> list[str]:
+    """Every verse ref in a reading ('ROM-7-14' … 'ROM-8-2').
+
+    orthocal's `passage` lists each verse of the reading (spanning chapters
+    and composite ranges), so this yields the full set to navigate to and
+    highlight.
+    """
+    refs: list[str] = []
+    for p in reading.get("passage") or []:
+        book, chapter, verse = p.get("book"), p.get("chapter"), p.get("verse")
+        if book and chapter and verse:
+            refs.append(f"{book}-{chapter}-{verse}")
+    return refs
 
 
 def normalize(data: dict, day: date, calendar: str) -> dict:
     """Reduce orthocal's payload to the fields the app renders/stores."""
     readings = []
     for r in data.get("readings", []):
+        refs = _passage_refs(r)
         readings.append(
             {
                 "source": r.get("source", ""),      # "Epistle", "Gospel", ...
                 "display": r.get("display", ""),     # "Romans 7.14-8.2"
-                "ref": _passage_to_ref(r),           # "ROM-7-14" or None
+                "ref": refs[0] if refs else None,    # first verse, for navigation
+                "refs": refs,                        # full range, for highlighting
             }
         )
     return {

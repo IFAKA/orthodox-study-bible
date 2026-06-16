@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import sqlite3
 import threading
-from datetime import date
+from datetime import date, timedelta
 
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.screen import ModalScreen
-from textual.widgets import Button, Label
+from textual.widgets import Button, Label, ListItem, ListView
 
+from osb.db import queries
 from osb.importer import lectionary
 
 _CAL_LABELS = {"gregorian": "New Calendar", "julian": "Old Calendar (Julian)"}
@@ -72,104 +73,140 @@ class CalendarSelectModal(ModalScreen[str | None]):
         self.dismiss(None)
 
 
-class DailyScreen(ModalScreen[str | None]):
-    """Shows today's lectionary readings for the chosen calendar.
+class DailyScreen(ModalScreen[list | None]):
+    """Daily lectionary readings for a chosen calendar and date.
 
     Readings are fetched (and cached) from orthocal.info on a worker thread.
-    Dismisses with a verse_ref to navigate to, or None to stay put.
+    The user can step between days, switch calendar, and pick a reading to
+    open. Dismisses with the selected reading's verse refs, or None.
     """
 
     BINDINGS = [
         Binding("escape,q", "dismiss_none", "Close"),
-        Binding("g", "goto", "Go to first reading"),
+        Binding("left,[", "prev_day", "Prev day"),
+        Binding("right,]", "next_day", "Next day"),
+        Binding("c", "toggle_calendar", "Calendar"),
+        Binding("j", "cursor_down", "Down", show=False),
+        Binding("k", "cursor_up", "Up", show=False),
     ]
 
     def __init__(self, conn: sqlite3.Connection, calendar: str = "gregorian", **kwargs) -> None:
         super().__init__(**kwargs)
         self.conn = conn
         self.calendar = calendar if calendar in _CAL_LABELS else "gregorian"
-        self._goto_ref: str | None = None
+        self._date = date.today()
+        self._readings: list[dict] = []
 
     def compose(self) -> ComposeResult:
-        today = date.today().strftime("%A, %B %-d")
-        cal_label = _CAL_LABELS[self.calendar]
         with Vertical(id="daily-dialog", classes="modal-dialog"):
-            yield Label(f"Today's Readings — {today}  ·  {cal_label}",
-                        id="daily-title", classes="modal-title")
-            yield Label("⟳ Loading readings…", id="daily-readings")
-            with Horizontal(id="daily-buttons"):
-                yield Button("Go to first reading  [g]", id="goto-btn", variant="primary")
-                yield Button("Close  [q]", id="close-btn")
+            yield Label("", id="daily-title", classes="modal-title")
+            yield Label("", id="daily-meta")
+            yield ListView(id="daily-readings-list")
+            yield Label(
+                "[dim]\\[ ] prev/next day · c: calendar · j/k: move · enter: open · q: close[/]",
+                id="daily-hint",
+            )
 
     def on_mount(self) -> None:
-        # Disable goto until we know there's something to go to.
+        self._reload()
+
+    # ── Loading / rendering ───────────────────────────────────────────────────
+
+    def _reload(self) -> None:
+        self._set_title()
         try:
-            self.query_one("#goto-btn", Button).disabled = True
-            self.query_one("#close-btn", Button).focus()
+            self.query_one("#daily-readings-list", ListView).clear()
+            self.query_one("#daily-meta", Label).update("⟳ Loading…")
         except Exception:
             pass
-        threading.Thread(target=self._load_worker, daemon=True).start()
+        day, calendar = self._date, self.calendar
+        threading.Thread(
+            target=self._load_worker, args=(day, calendar), daemon=True
+        ).start()
 
-    def _load_worker(self) -> None:
-        data = lectionary.get_readings(self.conn, date.today(), self.calendar)
-        self.app.call_from_thread(self._render_readings, data)
+    def _load_worker(self, day: date, calendar: str) -> None:
+        data = lectionary.get_readings(self.conn, day, calendar)
+        self.app.call_from_thread(self._render_readings, day, calendar, data)
 
-    def _render_readings(self, data: dict | None) -> None:
+    def _set_title(self) -> None:
         try:
-            label = self.query_one("#daily-readings", Label)
-            goto_btn = self.query_one("#goto-btn", Button)
+            label = self.query_one("#daily-title", Label)
+        except Exception:
+            return
+        when = self._date.strftime("%A, %B %-d, %Y")
+        suffix = " · Today" if self._date == date.today() else ""
+        label.update(f"{when}  ·  {_CAL_LABELS[self.calendar]}{suffix}")
+
+    def _render_readings(self, day: date, calendar: str, data: dict | None) -> None:
+        # Ignore results that arrive after the user moved on.
+        if day != self._date or calendar != self.calendar:
+            return
+        try:
+            meta = self.query_one("#daily-meta", Label)
+            lv = self.query_one("#daily-readings-list", ListView)
         except Exception:
             return
 
+        lv.clear()
+        self._readings = []
+
         if data is None:
-            label.update(
-                "Couldn't load today's readings.\n"
-                "[dim]Connect to the internet once to cache them, then they "
-                "work offline.[/]"
+            meta.update(
+                "[dim]Couldn't load — connect once to cache this day, then it "
+                "works offline.[/]"
             )
             return
 
-        readings = data.get("readings") or []
-        lines: list[str] = []
+        title = data.get("title") or ""
+        fast = " · ".join(p for p in (data.get("fast"), data.get("fast_note")) if p)
+        meta.update(f"[bold]{title}[/]" + (f"\n[dim]Fast: {fast}[/]" if fast else ""))
 
-        title = data.get("title")
-        if title:
-            lines.append(f"[bold]{title}[/]")
+        readings = [r for r in (data.get("readings") or []) if (r.get("refs") or r.get("ref"))]
+        self._readings = readings
+        if not readings:
+            meta.update(f"[bold]{title}[/]\n[dim]No appointed readings for this day.[/]")
+            return
 
-        fast = data.get("fast") or ""
-        fast_note = data.get("fast_note") or ""
-        fast_line = " · ".join(part for part in (fast, fast_note) if part)
-        if fast_line:
-            lines.append(f"[dim]Fast: {fast_line}[/]")
+        for r in readings:
+            source = r.get("source") or "Reading"
+            display = r.get("display") or ""
+            lv.append(ListItem(Label(f"[bold]{source}:[/] {display}")))
+        lv.index = 0
+        lv.focus()
 
-        if readings:
-            if lines:
-                lines.append("")
-            for r in readings:
-                source = r.get("source") or "Reading"
-                display = r.get("display") or ""
-                lines.append(f"[bold]{source}:[/] {display}")
-            # First reading with a navigable ref becomes the goto target.
-            self._goto_ref = next((r["ref"] for r in readings if r.get("ref")), None)
-        else:
-            lines.append("")
-            lines.append("No appointed readings for today.")
+    # ── Reading selection ─────────────────────────────────────────────────────
 
-        label.update("\n".join(lines))
+    def on_list_view_selected(self, event: ListView.Selected) -> None:
+        self._open_index(event.list_view.index)
 
-        if self._goto_ref:
-            goto_btn.disabled = False
-            goto_btn.focus()
+    def _open_index(self, idx: int | None) -> None:
+        if idx is None or not (0 <= idx < len(self._readings)):
+            return
+        r = self._readings[idx]
+        refs = r.get("refs") or ([r["ref"]] if r.get("ref") else [])
+        if refs:
+            self.dismiss(refs)
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "goto-btn":
-            self.action_goto()
-        else:
-            self.dismiss(None)
+    # ── Navigation ────────────────────────────────────────────────────────────
 
-    def action_goto(self) -> None:
-        if self._goto_ref:
-            self.dismiss(self._goto_ref)
+    def action_cursor_down(self) -> None:
+        self.query_one("#daily-readings-list", ListView).action_cursor_down()
+
+    def action_cursor_up(self) -> None:
+        self.query_one("#daily-readings-list", ListView).action_cursor_up()
+
+    def action_prev_day(self) -> None:
+        self._date -= timedelta(days=1)
+        self._reload()
+
+    def action_next_day(self) -> None:
+        self._date += timedelta(days=1)
+        self._reload()
+
+    def action_toggle_calendar(self) -> None:
+        self.calendar = "julian" if self.calendar == "gregorian" else "gregorian"
+        queries.set_session(self.conn, "lectionary_calendar", self.calendar)
+        self._reload()
 
     def action_dismiss_none(self) -> None:
         self.dismiss(None)

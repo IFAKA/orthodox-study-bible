@@ -144,6 +144,12 @@ def get_daily_readings(today: date | None = None) -> list[dict]:
 
 
 
+def _is_current_format(data: dict) -> bool:
+    """Reject cache entries written before readings carried per-verse `refs`."""
+    readings = data.get("readings") or []
+    return not readings or "refs" in readings[0]
+
+
 def get_readings(
     conn: sqlite3.Connection,
     day: date | None = None,
@@ -165,7 +171,9 @@ def get_readings(
     cached = queries.get_lectionary_cache(conn, date_str, calendar)
     if cached:
         try:
-            return json.loads(cached)
+            data = json.loads(cached)
+            if _is_current_format(data):
+                return data
         except (ValueError, TypeError):
             pass
 

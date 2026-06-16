@@ -210,6 +210,13 @@ VerseBlock .verse-glyph {
     height: auto;
 }
 
+/* Active lectionary reading range (transient visual aid) */
+VerseBlock.lectionary-reading {
+    border-left: thick $accent;
+    text-style: bold;
+    padding-left: 2;
+}
+
 /* Highlight variants */
 VerseBlock.hl-yellow { background: $hl-yellow; }
 VerseBlock.hl-green  { background: $hl-green;  }
@@ -597,6 +604,32 @@ DailyScreen, CalendarSelectModal {
 
 #daily-readings {
     margin-bottom: 1;
+}
+
+#daily-meta {
+    margin-bottom: 1;
+}
+
+#daily-readings-list {
+    height: auto;
+    max-height: 12;
+    background: $surface;
+    border: none;
+    margin-bottom: 1;
+}
+
+#daily-readings-list > ListItem {
+    padding: 0 1;
+    background: $surface;
+}
+
+#daily-readings-list > ListItem.--highlight {
+    background: $surface-alt;
+}
+
+#daily-hint {
+    color: $text-muted;
+    text-align: center;
 }
 
 #daily-buttons {

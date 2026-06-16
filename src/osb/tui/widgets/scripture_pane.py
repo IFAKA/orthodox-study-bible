@@ -74,6 +74,8 @@ class ScripturePane(ChordMixin, SpNavigationMixin, SpSearchMixin, SpVerseActions
         self._search_mode: bool = False
         self._match_refs: list[str] = []
         self._match_idx: int = 0
+        # Transient "active lectionary reading" range (in-memory only).
+        self._reading_refs: set[str] = set()
         self._accel_count: int = 0
         self._last_nav_time: float = 0.0
         self._last_nav_dir: int = 0
@@ -129,10 +131,30 @@ class ScripturePane(ChordMixin, SpNavigationMixin, SpSearchMixin, SpVerseActions
         if blocks:
             self.query_one("#sp-content").mount(*blocks)
 
+        # Active lectionary reading: clear it once we've navigated to a chapter
+        # that contains none of its verses, otherwise (re)apply the marking —
+        # this also handles readings that span a chapter boundary.
+        if self._reading_refs and not any(r in self._reading_refs for r in self._verse_refs):
+            self._reading_refs = set()
+        self._apply_reading_highlight()
+
         if focus_verse_ref and focus_verse_ref in self._blocks:
             self._set_focus_idx(self._verse_refs.index(focus_verse_ref))
         elif self._verse_refs:
             self._set_focus_idx(0)
+
+    def set_reading_refs(self, refs: set[str]) -> None:
+        """Mark a lectionary reading's verses (transient; never persisted)."""
+        self._reading_refs = set(refs)
+        self._apply_reading_highlight()
+
+    def clear_reading_refs(self) -> None:
+        self._reading_refs = set()
+        self._apply_reading_highlight()
+
+    def _apply_reading_highlight(self) -> None:
+        for ref, block in self._blocks.items():
+            block.set_class(ref in self._reading_refs, "lectionary-reading")
 
     @property
     def focused_verse_ref(self) -> str | None:
@@ -168,6 +190,10 @@ class ScripturePane(ChordMixin, SpNavigationMixin, SpSearchMixin, SpVerseActions
                 return
         if event.key == "escape" and self._search_mode:
             self._clear_search()
+            event.stop()
+            return
+        if event.key == "escape" and self._reading_refs:
+            self.clear_reading_refs()
             event.stop()
             return
         if self.handle_chord(event):

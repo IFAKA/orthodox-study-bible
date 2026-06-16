@@ -623,8 +623,18 @@ DailyScreen, CalendarSelectModal {
     background: $surface;
 }
 
-#daily-readings-list > ListItem.--highlight {
-    background: $surface-alt;
+/* Selected reading: high-contrast accent bar so it's unmistakable
+   (Textual's highlight class is `-highlight`, single dash). */
+#daily-readings-list > ListItem.-highlight,
+#daily-readings-list:focus > ListItem.-highlight {
+    background: $accent;
+    color: $bg;
+    text-style: bold;
+}
+
+#daily-readings-list > ListItem.-highlight Label {
+    color: $bg;
+    text-style: bold;
 }
 
 #daily-hint {

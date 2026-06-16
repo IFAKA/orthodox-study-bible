@@ -18,6 +18,7 @@ A modern, offline-first Terminal User Interface (TUI) for studying the **Orthodo
 - [AI Chat (Optional)](#ai-chat-optional)
 - [Developer Guide](#developer-guide)
 - [SEO & AI Optimization](#seo--ai-optimization)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ---
@@ -38,7 +39,7 @@ A modern, offline-first Terminal User Interface (TUI) for studying the **Orthodo
 - **Commentary & Cross-References**: Integrated study notes available instantly for every verse.
 - **Full-Text Search (FTS5)**: Blazing fast search across all books and commentary.
 - **Personal Study Tools**: Add annotations, bookmarks, and color-coded highlights.
-- **Daily Lectionary**: Built-in tracking for the Menaion and Paschal cycles (Julian calendar).
+- **Daily Lectionary**: Full daily readings (Epistle & Gospel) for any day, New or Old Calendar, via [orthocal.info](https://orthocal.info); cached locally so they work offline after one fetch.
 - **Local AI Chat**: Stream theological inquiries directly through [Ollama](https://ollama.ai) (100% private, no cloud).
 - **Modern UI**: Dark and Sepia themes, responsive layout, and Vim-style navigation.
 - **Markdown Export**: Export your personal notes and study progress to Markdown.
@@ -139,6 +140,12 @@ This project is optimized for both search engines and AI agents.
 - **Structured Metadata**: Defined in `pyproject.toml`.
 - **AI Context**: See [llms.txt](llms.txt) for a technical summary optimized for Large Language Models.
 - **Social Preview**: [Instructions for adding a repository social image](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/configuring-a-social-preview-for-your-repository).
+
+---
+
+## 🙏 Acknowledgements
+
+- Daily lectionary readings are provided by [**orthocal.info**](https://orthocal.info), which computes the OCA daily calendar (commemorations, Epistle & Gospel) in both the New and Old Calendar reckonings.
 
 ---
 

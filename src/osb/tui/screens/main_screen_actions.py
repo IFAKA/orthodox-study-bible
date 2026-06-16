@@ -67,9 +67,8 @@ class MainScreenActionsMixin:
         self.app.push_screen(GlossaryScreen(self.conn))
 
     def action_help(self) -> None:
-        context = self._get_focus_context()
-        title, text = self._build_context_help(context)
-        self.app.push_screen(HelpScreen(title, text))
+        # One comprehensive, grouped keybinding reference.
+        self.app.push_screen(HelpScreen())
 
     def action_toggle_theme(self) -> None:
         screen = self.app.screen

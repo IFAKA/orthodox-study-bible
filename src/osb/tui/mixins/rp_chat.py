@@ -25,7 +25,11 @@ class RpChatMixin(RpChatStreamingMixin):
     def _check_ollama(self) -> None:
         def check():
             try:
-                httpx.get(f"{config.OLLAMA_BASE_URL}/api/tags", timeout=2.0)
+                httpx.get(
+                    f"{config.OLLAMA_BASE_URL}/api/tags",
+                    headers=config.ollama_headers(),
+                    timeout=2.0,
+                )
                 self._ollama_available = True
                 self.app.call_from_thread(self._update_ollama_status, True)
             except Exception:
@@ -38,13 +42,24 @@ class RpChatMixin(RpChatStreamingMixin):
         try:
             widget = self.query_one("#ollama-status", Static)
             if available:
-                widget.update(f"[green]● [/][dim]ollama · {config.OLLAMA_MODEL}[/]")
+                label = "ollama" if config.ollama_is_local() else "ollama cloud"
+                widget.update(f"[green]● [/][dim]{label} · {config.OLLAMA_MODEL}[/]")
             else:
-                widget.update("[red]● [/][dim]ollama offline — run `ollama serve`[/]")
+                widget.update(f"[red]● [/][dim]{self._ollama_offline_hint()}[/]")
         except Exception:
             pass
         if not available:
-            self._append_message("assistant", "Ollama not running — start with `ollama serve`")
+            self._append_message("assistant", self._ollama_offline_message())
+
+    def _ollama_offline_hint(self) -> str:
+        if config.ollama_is_local():
+            return "ollama offline — run `ollama serve`"
+        return "ollama cloud unreachable — check OLLAMA_API_KEY"
+
+    def _ollama_offline_message(self) -> str:
+        if config.ollama_is_local():
+            return "Ollama not running — start with `ollama serve`"
+        return "Can't reach Ollama Cloud — check OLLAMA_BASE_URL / OLLAMA_API_KEY"
 
     def _update_tree_chat_indicator(self, chapter_ref: str, has_chat: bool) -> None:
         try:

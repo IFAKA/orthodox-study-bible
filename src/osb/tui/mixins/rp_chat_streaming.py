@@ -50,6 +50,7 @@ class RpChatStreamingMixin:
                     "POST",
                     f"{config.OLLAMA_BASE_URL}/api/chat",
                     json={"model": config.OLLAMA_MODEL, "messages": messages, "stream": True},
+                    headers=config.ollama_headers(),
                     timeout=90.0,
                 ) as response:
                     if response.status_code == 200:
@@ -90,14 +91,21 @@ class RpChatStreamingMixin:
                         self.app.call_from_thread(self._finish_stream_widget, f"[red]Error {response.status_code}[/]")
 
             except httpx.TimeoutException:
+                if config.ollama_is_local():
+                    hint = "Is it running? Try: ollama serve"
+                else:
+                    hint = "Ollama Cloud was slow to respond — try again"
                 self.app.call_from_thread(
                     self._finish_stream_widget,
-                    "[red]Timeout — Ollama took too long[/]\n[dim]Is it running? Try: ollama serve[/]"
+                    f"[red]Timeout — Ollama took too long[/]\n[dim]{hint}[/]"
                 )
             except Exception as e:
                 error_msg = str(e)
                 if "Connection" in error_msg or "connect" in error_msg.lower():
-                    msg = "[red]Can't connect to Ollama[/]\n[dim]Start with: ollama serve[/]"
+                    if config.ollama_is_local():
+                        msg = "[red]Can't connect to Ollama[/]\n[dim]Start with: ollama serve[/]"
+                    else:
+                        msg = "[red]Can't reach Ollama Cloud[/]\n[dim]Check OLLAMA_BASE_URL / OLLAMA_API_KEY[/]"
                 else:
                     msg = f"[red]Error: {error_msg}[/]"
                 self.app.call_from_thread(self._finish_stream_widget, msg)
@@ -121,6 +129,7 @@ class RpChatStreamingMixin:
                 resp = httpx.post(
                     f"{config.OLLAMA_BASE_URL}/api/generate",
                     json={"model": config.OLLAMA_MODEL, "prompt": prompt, "stream": False},
+                    headers=config.ollama_headers(),
                     timeout=30.0,
                 )
                 if resp.status_code == 200:

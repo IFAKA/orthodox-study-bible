@@ -8,3 +8,5 @@ data/
 dist/
 *.egg-info/
 .aider*
+.env
+!.env.example

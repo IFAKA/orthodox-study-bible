@@ -95,7 +95,7 @@ OSB is modal: which keys are active depends on which pane has focus. The app ope
 | `F` | full-text search |
 | `N` | open **My Notes** (all annotations & bookmarks) |
 | `p` | reading-progress overview |
-| `L` | jump to today's primary feast reading (if any) |
+| `L` | open today's lectionary readings |
 | `?` | context help |
 | `T` | toggle Dark / Sepia theme |
 | `:` | command mode (e.g. type `Gen 3:5` to jump there) |
@@ -106,7 +106,7 @@ OSB is modal: which keys are active depends on which pane has focus. The app ope
 | Key | Action |
 |-----|--------|
 | `j` / `k` | next / previous verse |
-| `J` / `K` | previous / next chapter |
+| `J` / `K` | next / previous chapter |
 | `g` `g` | first verse of the chapter |
 | `G` / `g` `G` | last verse of the chapter |
 | `g` `?` | open the glossary |
@@ -167,7 +167,7 @@ OSB keeps several kinds of personal study data, each stored separately:
 - **Annotation** (`o`) — a personal text note attached to one verse.
 - **Highlight** (`m`) — a color marking on a verse; press `m` to cycle through the available colors.
 - **Collection** (`a`) — a **named, ordered list of verses**, like a playlist or themed study set (e.g. "Verses on mercy"). Build one manually by pressing `a` on verses, or let the AI chat assemble one automatically from the scripture references it cites in a reply. Manage collections in the right pane's **Collections** tab. (This is *not* the same as bookmarks — a bookmark is one flagged verse; a collection is a curated, reorderable group.)
-- **Lectionary** — the Orthodox cycle of daily readings (Julian calendar; Menaion and Paschal cycles). Today's readings appear automatically the first time you open the app each day; `L` jumps the reader to today's primary feast reading when there is one.
+- **Lectionary** — the Orthodox cycle of daily readings (Julian calendar; Menaion and Paschal cycles). Today's readings appear automatically the first time you open the app each day, and you can press `L` any time to reopen them.
 
 ---
 

@@ -116,6 +116,19 @@ ollama pull llama3.2
 
 Switch to the **Chat** tab in the app with `a`. All conversations remain on your machine.
 
+### Ollama Cloud
+
+Prefer a hosted model? Point the app at [Ollama Cloud](https://ollama.com) with environment variables — no local daemon required:
+
+```bash
+export OLLAMA_BASE_URL=https://ollama.com
+export OLLAMA_API_KEY=your-api-key
+export OLLAMA_MODEL=gpt-oss:120b   # any cloud model
+uv run osb
+```
+
+`OLLAMA_MODEL` and `OLLAMA_BASE_URL` also work on their own to override the local defaults (`llama3.2:3b`, `http://localhost:11434`). When `OLLAMA_API_KEY` is set, requests include an `Authorization: Bearer` header.
+
 ---
 
 ## 👨‍💻 Developer Guide

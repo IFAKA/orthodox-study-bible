@@ -61,6 +61,6 @@ An offline TUI application for studying the Orthodox Study Bible. Parses a user-
 
 **Database path:** `~/Library/Application Support/osb/osb.db` on macOS (via platformdirs).
 
-**Ollama:** Optional, `http://localhost:11434`, model `llama3.2:3b`, graceful degradation if unavailable.
+**Ollama:** Optional, `http://localhost:11434`, model `llama3.2:3b`, graceful degradation if unavailable. Overridable via env vars `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, and `OLLAMA_API_KEY` (set the last two + base URL `https://ollama.com` to use Ollama Cloud). `config.ollama_headers()` builds the `Authorization` header; `config.ollama_is_local()` drives offline/error messaging.
 
 **Themes:** Dark + Sepia, CSS-based via `tui/styles/themes.tcss`, toggled dynamically.

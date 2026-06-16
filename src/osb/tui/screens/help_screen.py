@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from textual.app import ComposeResult
 from textual.binding import Binding
+from textual.containers import VerticalScroll
 from textual.screen import ModalScreen
 from textual.widgets import Label, Static
 
@@ -39,6 +40,8 @@ class HelpScreen(ModalScreen):
         Binding("escape", "dismiss", show=False),
         Binding("?", "dismiss", show=False),
         Binding("q", "dismiss", show=False),
+        Binding("j", "scroll_down", show=False),
+        Binding("k", "scroll_up", show=False),
     ]
 
     def __init__(self, title: str, text: str) -> None:
@@ -47,6 +50,20 @@ class HelpScreen(ModalScreen):
         self._text = text
 
     def compose(self) -> ComposeResult:
-        with Static(id="help-dialog"):
+        # VerticalScroll (unlike Static) is focusable, so the help text can be
+        # scrolled with the keyboard when it overflows the dialog height.
+        with VerticalScroll(id="help-dialog"):
             yield Label(f"[bold]{self._title}[/bold]", id="help-title")
             yield Static(self._text, id="help-body")
+
+    def on_mount(self) -> None:
+        try:
+            self.query_one("#help-dialog", VerticalScroll).focus()
+        except Exception:
+            pass
+
+    def action_scroll_down(self) -> None:
+        self.query_one("#help-dialog", VerticalScroll).scroll_down()
+
+    def action_scroll_up(self) -> None:
+        self.query_one("#help-dialog", VerticalScroll).scroll_up()

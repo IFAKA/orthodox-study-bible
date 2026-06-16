@@ -18,6 +18,7 @@ A modern, offline-first Terminal User Interface (TUI) for studying the **Orthodo
 - [AI Chat (Optional)](#ai-chat-optional)
 - [Developer Guide](#developer-guide)
 - [SEO & AI Optimization](#seo--ai-optimization)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 ---
@@ -40,7 +41,7 @@ A modern, offline-first Terminal User Interface (TUI) for studying the **Orthodo
 - **Personal Study Tools**: Add annotations, bookmarks, and color-coded highlights.
 - **Daily Lectionary**: Built-in tracking for the Menaion and Paschal cycles (Julian calendar).
 - **Local AI Chat**: Stream theological inquiries directly through [Ollama](https://ollama.ai) (100% private, no cloud).
-- **Modern UI**: Dark and Sepia themes, responsive layout, and Vim-style navigation.
+- **Modern UI**: Five themes (Dark, Sepia, Compline, Lauds, Vigil), responsive layout, and Vim-style navigation.
 - **Markdown Export**: Export your personal notes and study progress to Markdown.
 
 ---
@@ -99,7 +100,7 @@ uv run osb
 | `a` | toggle Commentary / Chat tab |
 | `L` | today's lectionary readings |
 | `N` | My Notes (all annotations + bookmarks) |
-| `T` | toggle Dark / Sepia theme |
+| `T` | cycle theme (Dark / Sepia / Compline / Lauds / Vigil) |
 | `E` | export annotations to Markdown |
 | `q` | quit / close modal |
 
@@ -139,6 +140,13 @@ This project is optimized for both search engines and AI agents.
 - **Structured Metadata**: Defined in `pyproject.toml`.
 - **AI Context**: See [llms.txt](llms.txt) for a technical summary optimized for Large Language Models.
 - **Social Preview**: [Instructions for adding a repository social image](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/configuring-a-social-preview-for-your-repository).
+
+---
+
+## 🙏 Acknowledgements
+
+- The **Compline** and **Lauds** theme palettes are adapted from [joshuablais/compline](https://github.com/joshuablais/compline).
+- The **Vigil** (AMOLED) theme palette is adapted from [longestmt/librelift](https://github.com/longestmt/librelift).
 
 ---
 

@@ -16,6 +16,7 @@ from osb.tui.widgets.quit_modal import QuitModal
 from osb.tui.widgets.right_pane import RightPane
 from osb.tui.widgets.scripture_pane import ScripturePane
 from osb.tui.widgets.status_bar import StatusBar
+from osb.tui.themes import THEME_LABELS, THEME_NAMES
 
 
 class MainScreenActionsMixin:
@@ -72,11 +73,13 @@ class MainScreenActionsMixin:
         self.app.push_screen(HelpScreen(title, text))
 
     def action_toggle_theme(self) -> None:
-        screen = self.app.screen
-        if screen.has_class("sepia"):
-            screen.remove_class("sepia")
-        else:
-            screen.add_class("sepia")
+        """Cycle through the available themes and remember the choice."""
+        current = self.app.theme
+        idx = THEME_NAMES.index(current) if current in THEME_NAMES else 0
+        new = THEME_NAMES[(idx + 1) % len(THEME_NAMES)]
+        self.app.theme = new
+        queries.set_session(self.conn, "theme", new)
+        self.app.notify(f"Theme: {THEME_LABELS.get(new, new)}", timeout=1.5)
 
     def action_quit_app(self) -> None:
         def _on_confirm(confirmed: bool | None) -> None:

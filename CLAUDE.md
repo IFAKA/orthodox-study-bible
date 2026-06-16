@@ -63,4 +63,4 @@ An offline TUI application for studying the Orthodox Study Bible. Parses a user-
 
 **Ollama:** Optional, `http://localhost:11434`, model `llama3.2:3b`, graceful degradation if unavailable.
 
-**Themes:** Dark + Sepia, CSS-based via `tui/styles/themes.tcss`, toggled dynamically.
+**Themes:** Five themes (Dark, Sepia, Compline, Lauds, Vigil) defined in `tui/themes.py` as Textual `Theme` objects. Each supplies the app's full palette through the theme's `variables` dict (the custom `$bg`/`$surface`/`$text-verse`/`$hl-*` tokens used in `main.tcss`), so `main.tcss` holds no color literals. Themes are registered and the saved one applied in `OrthodoxStudyApp.__init__` (before stylesheet parse). `T` cycles themes; the choice persists in `session` (`theme`).

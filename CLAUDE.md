@@ -61,6 +61,8 @@ An offline TUI application for studying the Orthodox Study Bible. Parses a user-
 
 **Database path:** `~/Library/Application Support/osb/osb.db` on macOS (via platformdirs).
 
+**Daily lectionary:** Full daily readings come from the orthocal.info JSON API (`importer/orthocal.py`), in both `gregorian` (New Calendar) and `julian` reckonings. `lectionary.get_readings()` is cache-first: results are stored per date+calendar in the `lectionary_cache` table so they work offline after one fetch. `L` opens a calendar picker then `DailyScreen` (threaded fetch). The legacy `MENAION_DATA`/`PASCHAL_DATA` seed in `lectionary.py` now only powers the header feast indicator. Calendar choice is remembered in `session` (`lectionary_calendar`).
+
 **Ollama:** Optional, `http://localhost:11434`, model `llama3.2:3b`, graceful degradation if unavailable.
 
 **Themes:** Dark + Sepia, CSS-based via `tui/styles/themes.tcss`, toggled dynamically.

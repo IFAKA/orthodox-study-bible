@@ -2,10 +2,10 @@
 
 from datetime import date
 
+from osb import config
 from osb.db import queries
 from osb.tui.screens.main_screen_commands import handle_command
-from osb.importer.lectionary import get_primary_feast
-from osb.tui.screens.daily_screen import DailyScreen
+from osb.tui.screens.daily_screen import CalendarSelectModal, DailyScreen
 from osb.tui.screens.glossary_screen import GlossaryScreen
 from osb.tui.screens.help_screen import HelpScreen
 from osb.tui.screens.my_notes_screen import MyNotesScreen
@@ -52,9 +52,22 @@ class MainScreenActionsMixin:
         self.app.push_screen(MyNotesScreen(self.conn))
 
     def action_lectionary(self) -> None:
-        feast = get_primary_feast(date.today())
-        if feast:
-            self._navigate_to_verse(feast[0])
+        saved = queries.get_session(
+            self.conn, "lectionary_calendar", config.LECTIONARY_CALENDAR
+        )
+
+        def on_calendar(calendar: str | None) -> None:
+            if not calendar:
+                return
+            queries.set_session(self.conn, "lectionary_calendar", calendar)
+
+            def on_result(verse_ref: str | None) -> None:
+                if verse_ref:
+                    self._navigate_to_verse(verse_ref)
+
+            self.app.push_screen(DailyScreen(self.conn, calendar), on_result)
+
+        self.app.push_screen(CalendarSelectModal(saved), on_calendar)
 
     def action_progress(self) -> None:
         def on_result(ref: str | None) -> None:
@@ -168,8 +181,12 @@ class MainScreenActionsMixin:
             queries.set_session(self.conn, "last_session_date", today_str)
             verse_count = queries.get_verse_count(self.conn)
             if verse_count > 0:
+                calendar = queries.get_session(
+                    self.conn, "lectionary_calendar", config.LECTIONARY_CALENDAR
+                )
+
                 def on_result(verse_ref: str | None) -> None:
                     if verse_ref:
                         self._navigate_to_verse(verse_ref)
 
-                self.app.push_screen(DailyScreen(), on_result)
+                self.app.push_screen(DailyScreen(self.conn, calendar), on_result)

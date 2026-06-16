@@ -201,3 +201,21 @@ def set_session(conn: sqlite3.Connection, key: str, value: str) -> None:
         (key, value),
     )
     conn.commit()
+
+
+def get_lectionary_cache(conn: sqlite3.Connection, date_str: str, calendar: str) -> str | None:
+    row = conn.execute(
+        "SELECT payload FROM lectionary_cache WHERE date=? AND calendar=?",
+        (date_str, calendar),
+    ).fetchone()
+    return row["payload"] if row else None
+
+
+def set_lectionary_cache(conn: sqlite3.Connection, date_str: str, calendar: str, payload: str) -> None:
+    conn.execute(
+        "INSERT INTO lectionary_cache(date, calendar, payload) VALUES (?, ?, ?) "
+        "ON CONFLICT(date, calendar) DO UPDATE SET "
+        "payload=excluded.payload, fetched_at=datetime('now')",
+        (date_str, calendar, payload),
+    )
+    conn.commit()

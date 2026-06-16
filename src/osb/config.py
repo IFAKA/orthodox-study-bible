@@ -20,6 +20,10 @@ MAX_CONTEXT_TOKENS = 3000
 
 JURISDICTION = "OCA"
 
+# Default calendar for daily lectionary readings: "gregorian" (New Calendar)
+# or "julian" (Old Calendar). The user's last choice is remembered per-DB.
+LECTIONARY_CALENDAR = "gregorian"
+
 # Pre-built DB download (GitHub Releases)
 # Update DB_RELEASE_SHA256 after running: uv run python scripts/build_release_db.py
 DB_RELEASE_URL = "https://github.com/IFAKA/orthodox-study-bible/releases/download/db-v1/osb.db.gz"

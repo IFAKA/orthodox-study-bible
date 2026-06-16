@@ -553,8 +553,26 @@ MyNotesScreen {
 }
 
 /* ── Daily screen ──────────────────────────────────────────────────── */
-DailyScreen {
+DailyScreen, CalendarSelectModal {
     align: center middle;
+}
+
+#calendar-dialog {
+    width: 50%;
+    height: auto;
+    background: $surface;
+    border: solid $accent;
+    padding: 2 3;
+}
+
+#calendar-buttons {
+    height: auto;
+    align: center middle;
+    margin-top: 1;
+}
+
+#calendar-buttons Button {
+    margin: 0 1;
 }
 
 #daily-dialog {

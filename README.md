@@ -15,6 +15,7 @@ A modern, offline-first Terminal User Interface (TUI) for studying the **Orthodo
 - [Requirements](#requirements)
 - [Setup & Installation](#setup--installation)
 - [Keybindings](#keybindings)
+- [Concepts](#concepts)
 - [AI Chat (Optional)](#ai-chat-optional)
 - [Developer Guide](#developer-guide)
 - [SEO & AI Optimization](#seo--ai-optimization)
@@ -38,7 +39,7 @@ A modern, offline-first Terminal User Interface (TUI) for studying the **Orthodo
 - **Commentary & Cross-References**: Integrated study notes available instantly for every verse.
 - **Full-Text Search (FTS5)**: Blazing fast search across all books and commentary.
 - **Personal Study Tools**: Add annotations, bookmarks, and color-coded highlights.
-- **Daily Lectionary**: Built-in tracking for the Menaion and Paschal cycles (Julian calendar).
+- **Daily Lectionary**: Today's readings (Menaion and Paschal cycles, Julian calendar) shown automatically on first launch each day.
 - **Local AI Chat**: Stream theological inquiries directly through [Ollama](https://ollama.ai) (100% private, no cloud).
 - **Modern UI**: Dark and Sepia themes, responsive layout, and Vim-style navigation.
 - **Markdown Export**: Export your personal notes and study progress to Markdown.
@@ -84,24 +85,89 @@ uv run osb
 
 ## ⌨️ Keybindings
 
+OSB is modal: which keys are active depends on which pane has focus. The app opens with the **Scripture** pane focused. Press `l` to move into the right pane, `h` (or `Esc`) to come back, and `t` to toggle the sidebar.
+
+### Global (available anywhere)
+
+| Key | Action |
+|-----|--------|
+| `t` | toggle the book-tree sidebar |
+| `F` | full-text search |
+| `N` | open **My Notes** (all annotations & bookmarks) |
+| `p` | reading-progress overview |
+| `L` | jump to today's primary feast reading (if any) |
+| `?` | context help |
+| `T` | toggle Dark / Sepia theme |
+| `:` | command mode (e.g. type `Gen 3:5` to jump there) |
+| `q` | quit (or close the current modal) |
+
+### Scripture pane (reading)
+
 | Key | Action |
 |-----|--------|
 | `j` / `k` | next / previous verse |
-| `J` / `K` | next / previous chapter |
-| `h` / `l` | focus left / right pane |
-| `g` `g` | first verse of chapter |
-| `G` | last verse of chapter |
-| `t` | toggle book tree sidebar |
-| `/` | search |
-| `o` | edit annotation for focused verse |
-| `m` | cycle highlight color |
-| `b` | bookmark verse |
-| `a` | toggle Commentary / Chat tab |
-| `L` | today's lectionary readings |
-| `N` | My Notes (all annotations + bookmarks) |
-| `T` | toggle Dark / Sepia theme |
-| `E` | export annotations to Markdown |
-| `q` | quit / close modal |
+| `J` / `K` | previous / next chapter |
+| `g` `g` | first verse of the chapter |
+| `G` / `g` `G` | last verse of the chapter |
+| `g` `?` | open the glossary |
+| `space` | page down |
+| `ctrl+d` / `ctrl+u` | half-page down / up |
+| `/` | find within the reader |
+| `o` | add or edit an annotation on the focused verse |
+| `m` | cycle highlight color on the verse |
+| `b` | bookmark the verse |
+| `x` | show cross-references |
+| `y` | copy the verse text |
+| `C` | mark the chapter read (progress) |
+| `a` | add the verse to a collection |
+| `l` | open / focus the right pane |
+
+### Right pane (Commentary · Chat · Notes · Collections)
+
+Press `l` from the reader to focus this pane.
+
+| Key | Action |
+|-----|--------|
+| `a` | cycle tabs: Commentary → Chat → Notes → Collections |
+| `i` | focus the chat input (type a question) |
+| `j` / `k` | scroll down / up |
+| `r` | browse references from the last chat reply |
+| `y` | copy the last AI response |
+| `C` | clear the chat for this chapter |
+| `Esc` / `h` | return focus to the scripture pane |
+
+In the **Collections** tab: `enter` open · `n` new · `a` add current verse · `x` remove · `r` rename · `d` delete · `s` save · `J` / `K` reorder.
+
+### Sidebar (book tree)
+
+Press `t` to toggle, then navigate:
+
+| Key | Action |
+|-----|--------|
+| `j` / `k` | move down / up |
+| `l` / `enter` | open book / select chapter |
+| `h` | collapse / go to parent |
+| `space` / `o` | expand or collapse a node |
+| `G` | jump to bottom |
+| `/` | search · `q` / `Esc` close sidebar |
+
+### My Notes screen (`N`)
+
+| Key | Action |
+|-----|--------|
+| `e` | export annotations & bookmarks to Markdown |
+
+---
+
+## 📚 Concepts
+
+OSB keeps several kinds of personal study data, each stored separately:
+
+- **Bookmark** (`b`) — a single flagged verse you want to return to.
+- **Annotation** (`o`) — a personal text note attached to one verse.
+- **Highlight** (`m`) — a color marking on a verse; press `m` to cycle through the available colors.
+- **Collection** (`a`) — a **named, ordered list of verses**, like a playlist or themed study set (e.g. "Verses on mercy"). Build one manually by pressing `a` on verses, or let the AI chat assemble one automatically from the scripture references it cites in a reply. Manage collections in the right pane's **Collections** tab. (This is *not* the same as bookmarks — a bookmark is one flagged verse; a collection is a curated, reorderable group.)
+- **Lectionary** — the Orthodox cycle of daily readings (Julian calendar; Menaion and Paschal cycles). Today's readings appear automatically the first time you open the app each day; `L` jumps the reader to today's primary feast reading when there is one.
 
 ---
 
@@ -114,7 +180,7 @@ ollama serve
 ollama pull llama3.2
 ```
 
-Switch to the **Chat** tab in the app with `a`. All conversations remain on your machine.
+In the app, press `l` to focus the right pane, then `a` to cycle to the **Chat** tab (Commentary → Chat). Press `i` to type a question. All conversations remain on your machine.
 
 ---
 

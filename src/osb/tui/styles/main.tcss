@@ -1,20 +1,7 @@
 /* Orthodox Study Bible — main stylesheet */
 
-/* ── Variables (dark theme defaults) ──────────────────────────── */
-$bg:           #1a1a1a;
-$surface:      #242424;
-$surface-alt:  #2e2e2e;
-$border:       #3a3a3a;
-$accent:       #c9a84c;
-$accent-dim:   #8a6f2e;
-$text:         #e8e0d0;
-$text-muted:   #888880;
-$text-verse:   #d4cdc0;
-
-$hl-yellow:    #4a3c00;
-$hl-green:     #1a3a1a;
-$hl-blue:      #0a2040;
-$hl-pink:      #3a1028;
+/* Palette variables ($bg, $surface, $accent, $text-verse, $hl-*, …) are
+   supplied per-theme from src/osb/tui/themes.py and switched at runtime. */
 
 /* ── App root ──────────────────────────────────────────────────── */
 Screen {
@@ -259,7 +246,7 @@ VerseBlock.search-match {
 }
 
 VerseBlock.search-current {
-    background: #3a3000;
+    background: $search-current;
     border-left: thick $accent;
     padding-left: 2;
 }
@@ -349,7 +336,7 @@ VerseBlock.search-dim .verse-num {
     height: auto;
     max-height: 12;
     padding: 1 2;
-    background: #0a1520;
+    background: $surface-alt;
     border-top: solid $border;
     border-bottom: solid $border;
     color: $text-muted;
@@ -369,7 +356,7 @@ VerseBlock.search-dim .verse-num {
 }
 
 .chat-user {
-    background: #2a2010;
+    background: $chat-user-bg;
     border-left: thick $accent;
 }
 
@@ -515,7 +502,7 @@ ImportScreen {
 }
 
 #import-warnings {
-    color: #c0803a;
+    color: $warning;
 }
 
 /* ── My Notes screen ────────────────────────────────────────────────── */

@@ -7,10 +7,12 @@ from pathlib import Path
 
 from textual.app import App, ComposeResult
 
+from osb.db import queries
 from osb.tui.screens.download_screen import DownloadScreen
 from osb.tui.screens.import_screen import ImportScreen
 from osb.tui.screens.main_screen import MainScreen
 from osb.tui.screens.splash_screen import SplashScreen
+from osb.tui.themes import DEFAULT_THEME, OSB_THEMES, THEME_NAMES
 
 
 class OrthodoxStudyApp(App):
@@ -18,7 +20,6 @@ class OrthodoxStudyApp(App):
 
     CSS_PATH = [
         Path(__file__).parent / "styles" / "main.tcss",
-        Path(__file__).parent / "styles" / "themes.tcss",
     ]
     TITLE = "Orthodox Study Bible"
 
@@ -26,6 +27,12 @@ class OrthodoxStudyApp(App):
         super().__init__(**kwargs)
         self.conn = conn
         self.epub_path = epub_path
+        # Register themes and apply the saved one BEFORE the stylesheet is
+        # parsed, so each theme's custom palette variables resolve.
+        for theme in OSB_THEMES:
+            self.register_theme(theme)
+        saved = queries.get_session(conn, "theme", DEFAULT_THEME)
+        self.theme = saved if saved in THEME_NAMES else DEFAULT_THEME
 
     def on_mount(self) -> None:
         self.push_screen(SplashScreen(), self._after_splash)

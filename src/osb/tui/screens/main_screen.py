@@ -36,10 +36,11 @@ class MainScreen(MainScreenActionsMixin, Screen):
         Binding("c", "show_chat", "Chat"),
         Binding("n", "show_notes", "Notes"),
         Binding("l", "show_collections", "Collections"),
+        Binding("p", "toggle_right", "Toggle panel"),
         Binding("left_square_bracket", "right_tab_prev", "Prev panel", show=False),
         Binding("right_square_bracket", "right_tab_next", "Next panel", show=False),
         # Interactions / settings
-        Binding("p", "progress", "Progress"),
+        Binding("P", "progress", "Progress"),
         Binding("T", "toggle_theme", "Theme"),
         # Other (unlisted)
         Binding("N", "notes", "My Notes", show=False),

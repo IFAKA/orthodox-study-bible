@@ -29,13 +29,24 @@ class CalendarSelectModal(ModalScreen[str | None]):
         Binding("j", "pick_julian", "Julian"),
     ]
 
-    def __init__(self, current: str = "gregorian", **kwargs) -> None:
+    def __init__(self, current: str = "gregorian", first_run: bool = False, **kwargs) -> None:
         super().__init__(**kwargs)
         self._current = current if current in _CAL_LABELS else "gregorian"
+        self._first_run = first_run
 
     def compose(self) -> ComposeResult:
+        title = (
+            "Welcome — which calendar does your parish follow?"
+            if self._first_run
+            else "Daily Readings — choose calendar"
+        )
         with Vertical(id="calendar-dialog", classes="modal-dialog"):
-            yield Label("Daily Readings — choose calendar", classes="modal-title")
+            yield Label(title, classes="modal-title")
+            yield Label(
+                "Sets which fixed-feast commemorations are shown. "
+                "You can change this any time with [b]L[/].",
+                id="calendar-subtitle",
+            )
             with Horizontal(id="calendar-buttons"):
                 yield Button("New Calendar  [n]", id="cal-gregorian", variant="primary")
                 yield Button("Julian  [j]", id="cal-julian")

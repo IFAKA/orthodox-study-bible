@@ -174,19 +174,39 @@ class MainScreenActionsMixin:
                 pass
 
     def show_daily_if_needed(self) -> None:
-        """Show the daily lectionary overlay if this is the first launch today."""
+        """First-ever launch: ask which calendar to use. Then show the daily
+        lectionary overlay once per day."""
+        if queries.get_verse_count(self.conn) <= 0:
+            return
+
+        calendar = queries.get_session(self.conn, "lectionary_calendar", "")
+        if not calendar:
+            self._first_run_calendar_setup()
+            return
+
         last_date = queries.get_session(self.conn, "last_session_date", "")
         today_str = date.today().isoformat()
         if last_date != today_str:
             queries.set_session(self.conn, "last_session_date", today_str)
-            verse_count = queries.get_verse_count(self.conn)
-            if verse_count > 0:
-                calendar = queries.get_session(
-                    self.conn, "lectionary_calendar", config.LECTIONARY_CALENDAR
-                )
+            self._push_daily_overlay(calendar)
 
-                def on_result(verse_ref: str | None) -> None:
-                    if verse_ref:
-                        self._navigate_to_verse(verse_ref)
+    def _first_run_calendar_setup(self) -> None:
+        """Prompt for the calendar on first launch, save it, then show today's
+        readings."""
+        def on_calendar(calendar: str | None) -> None:
+            chosen = calendar or config.LECTIONARY_CALENDAR
+            queries.set_session(self.conn, "lectionary_calendar", chosen)
+            # Don't immediately re-show the once-per-day overlay after setup.
+            queries.set_session(self.conn, "last_session_date", date.today().isoformat())
+            self._push_daily_overlay(chosen)
 
-                self.app.push_screen(DailyScreen(self.conn, calendar), on_result)
+        self.app.push_screen(
+            CalendarSelectModal(config.LECTIONARY_CALENDAR, first_run=True), on_calendar
+        )
+
+    def _push_daily_overlay(self, calendar: str) -> None:
+        def on_result(verse_ref: str | None) -> None:
+            if verse_ref:
+                self._navigate_to_verse(verse_ref)
+
+        self.app.push_screen(DailyScreen(self.conn, calendar), on_result)

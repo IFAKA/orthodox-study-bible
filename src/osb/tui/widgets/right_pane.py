@@ -29,7 +29,6 @@ class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixi
     can_focus = True
 
     BINDINGS = [
-        Binding("a", "toggle_tab", "Tab", show=True),
         Binding("escape", "escape_pane", "Back", show=True, priority=True),
         Binding("i", "focus_input", "Type", show=True),
         Binding("j", "scroll_down", "↓", show=False),
@@ -53,9 +52,9 @@ class RightPane(ChordMixin, Widget, RpChatMixin, RpChatHistoryMixin, RpNotesMixi
     ]
 
     TAB_BINDINGS = {
-        "tab-commentary": ["j", "k", "a"],
-        "tab-chat": ["j", "k", "a", "i", "y", "C", "r"],
-        "tab-notes": ["j", "k", "a", "i"],
+        "tab-commentary": ["j", "k"],
+        "tab-chat": ["j", "k", "i", "y", "C", "r"],
+        "tab-notes": ["j", "k", "i"],
         "tab-collections": ["j", "k", "n", "a", "r", "x", "J", "K", "s"],
     }
 

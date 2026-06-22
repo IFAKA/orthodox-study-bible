@@ -25,17 +25,26 @@ class MainScreen(MainScreenActionsMixin, Screen):
     """Primary 3-pane reading screen."""
 
     BINDINGS = [
-        Binding("t", "toggle_sidebar", "Sidebar"),
-        Binding("F", "search", "Search"),
-        Binding("N", "notes", "Notes"),
-        Binding("L", "lectionary", "Lectionary"),
-        Binding("p", "progress", "Progress"),
-        Binding("?", "help", "Help"),
-        Binding("colon", "command_mode", show=False),
+        # App navigation
+        Binding("t", "toggle_sidebar", "Table of Contents"),
+        Binding("f", "search", "Find"),
+        Binding("question_mark", "help", "Help"),
         Binding("q", "quit_app", "Quit"),
-        Binding("T", "toggle_theme", "Theme", show=False),
-        Binding("h", "focus_scripture", "Scripture", show=False),
-        Binding("l", "toggle_right", "Commentary", show=False),
+        # Functions — open right-pane panels / overlays
+        Binding("L", "lectionary", "Lectionary"),
+        Binding("m", "show_commentary", "Commentary"),
+        Binding("c", "show_chat", "Chat"),
+        Binding("n", "show_notes", "Notes"),
+        Binding("l", "show_collections", "Collections"),
+        Binding("p", "toggle_right", "Toggle panel"),
+        Binding("left_square_bracket", "right_tab_prev", "Prev panel", show=False),
+        Binding("right_square_bracket", "right_tab_next", "Next panel", show=False),
+        # Interactions / settings
+        Binding("P", "progress", "Progress"),
+        Binding("T", "toggle_theme", "Theme"),
+        # Other (unlisted)
+        Binding("N", "notes", "My Notes", show=False),
+        Binding("colon", "command_mode", show=False),
     ]
 
     def __init__(self, conn: sqlite3.Connection, **kwargs) -> None:

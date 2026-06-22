@@ -30,23 +30,25 @@ class ScripturePane(ChordMixin, SpNavigationMixin, SpSearchMixin, SpVerseActions
     can_focus = True
 
     BINDINGS = [
-        Binding("/", "start_search", "Find", show=True),
-        Binding("j", "next_verse", "Next verse", show=True),
-        Binding("k", "prev_verse", "Prev verse", show=True),
-        Binding("J", "prev_chapter", "Prev chapter", show=True),
-        Binding("K", "next_chapter", "Next chapter", show=True),
-        Binding("b", "bookmark", "Bookmark", show=True),
-        Binding("m", "cycle_highlight", "Highlight", show=True),
-        Binding("o", "annotate", "Annotate", show=True),
-        Binding("x", "crossrefs", "Cross-refs", show=True),
-        Binding("y", "copy_verse", "Copy", show=True),
-        Binding("C", "toggle_complete", "Complete", show=True),
-        Binding("a", "add_to_collection", "Add to collection", show=False),
-        Binding("G", "last_verse", "Last verse", show=False),
+        # Text navigation
+        Binding("slash", "start_search", "Search", show=True),
+        Binding("j,down", "next_verse", "Next verse", show=True),
+        Binding("k,up", "prev_verse", "Prev verse", show=True),
+        Binding("J,shift+down", "next_chapter", "Next chapter", show=True),
+        Binding("K,shift+up", "prev_chapter", "Prev chapter", show=True),
         Binding("space", "page_down", "Page down", show=False),
-        Binding("ctrl+d", "half_page_down", "Half page", show=False),
+        Binding("ctrl+d", "half_page_down", "Half page down", show=False),
         Binding("ctrl+u", "half_page_up", "Half page up", show=False),
+        Binding("G", "last_verse", "Last verse", show=False),
         Binding("gg", "goto_first_verse", "First verse", show=False),
+        # Interactions
+        Binding("b", "bookmark", "Bookmark", show=True),
+        Binding("h", "cycle_highlight", "Highlight", show=True),
+        Binding("o", "annotate", "Annotate", show=True),
+        Binding("x", "crossrefs", "Cross-reference", show=True),
+        Binding("y", "copy_verse", "Copy", show=True),
+        Binding("C", "toggle_complete", "Mark Complete", show=True),
+        Binding("a", "add_to_collection", "Add to collection", show=True),
     ]
 
     class VerseFocused(Message):

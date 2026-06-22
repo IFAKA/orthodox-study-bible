@@ -64,12 +64,24 @@ class RpNavigationMixin:
         else:
             scroll_active_edge(self, end=True)
 
-    def action_toggle_tab(self) -> None:
+    _TAB_ORDER = ["tab-commentary", "tab-chat", "tab-notes", "tab-collections"]
+
+    def show_tab(self, tab_id: str) -> None:
+        """Switch directly to a named right-pane tab."""
         try:
-            tabs = self.query_one("#right-tabs", TabbedContent)
-            order = ["tab-commentary", "tab-chat", "tab-notes", "tab-collections"]
-            active = tabs.active
-            idx = order.index(active) if active in order else 0
-            tabs.active = order[(idx + 1) % len(order)]
+            self.query_one("#right-tabs", TabbedContent).active = tab_id
         except Exception:
             pass
+
+    def cycle_tab(self, step: int = 1) -> None:
+        """Move to the previous/next right-pane tab (step -1/+1)."""
+        try:
+            tabs = self.query_one("#right-tabs", TabbedContent)
+            order = self._TAB_ORDER
+            idx = order.index(tabs.active) if tabs.active in order else 0
+            tabs.active = order[(idx + step) % len(order)]
+        except Exception:
+            pass
+
+    def action_toggle_tab(self) -> None:
+        self.cycle_tab(1)

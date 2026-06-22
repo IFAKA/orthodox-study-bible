@@ -67,9 +67,8 @@ class MainScreenActionsMixin:
         self.app.push_screen(GlossaryScreen(self.conn))
 
     def action_help(self) -> None:
-        context = self._get_focus_context()
-        title, text = self._build_context_help(context)
-        self.app.push_screen(HelpScreen(title, text))
+        # One comprehensive, grouped keybinding reference.
+        self.app.push_screen(HelpScreen())
 
     def action_toggle_theme(self) -> None:
         screen = self.app.screen
@@ -115,6 +114,42 @@ class MainScreenActionsMixin:
                 pass
             rp.add_class("hidden")
             self.query_one("#scripture-pane", ScripturePane).focus()
+
+    # ── Right-pane panels (Commentary / Chat / Notes / Collections) ───────────
+
+    def _reveal_right_pane(self) -> "RightPane":
+        rp = self.query_one("#right-pane", RightPane)
+        self._right_pane_visible = True
+        rp.remove_class("hidden")
+        self._vim_mode = "RIGHT"
+        try:
+            self.query_one(StatusBar).update_mode("RIGHT")
+        except Exception:
+            pass
+        return rp
+
+    def _open_right_tab(self, tab_id: str) -> None:
+        rp = self._reveal_right_pane()
+        rp.show_tab(tab_id)
+        rp.focus()
+
+    def action_show_commentary(self) -> None:
+        self._open_right_tab("tab-commentary")
+
+    def action_show_chat(self) -> None:
+        self._open_right_tab("tab-chat")
+
+    def action_show_notes(self) -> None:
+        self._open_right_tab("tab-notes")
+
+    def action_show_collections(self) -> None:
+        self._open_right_tab("tab-collections")
+
+    def action_right_tab_next(self) -> None:
+        self._reveal_right_pane().cycle_tab(1)
+
+    def action_right_tab_prev(self) -> None:
+        self._reveal_right_pane().cycle_tab(-1)
 
     def action_command_mode(self) -> None:
         self._vim_mode = "COMMAND"

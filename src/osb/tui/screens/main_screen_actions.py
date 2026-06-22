@@ -2,10 +2,10 @@
 
 from datetime import date
 
+from osb import config
 from osb.db import queries
 from osb.tui.screens.main_screen_commands import handle_command
-from osb.importer.lectionary import get_primary_feast
-from osb.tui.screens.daily_screen import DailyScreen
+from osb.tui.screens.daily_screen import CalendarSelectModal, DailyScreen
 from osb.tui.screens.glossary_screen import GlossaryScreen
 from osb.tui.screens.help_screen import HelpScreen
 from osb.tui.screens.my_notes_screen import MyNotesScreen
@@ -52,9 +52,26 @@ class MainScreenActionsMixin:
         self.app.push_screen(MyNotesScreen(self.conn))
 
     def action_lectionary(self) -> None:
-        feast = get_primary_feast(date.today())
-        if feast:
-            self._navigate_to_verse(feast[0])
+        # Use the remembered calendar; the readings overlay itself lets the
+        # user switch calendars and move between days.
+        calendar = queries.get_session(
+            self.conn, "lectionary_calendar", config.LECTIONARY_CALENDAR
+        )
+        self.app.push_screen(DailyScreen(self.conn, calendar), self._open_reading)
+
+    def _open_reading(self, refs: list[str] | None) -> None:
+        if refs:
+            self.set_active_reading(refs)
+
+    def set_active_reading(self, refs: list[str]) -> None:
+        """Navigate to a lectionary reading and mark its verse range."""
+        if not refs:
+            return
+        try:
+            self.query_one("#scripture-pane", ScripturePane).set_reading_refs(set(refs))
+        except Exception:
+            pass
+        self._navigate_to_verse(refs[0])
 
     def action_progress(self) -> None:
         def on_result(ref: str | None) -> None:
@@ -161,15 +178,35 @@ class MainScreenActionsMixin:
                 pass
 
     def show_daily_if_needed(self) -> None:
-        """Show the daily lectionary overlay if this is the first launch today."""
+        """First-ever launch: ask which calendar to use. Then show the daily
+        lectionary overlay once per day."""
+        if queries.get_verse_count(self.conn) <= 0:
+            return
+
+        calendar = queries.get_session(self.conn, "lectionary_calendar", "")
+        if not calendar:
+            self._first_run_calendar_setup()
+            return
+
         last_date = queries.get_session(self.conn, "last_session_date", "")
         today_str = date.today().isoformat()
         if last_date != today_str:
             queries.set_session(self.conn, "last_session_date", today_str)
-            verse_count = queries.get_verse_count(self.conn)
-            if verse_count > 0:
-                def on_result(verse_ref: str | None) -> None:
-                    if verse_ref:
-                        self._navigate_to_verse(verse_ref)
+            self._push_daily_overlay(calendar)
 
-                self.app.push_screen(DailyScreen(), on_result)
+    def _first_run_calendar_setup(self) -> None:
+        """Prompt for the calendar on first launch, save it, then show today's
+        readings."""
+        def on_calendar(calendar: str | None) -> None:
+            chosen = calendar or config.LECTIONARY_CALENDAR
+            queries.set_session(self.conn, "lectionary_calendar", chosen)
+            # Don't immediately re-show the once-per-day overlay after setup.
+            queries.set_session(self.conn, "last_session_date", date.today().isoformat())
+            self._push_daily_overlay(chosen)
+
+        self.app.push_screen(
+            CalendarSelectModal(config.LECTIONARY_CALENDAR, first_run=True), on_calendar
+        )
+
+    def _push_daily_overlay(self, calendar: str) -> None:
+        self.app.push_screen(DailyScreen(self.conn, calendar), self._open_reading)

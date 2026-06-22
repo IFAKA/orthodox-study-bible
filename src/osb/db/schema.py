@@ -137,6 +137,17 @@ CREATE TABLE IF NOT EXISTS glossary (
     definition TEXT NOT NULL
 );
 
+-- Cached daily lectionary readings fetched from orthocal.info, keyed by
+-- civil date + calendar ("gregorian" / "julian"). Lets the daily readings
+-- work offline after a one-time fetch per date.
+CREATE TABLE IF NOT EXISTS lectionary_cache (
+    date       TEXT NOT NULL,
+    calendar   TEXT NOT NULL,
+    payload    TEXT NOT NULL,
+    fetched_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY(date, calendar)
+);
+
 CREATE TABLE IF NOT EXISTS collections (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     name       TEXT    NOT NULL,

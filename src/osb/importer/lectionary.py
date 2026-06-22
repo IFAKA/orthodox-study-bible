@@ -7,8 +7,13 @@ Computes the daily Orthodox reading from:
 
 from __future__ import annotations
 
+import json
 import math
+import sqlite3
 from datetime import date, timedelta
+
+from osb.db import queries
+from osb.importer import orthocal
 
 
 def julian_pascha(year: int) -> date:
@@ -137,6 +142,51 @@ def get_daily_readings(today: date | None = None) -> list[dict]:
 
     return readings
 
+
+
+def _is_current_format(data: dict) -> bool:
+    """Reject cache entries written before readings carried per-verse `refs`."""
+    readings = data.get("readings") or []
+    return not readings or "refs" in readings[0]
+
+
+def get_readings(
+    conn: sqlite3.Connection,
+    day: date | None = None,
+    calendar: str = "gregorian",
+    allow_fetch: bool = True,
+) -> dict | None:
+    """Return the full daily readings for a date, cache-first.
+
+    Looks up the local cache; on a miss (and if allow_fetch), fetches from
+    orthocal.info and stores the result. Returns the normalized payload
+    (see orthocal.normalize) or None when unavailable offline.
+
+    Network-capable — call from a worker thread, not the UI thread.
+    """
+    if day is None:
+        day = date.today()
+    date_str = day.isoformat()
+
+    cached = queries.get_lectionary_cache(conn, date_str, calendar)
+    if cached:
+        try:
+            data = json.loads(cached)
+            if _is_current_format(data):
+                return data
+        except (ValueError, TypeError):
+            pass
+
+    if allow_fetch:
+        data = orthocal.fetch_daily(day, calendar)
+        if data:
+            try:
+                queries.set_lectionary_cache(conn, date_str, calendar, json.dumps(data))
+            except sqlite3.Error:
+                pass
+            return data
+
+    return None
 
 
 def get_primary_feast(today: date | None = None) -> tuple[str, str | None] | None:

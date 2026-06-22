@@ -210,6 +210,13 @@ VerseBlock .verse-glyph {
     height: auto;
 }
 
+/* Active lectionary reading range (transient visual aid) */
+VerseBlock.lectionary-reading {
+    border-left: thick $accent;
+    text-style: bold;
+    padding-left: 2;
+}
+
 /* Highlight variants */
 VerseBlock.hl-yellow { background: $hl-yellow; }
 VerseBlock.hl-green  { background: $hl-green;  }
@@ -553,8 +560,32 @@ MyNotesScreen {
 }
 
 /* ── Daily screen ──────────────────────────────────────────────────── */
-DailyScreen {
+DailyScreen, CalendarSelectModal {
     align: center middle;
+}
+
+#calendar-dialog {
+    width: 50%;
+    height: auto;
+    background: $surface;
+    border: solid $accent;
+    padding: 2 3;
+}
+
+#calendar-subtitle {
+    color: $text-muted;
+    text-align: center;
+    margin-bottom: 1;
+}
+
+#calendar-buttons {
+    height: auto;
+    align: center middle;
+    margin-top: 1;
+}
+
+#calendar-buttons Button {
+    margin: 0 1;
 }
 
 #daily-dialog {
@@ -573,6 +604,42 @@ DailyScreen {
 
 #daily-readings {
     margin-bottom: 1;
+}
+
+#daily-meta {
+    margin-bottom: 1;
+}
+
+#daily-readings-list {
+    height: auto;
+    max-height: 12;
+    background: $surface;
+    border: none;
+    margin-bottom: 1;
+}
+
+#daily-readings-list > ListItem {
+    padding: 0 1;
+    background: $surface;
+}
+
+/* Selected reading: high-contrast accent bar so it's unmistakable
+   (Textual's highlight class is `-highlight`, single dash). */
+#daily-readings-list > ListItem.-highlight,
+#daily-readings-list:focus > ListItem.-highlight {
+    background: $accent;
+    color: $bg;
+    text-style: bold;
+}
+
+#daily-readings-list > ListItem.-highlight Label {
+    color: $bg;
+    text-style: bold;
+}
+
+#daily-hint {
+    color: $text-muted;
+    text-align: center;
 }
 
 #daily-buttons {
